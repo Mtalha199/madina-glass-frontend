@@ -22,7 +22,14 @@ jobs:
 
       - name: Build React app
         run: npm run build
-        
+
+      - name: Debug Build Process
+        run: |
+          echo "Current Directory:"
+          pwd
+          echo "Contents:"
+          ls -R
+
       - name: List build directory
         run: ls -R ./build
         
