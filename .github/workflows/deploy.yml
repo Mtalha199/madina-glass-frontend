@@ -22,7 +22,10 @@ jobs:
 
       - name: Build React app
         run: npm run build
-
+        
+      - name: List build directory
+        run: ls -R ./build
+        
       - name: Deploy to VPS
         uses: appleboy/scp-action@v0.1.4
         with:
