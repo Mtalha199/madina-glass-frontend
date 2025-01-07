@@ -22,16 +22,6 @@ jobs:
 
       - name: Build React app
         run: npm run build
-
-      - name: Debug Build Process
-        run: |
-          echo "Current Directory:"
-          pwd
-          echo "Contents:"
-          ls -R
-
-      - name: List build directory
-        run: ls -R ./build
         
       - name: Deploy to VPS
         uses: appleboy/scp-action@v0.1.4
@@ -39,5 +29,5 @@ jobs:
           host: ${{ secrets.VPS_HOST }}     
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY_PRIVATE }}
-          source: "./build/*"               
+          source: "./dist/*"               
           target: "/var/www/html/sipmapAdmin"
