@@ -30,4 +30,4 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY_PRIVATE }}
           source: "./build/*"               
-          target: "/var/www/react-app"
+          target: "/var/www/frontendAdmin"
