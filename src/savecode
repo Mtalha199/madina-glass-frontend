@@ -1,0 +1,563 @@
+     {/* <div className="flex items-center my-4">
+             <div className="flex-grow border-t border-gray-300"></div>
+             <span className="mx-4 text-gray-500">OR CONTINUE WITH</span>
+             <div className="flex-grow border-t border-gray-300"></div>
+           </div>
+           <Button variant="outline" className="w-full flex items-center justify-center">
+             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="24px" height="24px" className="mr-2">
+               <path fill="#4285F4" d="M24 9.5c3.13 0 5.74 1.07 7.8 2.85L38.5 8C34.62 4.58 29.62 2.5 24 2.5 14.5 2.5 6.73 7.86 3 15.5l8.25 6.25c1.8-5.2 6.63-9 12.75-9z" />
+               <path fill="#34A853" d="M46.5 24c0-1.4-.14-2.76-.4-4H24v8.75h12.75c-.6 3.35-2.45 6.14-5.2 7.8l8.25 6.25C44.4 38.48 46.5 31.73 46.5 24z" />
+               <path fill="#FBBC05" d="M11.75 28.25c-1.5-4.25-1.5-9.25 0-13.5L3.5 8c-4.5 7.5-4.5 16.5 0 24l8.25-6.25z" />
+               <path fill="#EA4335" d="M24 46.5c5.62 0 10.62-2.08 14.5-5.5L30.25 34c-1.63 1.08-3.64 1.75-6.25 1.75-6.12 0-10.95-3.8-12.75-9L3 32.5c3.73 7.63 11.5 13 21 13z" />
+               <path fill="none" d="M0 0h48v48H0z" />
+             </svg>
+             Login with Google
+           </Button>
+           <Button variant="outline" className="w-full flex items-center justify-center">
+             <svg
+               xmlns="http://www.w3.org/2000/svg"
+               viewBox="0 0 24 24"
+               width="24"
+               height="24"
+               fill="currentColor"
+               className="mr-2"
+             >
+               <path
+                 fillRule="evenodd"
+                 d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.867 8.166 6.839 9.49.5.09.683-.217.683-.483 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.34-3.369-1.34-.454-1.157-1.11-1.465-1.11-1.465-.907-.62.069-.607.069-.607 1.003.07 1.53 1.03 1.53 1.03.892 1.529 2.341 1.088 2.91.832.092-.647.349-1.088.635-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.03-2.683-.104-.253-.446-1.27.097-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.845c.85.004 1.705.115 2.504.337 1.908-1.294 2.746-1.025 2.746-1.025.546 1.377.204 2.394.1 2.647.64.7 1.028 1.592 1.028 2.683 0 3.842-2.338 4.687-4.565 4.936.359.31.678.923.678 1.861 0 1.343-.012 2.427-.012 2.758 0 .268.18.578.688.48C19.137 20.165 22 16.418 22 12c0-5.523-4.477-10-10-10z"
+                 clipRule="evenodd"
+               />
+             </svg>
+             Login with GitHub
+           </Button> */}
+           
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+           <!-- --------------------------------------------------------------------------------------------------------
+             -->
+           <!-- Input Common <COde></COde> -->
+           //   const initialValues = {
+            //     email: "",
+            //     password: "",
+            //   };
+            //   const [form, setForm] = useState(initialValues);
+            //   const handleInputChange = (e) => {
+            //     const { name, value } = e.target;
+            //     setForm({
+            //       ...form,
+            //       [name]: value,
+            //     });
+            //   };
+            {/* <div className="grid gap-2">
+              <InputCommon
+                label={"Email"}
+                type={"email"}
+                id={"email"}
+                name={"email"}
+                value={form?.email}
+                onChange={handleInputChange}
+                placeholder={"m@example.com"}
+              />
+            </div>
+            <div className="grid gap-2">
+              <InputCommon
+                label={"Password"}
+                type={"password"}
+                id={"password"}
+                name={"password"}
+                value={form?.password}
+                onChange={handleInputChange}
+              />
+      
+              <div className="flex items-center">
+                <div className="ml-auto inline-block text-sm underline">
+                  <Link
+                    to="/forgot-password"
+                    className="text-primary ml-auto inline-block text-sm underline font-bold"
+                  >
+                    Forgot your password?
+                  </Link>
+                </div>
+              </div>
+            </div>
+            <Link to={"/dashboard"}>
+              <Button type="submit" className="w-full">
+                {AUTH_NAMING.LOGIN}
+              </Button>
+            </Link> */}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
+
+
+            import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+
+export const InputCommon = (
+    {
+        label,
+        id,
+        type,
+        placeholder,
+        value,
+        onChange,
+        ...props
+    }) => {
+    return (
+        <>
+            <Label htmlFor="email">{label}</Label>
+            <Input
+                id={id}
+                type={type}
+                placeholder={placeholder}
+                value={value}
+                onChange={onChange}
+                {...props}
+            />
+        </>
+    )
+}
+
+
+
+
+
+
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.sidebar-title {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #343a40;
+}
+.close-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.menu-item {
+  padding: 10px 0;
+  font-size: 1.2rem;
+  color: #495057;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// -----------------------------------------------OLD DASHBOARD-----------------------------------------------------------------------------
+//   const navigate = useNavigate();
+//   const [isSidebarVisible, setSidebarVisible] = React.useState(false);
+//   const [activeTab, setActiveTab] = React.useState(1);
+//   const [activeItemKey, setActiveItemKey] = React.useState(null);
+//   const { theme, setTheme } = React.useContext(ThemeContext);
+//   const handleThemeChange = (theme) => {
+//     setTheme(theme);
+//   };
+//   const toggleSidebar = (key) => {
+//     // if (isSidebarVisible && activeTab === key) {
+//     //   setSidebarVisible(false);
+//     // } else {
+//       setSidebarVisible(true);
+//     // }
+//   };
+//   const handleClick = (key) => {
+//     setActiveTab(key);
+//     if (key === 1) {
+//       navigate("/dashboard");
+//       setSidebarVisible(false);
+//     } 
+//     else if (key ===2) 
+//     {
+//       navigate(SCREEN_PATH.NUMBER_REPUTATION_GROUPS);
+//       setSidebarVisible(false)
+//     }
+//     else if (key === 4) 
+//       {
+//         navigate(SCREEN_PATH.ROTATOR);
+//         setSidebarVisible(false)
+//       }
+//     else {
+//       toggleSidebar(key);
+//     }
+//   };
+//   const handleRoute = (route, key) => {
+//     navigate(route);
+//     setActiveItemKey(key);
+//   };
+//   return (
+//     <div className="flex min-h-screen w-full flex-col bg-background/40">
+//       <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col  bg-muted sm:flex border">
+//         <p
+//           href="#"
+//           className="group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full  text-lg font-semibold  md:h-14 md:w-14 md:text-base"
+//         >
+//           <Package2 className="h-4 w-4 transition-all group-hover:scale-110" />
+//           <span className="sr-only">Acme Inc</span>
+//         </p>
+//         <nav className="flex flex-col items-center border-r  px-2 sm:pb-4">
+//           {mainSideBar.map((item, index) => (
+//             <TooltipProvider>
+//               <Tooltip>
+//                 <TooltipTrigger asChild>
+//                   <p
+//                     key={index}
+//                     onClick={() => handleClick(item.key)}
+//                     href="#"
+//                     className={`flex h-14 w-14 items-center justify-center  transition-colors hover:text-foreground md:h-14 md:w-14 cursor-pointer ${
+//                       activeTab === item.key
+//                         ? "text-background bg-primary"
+//                         : "text-muted-foreground"
+//                     }`}
+//                   >
+//                     {item.icon}
+//                     <span className="sr-only">{item.name}</span>
+//                   </p>
+//                 </TooltipTrigger>
+//                 <TooltipContent side="right">{item.tooltip}</TooltipContent>
+//               </Tooltip>
+//             </TooltipProvider>
+//           ))}
+//           {isSidebarVisible && (
+//             <div
+//               className={`bg-muted sidebar ${
+//                 isSidebarVisible ? "visible" : ""
+//               }`}
+//             >
+//               <div className="">
+//                 <div className="">
+//                   {menuSideBar[activeTab]?.map((item, index) => (
+//                     <div
+//                       key={index}
+//                       className={`flex items-center text-base transition-colors hover:text-foreground cursor-pointer border  p-4 ${
+//                         activeItemKey === item.key
+//                           ? "text-primary"
+//                           : "text-muted-foreground"
+//                       }`}
+//                     >
+//                       {item.icon}
+//                       <span
+//                         className="ms-2"
+//                         onClick={() => handleRoute(item?.route, item?.key)}
+//                       >
+//                         {" "}
+//                         {item.name}
+//                       </span>
+//                     </div>
+//                   ))}
+//                 </div>
+//               </div>
+//             </div>
+//           )}
+
+//           <style jsx>{`
+//             .sidebar {
+//               position: fixed;
+//               top: 57;
+//               left: 0;
+//               height: 100%;
+//               width: 220px;
+//               box-shadow: 0px 0 2px rgba(0, 0, 0, 0.1);
+//               transform: translateX(-100%);
+//               transition: transform 0.3s ease-in-out;
+//               display: flex;
+//               flex-direction: column;
+//             }
+//             .sidebar.visible {
+//               transform: translateX(55px);
+//             }
+//             .sidebar.hidden {
+//               transform: translateX(-100%);
+//             }
+        
+//           `}</style>
+//         </nav>
+//         <nav className="mt-auto flex flex-col items-center gap-4 px-2 sm:py-4">
+//           {/* <TooltipProvider>
+
+//                         <Tooltip>
+//                             <TooltipTrigger asChild>
+//                                 <p
+//                                     href="#"
+//                                     className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+//                                 >
+//                                     <Settings className="h-5 w-5" />
+//                                     <span className="sr-only">Settings</span>
+//                                 </p>
+//                             </TooltipTrigger>
+//                             <TooltipContent side="right">Settings</TooltipContent>
+//                         </Tooltip>
+//                     </TooltipProvider> */}
+//           <DropdownMenu>
+//             <DropdownMenuTrigger asChild>
+//               <Button
+//                 variant="outline"
+//                 size="icon"
+//                 className="overflow-hidden rounded-full w-7 h-7"
+//               >
+//                 {/* <Image
+//                   src="/placeholder-user.jpg"
+//                   width={36}
+//                   height={36}
+//                   alt="Avatar"
+//                   className="overflow-hidden rounded-full"
+//                 /> */}
+//                 <Avatar>
+//                   <AvatarImage
+//                     src="https://github.com/shadcn.png"
+//                     alt="@shadcn"
+//                   />
+//                   <AvatarFallback>CN</AvatarFallback>
+//                 </Avatar>
+//               </Button>
+//             </DropdownMenuTrigger>
+//             <DropdownMenuContent align="end">
+//               <DropdownMenuLabel>My Account</DropdownMenuLabel>
+//               <DropdownMenuSeparator />
+//               <DropdownMenuItem>Settings</DropdownMenuItem>
+//               <DropdownMenuItem>Support</DropdownMenuItem>
+//               <DropdownMenuSeparator />
+//               <DropdownMenuItem>
+//                 <Link to={"/"}>Logout </Link>
+//               </DropdownMenuItem>
+//             </DropdownMenuContent>
+//           </DropdownMenu>
+//         </nav>
+//       </aside>
+//       <div className="flex flex-col sm:gap-4 sm:pl-14 h-14 pt-2 bg-muted">
+//         <header className="sticky top-0 z-30 flex  items-center gap-6 border-b text-muted-foreground bg-muted px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
+//           <Sheet>
+//             <SheetTrigger asChild>
+//               <Button size="icon" variant="outline" className="sm:hidden">
+//                 <PanelLeft className="h-5 w-5" />
+//                 <span className="sr-only">Toggle Menu</span>
+//               </Button>
+//             </SheetTrigger>
+//             <SheetContent side="left" className="sm:max-w-xs">
+//               <nav className="grid gap-6 text-lg font-medium">
+//                 <p
+//                   href="#"
+//                   className="group flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base"
+//                 >
+//                   <Package2 className="h-5 w-5 transition-all group-hover:scale-110" />
+//                   <span className="sr-only">Acme Inc</span>
+//                 </p>
+//                 {mainSideBar.map((item) => (
+//                   <p
+//                     href="#"
+//                     className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-primary"
+//                   >
+//                     <Home className="h-5 w-5" />
+//                     {item?.name}
+//                   </p>
+//                 ))}
+
+//                 <p
+//                   href="#"
+//                   className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+//                 >
+//                   {/* <Users2 className="h-5 w-5" /> */}
+//                   Customers
+//                 </p>
+//                 <p
+//                   href="#"
+//                   className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+//                 >
+//                   <LineChart className="h-5 w-5" />
+//                   Settings
+//                 </p>
+//               </nav>
+//             </SheetContent>
+//           </Sheet>
+//           <div className="relative ml-auto flex-1 md:grow-0">
+//             <Search className="w-5 h-5" />
+//             {/* <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+//             <Input
+//               type="search"
+//               placeholder="Search..."
+//               className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[320px]"
+//             /> */}
+//           </div>
+
+//           {/* <div className="mr-3">
+//             <NavigationMenu>
+//               <NavigationMenuList>
+//                 <NavigationMenuItem>
+//                   <NavigationMenuTrigger>
+//                     <p className="flex select-none flex-col justify-end bg-gradient-to-b from-muted/50 to-muted ps-1.5 pe-1.5 no-underline outline-none focus:shadow-md mr-1">
+//                       T
+//                     </p>
+//                     Getting started
+//                   </NavigationMenuTrigger>
+//                   <NavigationMenuContent>
+//                     <div className="relative">
+//                     <ul className="grid gap-3 p-2 bg-background shadow-lg rounded-md w-[250px]">
+//                       <li>
+//                         <div className="text-xs mb-2">
+//                           talha.binitelcom@gmail.com
+//                         </div>
+//                         <div className="flex items-center space-x-2">
+//                           <div className="flex items-center justify-center w-10 h-10 bg-gray-300 rounded-full text-black">
+//                             T
+//                           </div>
+//                           <div>
+//                             <h3 className="text-sm font-medium">Talha's</h3>
+//                             <p className="text-xs text-muted-foreground hover:text-foreground">
+//                               Free Plan · 1 member
+//                             </p>
+//                           </div>
+//                         </div>
+//                       </li>
+
+//                       <li>
+//                                                 <NavigationMenuLink asChild>
+//                                                     <a href="#" className="text-sm text-muted-foreground hover:text-foreground">Log out</a>
+//                                                 </NavigationMenuLink>
+//                                             </li>
+//                                             <li>
+//                                                 <NavigationMenuLink asChild>
+//                                                     <a href="#" className="text-sm text-muted-foreground hover:text-foreground">Get Windows app</a>
+//                                                 </NavigationMenuLink>
+//                                             </li>
+//                     </ul>
+//                     <div className="bg-muted border-t p-4">
+//                       <ul>
+//                         <li>
+//                           <NavigationMenuLink asChild>
+//                             <a
+//                               href="#"
+//                               className="text-sm text-muted-foreground hover:text-foreground"
+//                             >
+//                               Create work account
+//                             </a>
+//                           </NavigationMenuLink>
+//                         </li>
+//                         <li>
+//                           <NavigationMenuLink asChild>
+//                             <a
+//                               href="#"
+//                               className="text-sm text-muted-foreground hover:text-foreground"
+//                             >
+//                               Add another account
+//                             </a>
+//                           </NavigationMenuLink>
+//                         </li>
+//                       </ul>
+//                     </div>
+//                     </div>
+//                   </NavigationMenuContent>
+//                 </NavigationMenuItem>
+//                 <NavigationMenuItem></NavigationMenuItem>
+//               </NavigationMenuList>
+//             </NavigationMenu>
+//           </div> */}
+//           <DropdownMenu>
+//             <DropdownMenuTrigger asChild>
+//               {theme == "dark" ? (
+//                 <Moon className="w-5 h-5" />
+//               ) : (
+//                 <Sun className="w-5 h-5" />
+//               )}
+//               {/* <Sun /> */}
+//             </DropdownMenuTrigger>
+//             <DropdownMenuContent align="end">
+//               <DropdownMenuItem onClick={() => handleThemeChange("light")}>
+//                 Light
+//               </DropdownMenuItem>
+//               <DropdownMenuSeparator />
+//               <DropdownMenuItem onClick={() => handleThemeChange("dark")}>
+//                 Dark
+//               </DropdownMenuItem>
+//             </DropdownMenuContent>
+//           </DropdownMenu>
+
+//           <Bell className="w-5 h-5" />
+//           <Wallet className="w-5 h-5" />
+//           <div>
+//             <div className="text-sm text-muted-foreground">Balance</div>
+//             <div className="font-bold">$123.45</div>
+//           </div>
+//         </header>
+//       </div>
+//       <main
+//         className={`bg-background border flex-1 items-start gap-4 p-4 transition-all duration-300 ${
+//           isSidebarVisible ? "sm:pl-60 md:pl-72 md:pt-5 md:pr-5 md:pb-5" : "sm:pl-16 md:pl-20"
+//         } sm:px-6 sm:py-0 md:gap-8 md:pt-5 md:pr-5 md:pb-5`}
+//       >
+//         <Outlet />
+//       </main>
+//     </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// -----------------------------------------------------------LOADER TYPE---------------------------------------------------------------------
+        {/* <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+          <div className="grid auto-rows-min gap-4 md:grid-cols-3">
+            <div className="aspect-video rounded-xl bg-muted/50" />
+            <div className="aspect-video rounded-xl bg-muted/50" />
+            <div className="aspect-video rounded-xl bg-muted/50" />
+          </div>
+          <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" />
+        </div> */}
