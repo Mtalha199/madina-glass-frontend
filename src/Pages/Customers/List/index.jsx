@@ -1,4 +1,3 @@
-// customers-list.jsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -15,138 +14,11 @@ import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 import { Headers } from "@tanstack/react-table";
 import HeaderCommon from "@/Commons/HeaderCommon";
-
-// Dummy data for customers
-const dummyCustomers = [
-  {
-    id: 1,
-    fullName: "John Doe",
-    accountStatus: "Active",
-    email: "john.doe@example.com",
-    phoneNumber: "+1 (555) 123-4567",
-    address: "123 Elm St, Springfield",
-  },
-  {
-    id: 2,
-    fullName: "Jane Smith",
-    accountStatus: "Suspended",
-    email: "jane.smith@example.com",
-    phoneNumber: "+1 (555) 987-6543",
-    address: "456 Oak Ave, Springfield",
-  },
-  {
-    id: 3,
-    fullName: "Alice Johnson",
-    accountStatus: "Active",
-    email: "alice.johnson@example.com",
-    phoneNumber: "+1 (555) 246-8135",
-    address: "789 Pine Rd, Springfield",
-  },
-  {
-    id: 3,
-    fullName: "Alice Johnson",
-    accountStatus: "Active",
-    email: "alice.johnson@example.com",
-    phoneNumber: "+1 (555) 246-8135",
-    address: "789 Pine Rd, Springfield",
-  },
-  {
-    id: 3,
-    fullName: "Alice Johnson",
-    accountStatus: "Active",
-    email: "alice.johnson@example.com",
-    phoneNumber: "+1 (555) 246-8135",
-    address: "789 Pine Rd, Springfield",
-  },
-  {
-    id: 3,
-    fullName: "Alice Johnson",
-    accountStatus: "Active",
-    email: "alice.johnson@example.com",
-    phoneNumber: "+1 (555) 246-8135",
-    address: "789 Pine Rd, Springfield",
-  },
-  {
-    id: 3,
-    fullName: "Alice Johnson",
-    accountStatus: "Active",
-    email: "alice.johnson@example.com",
-    phoneNumber: "+1 (555) 246-8135",
-    address: "789 Pine Rd, Springfield",
-  },
-  {
-    id: 3,
-    fullName: "Alice Johnson",
-    accountStatus: "Active",
-    email: "alice.johnson@example.com",
-    phoneNumber: "+1 (555) 246-8135",
-    address: "789 Pine Rd, Springfield",
-  },
-  {
-    id: 3,
-    fullName: "Alice Johnson",
-    accountStatus: "Active",
-    email: "alice.johnson@example.com",
-    phoneNumber: "+1 (555) 246-8135",
-    address: "789 Pine Rd, Springfield",
-  },
-  {
-    id: 3,
-    fullName: "Alice Johnson",
-    accountStatus: "Active",
-    email: "alice.johnson@example.com",
-    phoneNumber: "+1 (555) 246-8135",
-    address: "789 Pine Rd, Springfield",
-  },
-  {
-    id: 3,
-    fullName: "Alice Johnson",
-    accountStatus: "Active",
-    email: "alice.johnson@example.com",
-    phoneNumber: "+1 (555) 246-8135",
-    address: "789 Pine Rd, Springfield",
-  },
-  {
-    id: 3,
-    fullName: "Alice Johnson",
-    accountStatus: "Active",
-    email: "alice.johnson@example.com",
-    phoneNumber: "+1 (555) 246-8135",
-    address: "789 Pine Rd, Springfield",
-  },  {
-    id: 3,
-    fullName: "Alice Johnson",
-    accountStatus: "Active",
-    email: "alice.johnson@example.com",
-    phoneNumber: "+1 (555) 246-8135",
-    address: "789 Pine Rd, Springfield",
-  },
-  {
-    id: 3,
-    fullName: "Alice Johnson",
-    accountStatus: "Active",
-    email: "alice.johnson@example.com",
-    phoneNumber: "+1 (555) 246-8135",
-    address: "789 Pine Rd, Springfield",
-  },
-  {
-    id: 3,
-    fullName: "Alice Johnson",
-    accountStatus: "Active",
-    email: "alice.johnson@example.com",
-    phoneNumber: "+1 (555) 246-8135",
-    address: "789 Pine Rd, Springfield",
-  },
-
-    {
-    id: 3,
-    fullName: "Alice Johnson",
-    accountStatus: "Active",
-    email: "alice.johnson@example.com",
-    phoneNumber: "+1 (555) 246-8135",
-    address: "789 Pine Rd, Springfield",
-  },
-];
+import axios from "@/components/Api/Axios";
+import { toast } from "@/hooks/use-toast";
+import { APICALL } from "@/components/Api/ApiCall";
+import { API_END_POINT, API_TYPE } from "@/Constant";
+import SkeletonTable from "@/Commons/SkeletonTable";
 
 const columns = [
   { header: "ID", accessorKey: "id" },
@@ -157,10 +29,7 @@ const columns = [
       const fullName = row.getValue("fullName");
       const id = row.getValue("id");
       return (
-        <Link
-          to={`/customer/${id}`}
-          className="text-primary hover:underline"
-        >
+        <Link to={`/customer/${id}`} className="text-primary hover:underline">
           {fullName}
         </Link>
       );
@@ -168,12 +37,12 @@ const columns = [
   },
   {
     header: "Status",
-    accessorKey: "accountStatus",
+    accessorKey: "is_active",
     cell: ({ row }) => {
-      const status = row.getValue("accountStatus");
+      const status = row.getValue("is_active");
       return (
-        <Badge variant={status === "Active" ? "success" : "destructive"}>
-          {status}
+        <Badge variant={status === true ? "success" : "destructive"}>
+          {status === true ? "Active" : "Suspended"}
         </Badge>
       );
     },
@@ -184,17 +53,25 @@ const columns = [
 ];
 
 export default function CustomersList() {
+  const [loading, setloading] = useState(false);
+  const [count, setCount] = useState(0);
+  const [data,setData]= useState([]);
+
   const [customers, setCustomers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   useEffect(() => {
-    setCustomers(dummyCustomers);
+    getCustomerList();
   }, []);
+  const getCustomerList = async () => {
+    const response = await APICALL(
+      API_TYPE.GET,
+      API_END_POINT.CUSTOMER_LIST,
+      setloading,
+      setData,
+      setCount
+    );
+  };
 
-  const filteredCustomers = customers.filter(
-    (customer) =>
-      customer.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      customer.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   return (
     <div className="p-6">
@@ -202,7 +79,11 @@ export default function CustomersList() {
         <h1 className="text-2xl font-bold">Customers List</h1>
         <Button>Add New Customer</Button>
       </div>
-      <HeaderCommon DATA={filteredCustomers} COLUMNS={columns} />
+      {loading ? (
+        <SkeletonTable ROWS={10} COLUMNS={3} />
+      ) : (
+        <HeaderCommon DATA={data} COLUMNS={columns} />
+      )}
     </div>
   );
 }

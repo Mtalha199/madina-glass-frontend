@@ -3,13 +3,7 @@ import { z } from "zod";
 export const loginFormSchema = z.object({
   email: z
   .string()
-  .email({ message: "Please enter a valid email address." })
-  .refine(
-    (email) => !/(gmail\.com|yahoo\.com|outlook\.com|hotmail\.com)$/.test(email),
-    {
-      message: "Please use your company email address.",
-    }
-  ),
+  .email({ message: "Please enter a valid email address." }),
   password: z
     .string()
     .min(6, { message: "Password must be at least 6 characters." }),

@@ -1,3 +1,20 @@
+/* --------------------------------- AUTHENTICATION --------------------------------- */
+export const AUTHENTICATION_VALUE={
+  AUTH_TOKEN:"authToken"
+}
+
+/* --------------------------------- API_END_POINT --------------------------------- */
+export const API_END_POINT={
+  AUTH_LOGIN:"auth/login",
+  CUSTOMER_LIST:"admin/customers",
+}
+
+export const API_TYPE={
+  GET:"get",
+  POST:"post",
+  PATCH:"patch",
+  DELETE:"delete",
+}
 /* --------------------------------- IMAGES --------------------------------- */
 export const Logo = "./assets/Images/logo.png";
 export const errorLogo = "./assets/Images/errorlogo.png";

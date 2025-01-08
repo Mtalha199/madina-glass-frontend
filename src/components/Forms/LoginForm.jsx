@@ -1,13 +1,50 @@
+import axios from "axios";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { InputCommon } from "@/Commons/FormCommons";
-import { AUTH_NAMING } from "@/Constant";
-import { Link } from "react-router-dom";
+import {
+  API_END_POINT,
+  AUTH_NAMING,
+  AUTHENTICATION_VALUE,
+  SCREEN_PATH,
+} from "@/Constant";
 import { useLoginForm } from "../Hooks/CustomHooks";
+import { toast } from "@/hooks/use-toast";
+import { Loader } from "@/Commons/Loader";
+
 export default function LoginForm() {
+  const navigate = useNavigate();
+
+  const [loading, setLoading] = useState(false);
+
   const form = useLoginForm();
-  function onSubmit(values) {
-    console.log(values);
+
+  async function onSubmit(values) {
+    try {
+      setLoading(true);
+      localStorage.clear();
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}${API_END_POINT.AUTH_LOGIN}`,
+        {
+          email: values.email,
+          password: values.password,
+        }
+      );
+      const TOKEN = response?.data?.access_token;
+      localStorage.setItem(AUTHENTICATION_VALUE.AUTH_TOKEN, TOKEN);
+      navigate("/dashboard");
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: error?.response?.data?.detail || "Something went wrong",
+        description: "There was a problem with your request.",
+      });
+    } finally {
+      setLoading(false);
+    }
   }
   return (
     <>
@@ -42,11 +79,9 @@ export default function LoginForm() {
             </div>
           </div>
           <div>
-            {/* <Link to={"/dashboard"}> */}
-              <Button type="submit" className="w-full">
-                {AUTH_NAMING.LOGIN}
-              </Button>
-            {/* </Link> */}
+            <Button type="submit" className="w-full">
+              {loading ? <Loader size={60} /> : AUTH_NAMING.LOGIN}
+            </Button>
           </div>
         </form>
       </Form>
