@@ -30,7 +30,8 @@ const columns = [
       const id = row.getValue("id");
       return (
         <Link to={`/customer/${id}`} className="text-primary hover:underline">
-          {fullName}
+          {/* {fullName} */}
+          Talha
         </Link>
       );
     },
@@ -60,10 +61,10 @@ export default function CustomersList() {
   const [customers, setCustomers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   useEffect(() => {
-    getCustomerList();
+    getData();
   }, []);
-  const getCustomerList = async () => {
-    const response = await APICALL(
+  const getData = async () => {
+    await APICALL(
       API_TYPE.GET,
       API_END_POINT.CUSTOMER_LIST,
       setloading,
@@ -71,8 +72,6 @@ export default function CustomersList() {
       setCount
     );
   };
-
-
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
@@ -82,7 +81,7 @@ export default function CustomersList() {
       {loading ? (
         <SkeletonTable ROWS={10} COLUMNS={3} />
       ) : (
-        <HeaderCommon DATA={data} COLUMNS={columns} />
+        <HeaderCommon DATA={data} COLUMNS={columns} COUNT={count} />
       )}
     </div>
   );

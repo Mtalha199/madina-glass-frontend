@@ -57,6 +57,9 @@ import CardDetailCommon from "@/Commons/CardDetailCommon";
 import DropdownMenuWithDrawer from "./dropDownmenu";
 import HeaderCommon from "@/Commons/HeaderCommon";
 import { Link } from "react-router-dom";
+import TabsCommon from "@/Commons/TabsCommon";
+import { ProfileCustomer } from "./SpecificCustomerTabs/ProfileCustomer";
+import { CUSTOMER_LIST_TABS } from "@/components/Tabs/TabConfig";
 const sipMapData = [
   { id: "1", name: "SIP Map 1", status: "Active", lastUpdated: "2023-06-01" },
   { id: "2", name: "SIP Map 2", status: "Inactive", lastUpdated: "2023-05-28" },
@@ -81,49 +84,6 @@ const columnsPayment = [
   {
     accessorKey: "actions",
     header: "Actions",
-  },
-];
-const data = [
-  {
-    icon: KeySquare,
-    label: "User ID",
-    value: "user_2c2KIMjPNwmZXFtN08ZQtNO8ZQviUiJgV",
-  },
-  {
-    icon: Lock,
-    label: "Password",
-    value: "None",
-    valueItalic: true,
-  },
-  {
-    icon: User,
-    label: "Username",
-    value: "@charlie_r",
-  },
-  {
-    icon: Phone,
-    label: "Phone number",
-    value: "+1 (555) 123-4567",
-  },
-  {
-    icon: ShieldCheck,
-    label: "2-step auth",
-    value: "SMS code +1 (555) 123-4567",
-  },
-  {
-    icon: Key,
-    label: "Passkey",
-    value: "My mac, set on 15 Jun, 2024",
-  },
-  {
-    icon: Mail,
-    label: "Email address",
-    value: "hello@personalemail.com",
-  },
-  {
-    icon: Calendar,
-    label: "User since",
-    value: "April 29, 2021",
   },
 ];
 const dummyCustomers = [
@@ -257,7 +217,12 @@ const dummyCustomers = [
   },
 ];
 
+// ---------------------------------------CUSTOMER_LIST_TABS--------------------------------
 
+// const CUSTOMER_LIST_TABS =[
+//   {value: "profile" ,label:"Profile" ,component: <ProfileCustomer />}
+  
+//  ]
 export default function SpecificCustomer() {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
@@ -281,35 +246,6 @@ export default function SpecificCustomer() {
   };
   const paymentTable = () => (
     <DataTable data={filteredCustomers} columns={columnsPayment} />
-  );
-  const renderCustomerDetails = () => (
-    <>
-      <CardDetailCommon HEADING_NAME={"Company Detail"} DATA={data} />
-      <div className="grid lg:grid-cols-2 md:grid-cols-1 gap-4 mt-6   ">
-        <CardDetailCommon
-          HEADING_NAME={"Primary Contact Detail"}
-          DATA={data}
-          IS_TWO_COLUMNS={false}
-        />
-        <CardDetailCommon
-          HEADING_NAME={"Billing Detail"}
-          DATA={data}
-          IS_TWO_COLUMNS={false}
-        />
-      </div>
-      <div className="grid lg:grid-cols-2 md:grid-cols-1 gap-4 mt-6   ">
-        <CardDetailCommon
-          HEADING_NAME={"Technical  Detail"}
-          DATA={data}
-          IS_TWO_COLUMNS={false}
-        />
-        <CardDetailCommon
-          HEADING_NAME={"Notification Detail"}
-          DATA={data}
-          IS_TWO_COLUMNS={false}
-        />
-      </div>
-    </>
   );
   const renderSipMapTable = () => (
     <HeaderCommon DATA={dummyCustomers} COLUMNS={columns} />
@@ -436,7 +372,7 @@ export default function SpecificCustomer() {
       {/* setting(Cards),IP AUTH(Table), Routing (check box), Rate Deck(Table) */}
 
       {/* Filters, Limits  */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-4">
+      {/* <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-4">
         <TabsList>
           <TabsTrigger value="details">Profile</TabsTrigger>
           <TabsTrigger value="setting">Setting</TabsTrigger>
@@ -447,7 +383,8 @@ export default function SpecificCustomer() {
           <div className="flex justify-between items-center mb-4"></div>
           {renderTabContent(activeTab)}
         </TabsContent>
-      </Tabs>
+      </Tabs> */}
+      <TabsCommon TABS={CUSTOMER_LIST_TABS} DEFAULT_TAB={CUSTOMER_LIST_TABS[0].value}  />
       <Drawer open={isOpen} onOpenChange={setIsOpen}>
         <DrawerContent className="h-[700px] ">
           <div className="mx-auto w-full max-w-sm">
@@ -476,13 +413,11 @@ export default function SpecificCustomer() {
       </Drawer>
 
 
-      <Drawer open={isDrawerOpen} onOpenChange={closeDrawertrunks}>
+      {/* <Drawer open={isDrawerOpen} onOpenChange={closeDrawertrunks}>
         <DrawerContent className="h-[700px] ">
           <DrawerHeader>
-            {/* <h2 className="text-lg font-semibold">Customer Details</h2> */}
             <DrawerClose />
           </DrawerHeader>
-          {/* Tab Content */}
           <div className="p-4">
           <Tabs value={activeTabtrunks} onValueChange={setActiveTabtrunks}>
             <TabsList>
@@ -519,7 +454,7 @@ export default function SpecificCustomer() {
           </Tabs>
           </div>
         </DrawerContent>
-      </Drawer>
+      </Drawer> */}
     </div>
   );
 }

@@ -1,20 +1,20 @@
 /* --------------------------------- AUTHENTICATION --------------------------------- */
-export const AUTHENTICATION_VALUE={
-  AUTH_TOKEN:"authToken"
-}
+export const AUTHENTICATION_VALUE = {
+  AUTH_TOKEN: "authToken",
+};
 
 /* --------------------------------- API_END_POINT --------------------------------- */
-export const API_END_POINT={
-  AUTH_LOGIN:"auth/login",
-  CUSTOMER_LIST:"admin/customers",
-}
+export const API_END_POINT = {
+  AUTH_LOGIN: "auth/login",
+  CUSTOMER_LIST: "admin/customers",
+};
 
-export const API_TYPE={
-  GET:"get",
-  POST:"post",
-  PATCH:"patch",
-  DELETE:"delete",
-}
+export const API_TYPE = {
+  GET: "get",
+  POST: "post",
+  PATCH: "patch",
+  DELETE: "delete",
+};
 /* --------------------------------- IMAGES --------------------------------- */
 export const Logo = "./assets/Images/logo.png";
 export const errorLogo = "./assets/Images/errorlogo.png";
@@ -33,7 +33,6 @@ export const SCREEN_PATH = {
   CALENDER: "/specific-number/calender",
   CUSTOMER_LIST: "/customer-list",
   CUSTOMER_LIST_UNIQUE: "/customer/:id",
-
 };
 // ----------------------------------------NAVIGATION----------------------------------
 import {
@@ -51,6 +50,7 @@ import {
   Settings2,
   FileSpreadsheet,
 } from "lucide-react";
+
 export const NAVIGATION = {
   user: {
     name: "shadcn",
@@ -298,11 +298,115 @@ export const MODULENAME = {
   DNC_SCRUBBER: "DNC Scrubber",
 };
 
-// ---------------------------------------NUMBER_REPUTATION--------------------------------
-
-export const STEPS = [
-  { id: 1, label: "Group Information" },
-  { id: 2, label: "Attach Services" },
-  { id: 3, label: "Schedule" },
-  { id: 4, label: "Add Contacts" },
+// ---------------------------------------CUSTOMER_INFORMATION-----------------------------
+import {
+  KeySquare,
+  Lock,
+  User,
+  Phone,
+  ShieldCheck,
+  Key,
+  Mail,
+  Calendar,
+} from "lucide-react";
+export const COMPANY_DETAIL = (DATA) => [
+  {
+    icon: KeySquare,
+    label: "Company Name",
+    value: DATA?.account?.[0]?.companyname,
+  },
+  {
+    icon: KeySquare,
+    label: "Company Type",
+    value: DATA?.account?.[0]?.companytype,
+  },
+  {
+    icon: Mail,
+    label: "Email address",
+    value: DATA?.user?.[0]?.email || null,
+  },
+  {
+    icon: Calendar,
+    label: "Address",
+    value: DATA?.account?.[0]?.companyaddress,
+  },
+];
+export const PRIMARY_DETAIL = (DATA) => [
+  {
+    icon: Lock,
+    label: "Contact Email",
+    value: DATA?.account?.[0]?.primary_contact_email || null,
+    valueItalic: true,
+  },
+  {
+    icon: User,
+    label: "Contact Name",
+    value: DATA?.account?.[0]?.primary_contact_name || null,
+  },
+  {
+    icon: Phone,
+    label: "Contact Number",
+    value: DATA?.account?.[0]?.primary_contact_phone || null,
+  },
+  {
+    icon: ShieldCheck,
+    label: "Contact Skype",
+    value: DATA?.account?.[0]?.primary_contact_skype || null,
+  },
+  {
+    icon: Mail,
+    label: "Email address",
+    value: DATA?.user?.[0]?.email || null,
+  },
+];
+export const BILLING_DETAIL = (DATA) => [
+  {
+    icon: Lock,
+    label: "Contact Email",
+    value: DATA?.account?.[0]?.billing_contact_email || null,
+    valueItalic: true,
+  },
+  {
+    icon: User,
+    label: "Contact Name",
+    value: DATA?.account?.[0]?.billing_contact_name || null,
+  },
+  {
+    icon: Phone,
+    label: "Contact Number",
+    value: DATA?.account?.[0]?.billing_contact_phone || null,
+  },
+  {
+    icon: ShieldCheck,
+    label: "Contact Skype",
+    value: DATA?.account?.[0]?.billing_contact_skype || null,
+  },
+  {
+    icon: Mail,
+    label: "Email address",
+    value: DATA?.account?.[0]?.balance_notification_email || null,
+  },
+];
+export const TECH_DETAIL = (DATA) => [
+  {
+    icon: Lock,
+    label: "Contact Email",
+    value: DATA?.account?.[0]?.tech_contact_email || null,
+    valueItalic: true,
+  },
+  {
+    icon: User,
+    label: "Contact Name",
+    value: DATA?.account?.[0]?.tech_contact_name || null,
+  },
+  {
+    icon: Phone,
+    label: "Contact Number",
+    value: DATA?.account?.[0]?.tech_contact_phone || null,
+  },
+  {
+    icon: ShieldCheck,
+    label: "Contact Skype",
+    value: DATA?.account?.[0]?.tech_contact_skype || null,
+  },
 ];

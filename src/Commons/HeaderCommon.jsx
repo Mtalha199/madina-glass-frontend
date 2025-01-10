@@ -5,7 +5,7 @@ import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMe
 import { DataTable } from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
 
-const HeaderCommon = ({ ITEMS,COLUMNS,DATA }) => {
+const HeaderCommon = ({ ITEMS,COLUMNS,DATA,COUNT }) => {
   const [visibleColumns, setVisibleColumns] = useState(
     COLUMNS?.map((col) => col?.accessorKey)
   );
@@ -47,6 +47,7 @@ const HeaderCommon = ({ ITEMS,COLUMNS,DATA }) => {
      <DataTable
      data={DATA}
      columns={COLUMNS?.filter((col) => visibleColumns.includes(col?.accessorKey))}
+     COUNT={COUNT}
    />
    </>
   );

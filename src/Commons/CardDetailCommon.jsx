@@ -27,26 +27,26 @@ const CardDetailCommon = ({
         } gap-6 text-sm my-4 border-t`}
       >
         <div className="space-y-4 mt-4">
-          {leftColumn.map((item, index) => (
+          {leftColumn?.map((item, index) => (
             <div key={index} className="flex items-center gap-3">
               <item.icon className="w-5 h-5 text-gray-500" />
-              <p className="text-gray-500">{item.label}:</p>
-              <p className={`font-medium ${item.valueItalic ? "italic" : ""}`}>
-                {item.value}
+              <p className="text-gray-500">{item?.label}:</p>
+              <p className={`font-medium ${item?.valueItalic ? "italic" : ""}`}>
+                {item?.value}
               </p>
             </div>
           ))}
         </div>
         {IS_TWO_COLUMNS && (
           <div className="space-y-4 mt-4">
-            {rightColumn.map((item, index) => (
+            {rightColumn?.map((item, index) => (
               <div key={index} className="flex items-center gap-3">
                 <item.icon className="w-5 h-5 text-gray-500" />
-                <p className="text-gray-500">{item.label}:</p>
+                <p className="text-gray-500">{item?.label}:</p>
                 <p
-                  className={`font-medium ${item.valueItalic ? "italic" : ""}`}
+                  className={`font-medium ${item?.valueItalic ? "italic" : ""}`}
                 >
-                  {item.value}
+                  {item?.value}
                 </p>
               </div>
             ))}

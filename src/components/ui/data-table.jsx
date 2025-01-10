@@ -17,13 +17,13 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 
-export function DataTable({ data, columns }) {
+export function DataTable({ data, columns ,COUNT}) {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [sortColumn, setSortColumn] = useState(null);
   const [sortDirection, setSortDirection] = useState('asc');
 
-  const totalPages = Math.ceil(data?.length / rowsPerPage);
+  const totalPages = Math.ceil(COUNT / rowsPerPage);
   const startIndex = (currentPage - 1) * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
 

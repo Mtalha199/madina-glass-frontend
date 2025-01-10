@@ -35,7 +35,6 @@ const DropdownMenuWithDrawer = () => {
     { label: "Option 3", onClick: () => openDrawer("Option 3") },
     { label: "Option 4", onClick: () => openDrawer("Option 4") },
   ];
-
   return (
     <>
       <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
