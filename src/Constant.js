@@ -7,6 +7,7 @@ export const AUTHENTICATION_VALUE = {
 export const API_END_POINT = {
   AUTH_LOGIN: "auth/login",
   CUSTOMER_LIST: "admin/customers",
+  SIP_TRUNK:"admin/siptrunk"
 };
 
 export const API_TYPE = {

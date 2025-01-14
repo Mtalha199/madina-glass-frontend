@@ -1,0 +1,13 @@
+
+
+
+.tableWidth{
+  max-width:   calc(100vw - 7rem) !important;
+
+}
+
+.group[data-state="expanded"] ~ main .tableWidth {
+    width: calc(100vw - 21rem);
+    transition: width 0.2s ease-in-out;
+
+  }

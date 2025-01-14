@@ -217,12 +217,6 @@ const dummyCustomers = [
   },
 ];
 
-// ---------------------------------------CUSTOMER_LIST_TABS--------------------------------
-
-// const CUSTOMER_LIST_TABS =[
-//   {value: "profile" ,label:"Profile" ,component: <ProfileCustomer />}
-  
-//  ]
 export default function SpecificCustomer() {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
@@ -338,7 +332,7 @@ export default function SpecificCustomer() {
     },
   ];
   return (
-    <div className="container mx-auto">
+    <div className="p-6">
       <Button
         variant="ghost"
         onClick={() => navigate(SCREEN_PATH.CUSTOMER_LIST)}

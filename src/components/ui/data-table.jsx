@@ -1,5 +1,11 @@
-import React, { useState, useMemo } from 'react';
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, ArrowUpDown } from 'lucide-react';
+import React, { useState, useMemo } from "react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  ArrowUpDown,
+} from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -17,11 +23,11 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 
-export function DataTable({ data, columns ,COUNT}) {
+export function DataTable({ data, columns, COUNT }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [sortColumn, setSortColumn] = useState(null);
-  const [sortDirection, setSortDirection] = useState('asc');
+  const [sortDirection, setSortDirection] = useState("asc");
 
   const totalPages = Math.ceil(COUNT / rowsPerPage);
   const startIndex = (currentPage - 1) * rowsPerPage;
@@ -30,8 +36,10 @@ export function DataTable({ data, columns ,COUNT}) {
   const sortedData = useMemo(() => {
     if (sortColumn) {
       return [...data].sort((a, b) => {
-        if (a[sortColumn] < b[sortColumn]) return sortDirection === 'asc' ? -1 : 1;
-        if (a[sortColumn] > b[sortColumn]) return sortDirection === 'asc' ? 1 : -1;
+        if (a[sortColumn] < b[sortColumn])
+          return sortDirection === "asc" ? -1 : 1;
+        if (a[sortColumn] > b[sortColumn])
+          return sortDirection === "asc" ? 1 : -1;
         return 0;
       });
     }
@@ -46,45 +54,63 @@ export function DataTable({ data, columns ,COUNT}) {
 
   const handleSort = (column) => {
     if (sortColumn === column) {
-      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+      setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
     } else {
       setSortColumn(column);
-      setSortDirection('asc');
+      setSortDirection("asc");
     }
   };
 
   return (
-    <div className="space-y-4">
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              {columns.map((column) => (
-                <TableHead key={column.accessorKey}>
-                  <Button variant="ghost" onClick={() => handleSort(column.accessorKey)}>
-                    {column.header}
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                  </Button>
-                </TableHead>
-              ))}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {currentData.map((row, index) => (
-              <TableRow key={index}>
-                {columns.map((column) => (
-                  <TableCell key={column.accessorKey}>
-                    {column.cell 
-                      ? column.cell({ row: { getValue: (key) => row[key] } })
-                      : row[column.accessorKey]}
-                  </TableCell>
+    <>
+      <div className="space-y-4">
+        <div className="border rounded-md tableWidth">
+          <div>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  {columns.map((column) => (
+                    <TableHead
+                      key={column.accessorKey}
+                      className={column.className}
+                    >
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleSort(column.accessorKey)}
+                        className="h-8 whitespace-nowrap"
+                      >
+                        {column.header}
+                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                      </Button>
+                    </TableHead>
+                  ))}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {currentData.map((row, index) => (
+                  <TableRow key={index}>
+                    {columns.map((column) => (
+                      <TableCell
+                        key={column.accessorKey}
+                        className={column.className}
+                      >
+                        <div className="flex items-center">
+                          {column.cell
+                            ? column.cell({
+                                row: { getValue: (key) => row[key] },
+                              })
+                            : row[column.accessorKey]}
+                        </div>
+                      </TableCell>
+                    ))}
+                  </TableRow>
                 ))}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+              </TableBody>
+            </Table>
+          </div>
+        </div>
       </div>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between space-y-4">
         <div className="flex items-center space-x-2">
           <p className="text-sm font-medium">Rows per page</p>
           <Select
@@ -106,7 +132,8 @@ export function DataTable({ data, columns ,COUNT}) {
             </SelectContent>
           </Select>
         </div>
-        <div className="flex items-center space-x-2">
+
+        <div className="flex items-center  space-x-2">
           <Button
             variant="outline"
             className="hidden h-8 w-8 p-0 lg:flex"
@@ -148,6 +175,6 @@ export function DataTable({ data, columns ,COUNT}) {
           </Button>
         </div>
       </div>
-    </div>
+    </>
   );
 }
