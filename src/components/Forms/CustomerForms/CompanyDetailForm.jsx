@@ -69,7 +69,7 @@ const CompanyDetailForm = ({ form }) => {
           </p>
         </div>
 
-        <div className="col-span-1  gap-4">
+        <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
           <InputCommon
             LABEL={"Company Name"}
             IS_REQUIRED={true}
@@ -79,7 +79,7 @@ const CompanyDetailForm = ({ form }) => {
             CONTROL={form.control}
           />
         </div>
-        <div className="col-span-1 gap-4">
+        <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
           <InputCommon
             LABEL={"Company Type"}
             NAME={"company_type"}
@@ -89,9 +89,9 @@ const CompanyDetailForm = ({ form }) => {
           />
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-6 ">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-6 space-y-4 ">
         <div className="col-span-1"></div>
-        <div className="col-span-1 md:col-span-1 gap-4">
+        <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
           <InputCommon
             LABEL={"FRN"}
             NAME={"frn"}
@@ -100,7 +100,7 @@ const CompanyDetailForm = ({ form }) => {
             CONTROL={form.control}
           />
         </div>
-        <div className="col-span-1 md:col-span-1 gap-4">
+        <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
           <InputCommon
             LABEL={"499-A-ID"}
             NAME={"a_id"}
@@ -112,63 +112,64 @@ const CompanyDetailForm = ({ form }) => {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-5 gap-6 space-y-4">
         <div className="col-span-1"></div>
-        <div className="col-span-1 md:col-span-2 gap-4">
-        <InputCommon
-          LABEL={"Address 1"}
-          NAME={"company_street"}
-          TYPE={"text"}
-          PLACEHOLDER={"e.g., 123 Main St"}
-          CONTROL={form.control}
-        />
+        <div className="col-span-1 md:col-span-4 lg:col-span-2 gap-4">
+          <InputCommon
+            LABEL={"Address 1"}
+            NAME={"company_street"}
+            TYPE={"text"}
+            PLACEHOLDER={"e.g., 123 Main St"}
+            CONTROL={form.control}
+          />
         </div>
-        <div className="col-span-1 md:col-span-2 gap-4">
-        <InputCommon
-          LABEL={"Address 2"}
-          NAME={"company_street"}
-          TYPE={"text"}
-          PLACEHOLDER={"e.g., 123 Main St"}
-          CONTROL={form.control}
-        />
+        <div className="col-span-1 md:col-span-1 lg:hidden"></div>
+        <div className="col-span-1 md:col-span-4 lg:col-span-2 gap-4">
+          <InputCommon
+            LABEL={"Address 2"}
+            NAME={"company_street"}
+            TYPE={"text"}
+            PLACEHOLDER={"e.g., 123 Main St"}
+            CONTROL={form.control}
+          />
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-5 gap-6 space-y-4">
         <div className="col-span-1"></div>
-        <div className="col-span-1 md:col-span-1 gap-4">
-        <InputCommon
-          LABEL={"City"}
-          NAME={"company_city"}
-          TYPE={"text"}
-          PLACEHOLDER={"e.g., San Francisco"}
-          CONTROL={form.control}
-        />
+        <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
+          <InputCommon
+            LABEL={"City"}
+            NAME={"company_city"}
+            TYPE={"text"}
+            PLACEHOLDER={"e.g., San Francisco"}
+            CONTROL={form.control}
+          />
         </div>
-        <div className="col-span-1 md:col-span-1 gap-4">
-        <InputCommon
-          LABEL={"State"}
-          NAME={"company_state"}
-          TYPE={"text"}
-          PLACEHOLDER={"e.g., California"}
-          CONTROL={form.control}
-        />
-        
+        <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
+          <InputCommon
+            LABEL={"State"}
+            NAME={"company_state"}
+            TYPE={"text"}
+            PLACEHOLDER={"e.g., California"}
+            CONTROL={form.control}
+          />
         </div>
-        <div className="col-span-1 md:col-span-1 gap-4">
-        <InputCommon
-          LABEL={"Zipcode"}
-          NAME={"company_zip_code"}
-          TYPE={"text"}
-          PLACEHOLDER={"e.g., 94103"}
-          CONTROL={form.control}
-        />
+        <div className="col-span-1 md:col-span-1 lg:hidden"></div>
+        <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
+          <InputCommon
+            LABEL={"Zipcode"}
+            NAME={"company_zip_code"}
+            TYPE={"text"}
+            PLACEHOLDER={"e.g., 94103"}
+            CONTROL={form.control}
+          />
         </div>
-        <div className="col-span-1 md:col-span-1 gap-4">
-        <InputCommon
-          LABEL={"Country"}
-          NAME={"company_country"}
-          TYPE={"text"}
-          PLACEHOLDER={"e.g., United States"}
-          CONTROL={form.control}
-        />
+        <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
+          <InputCommon
+            LABEL={"Country"}
+            NAME={"company_country"}
+            TYPE={"text"}
+            PLACEHOLDER={"e.g., United States"}
+            CONTROL={form.control}
+          />
         </div>
       </div>
     </>
