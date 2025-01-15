@@ -29,7 +29,7 @@ export default function LoginForm() {
       const response = await axios.post(
         `${import.meta.env.VITE_BASE_URL}${API_END_POINT.AUTH_LOGIN}`,
         {
-          email: values.email,
+          username: values.user_name,
           password: values.password,
         }
       );
@@ -51,10 +51,10 @@ export default function LoginForm() {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <InputCommon
-            LABEL={"Email"}
+            LABEL={"User Name"}
             IS_REQUIRED={true}
-            NAME={"email"}
-            TYPE={"email"}
+            NAME={"user_name"}
+            TYPE={"text"}
             PLACEHOLDER={"m@example.com"}
             CONTROL={form.control}
           />
