@@ -1,6 +1,7 @@
 import BillingDetailForm from "@/components/Forms/CustomerForms/BillingDetailForm";
 import CompanyDetailForm from "@/components/Forms/CustomerForms/CompanyDetailForm";
 import NotificationDetailForm from "@/components/Forms/CustomerForms/NotificationDetailForm";
+import PortalCredientials from "@/components/Forms/CustomerForms/PortalCredientials";
 import PrimaryContactDetailForm from "@/components/Forms/CustomerForms/PrimaryContactDetailForm";
 import TechnicalDetailForm from "@/components/Forms/CustomerForms/TechnicalDetailForm";
 import { useContactDetail } from "@/components/Hooks/CustomHooks";
@@ -96,10 +97,11 @@ export const AddCustomer = ({ IS_TWO_COLUMNS = false }) => {
           onSubmit={form.handleSubmit(onSubmit)}
         >
           <CompanyDetailForm form={form} />
-          {/* <PrimaryContactDetailForm form={form} />
+          <PortalCredientials form={form} />
+          <PrimaryContactDetailForm form={form} />
           <BillingDetailForm form={form} />
           <TechnicalDetailForm form={form} />
-          <NotificationDetailForm form={form} /> */}
+          <NotificationDetailForm form={form} />
 
           <div className="col-span-2 flex justify-end mt-4">
             <Button type="submit" className="">
