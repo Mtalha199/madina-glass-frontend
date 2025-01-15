@@ -17,7 +17,7 @@ import HeaderCommon from "@/Commons/HeaderCommon";
 import axios from "@/components/Api/Axios";
 import { toast } from "@/hooks/use-toast";
 import { APICALL } from "@/components/Api/ApiCall";
-import { API_END_POINT, API_TYPE } from "@/Constant";
+import { API_END_POINT, API_TYPE, SCREEN_PATH } from "@/Constant";
 import SkeletonTable from "@/Commons/SkeletonTable";
 
 const columns = [
@@ -76,7 +76,10 @@ export default function CustomersList() {
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Customers List</h1>
-        <Button>Add New Customer</Button>
+        
+        <Link to={SCREEN_PATH.ADD_NEW_CUSTOMER} className="text-primary hover:underline">
+          <Button>Add New Customer</Button>
+        </Link>
       </div>
       {loading ? (
         <SkeletonTable ROWS={10} COLUMNS={3} />

@@ -59,3 +59,39 @@ export const SignUpFormSchema = z
     name:z.string().min(2,{message:"Name must be at least 2 characters"}),
 
   })
+
+  export const ContactFormSchema = z.object({
+    company_name: z.string().min(2, { message: "Company name is required" }),
+    company_type: z.string().optional(),
+    company_street: z.string().optional(),
+    company_city: z.string().optional(),
+    company_state: z.string().optional(),
+    company_country: z.string().optional(),
+    company_zip_code: z.string().optional(),
+    
+    primary_contact_email: z.string().email({ message: "Please enter a valid email address." }),
+    primary_contact_name: z.string().optional(),
+    primary_contact_phone: z.string().optional(),
+    primary_contact_skype: z.string().optional(),
+    primary_contact_street: z.string().optional(),
+    primary_contact_city: z.string().optional(),
+    primary_contact_state: z.string().optional(),
+    primary_contact_country: z.string().optional(),
+    primary_contact_zip_code: z.string().optional(),
+  
+    billing_contact_email: z.string().email({ message: "Please enter a valid email address." }).optional(),
+    billing_contact_name: z.string().optional(),
+    billing_contact_phone: z.string().optional(),
+    billing_contact_skype: z.string().optional(),
+    billing_contact_street: z.string().optional(),
+    billing_contact_city: z.string().optional(),
+    billing_contact_state: z.string().optional(),
+    billing_contact_country: z.string().optional(),
+    billing_contact_zip_code: z.string().optional(),
+  
+    notification_contact_email: z.string().email({ message: "Please enter a valid email address." }).optional(),
+    notification_contact_name: z.string().optional(),
+    notification_contact_phone: z.string().optional(),
+    notification_contact_skype: z.string().optional(),
+  });
+  

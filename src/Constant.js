@@ -34,6 +34,7 @@ export const SCREEN_PATH = {
   CALENDER: "/specific-number/calender",
   CUSTOMER_LIST: "/customer-list",
   CUSTOMER_LIST_UNIQUE: "/customer/:id",
+  ADD_NEW_CUSTOMER:"/customer/register",
 };
 // ----------------------------------------NAVIGATION----------------------------------
 import {

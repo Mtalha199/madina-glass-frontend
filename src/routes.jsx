@@ -9,6 +9,7 @@ import CustomersList from "./Pages/Customers/List";
 import SpecificCustomer from "./Pages/Customers/List/specificCustomer";
 import Dashboard from "./Pages/DashBoard";
 import AuthGuard from "./Auth/AuthGaurd";
+import { AddCustomer } from "./Pages/Customers/List/AddCustomer";
 
 const routes = [
   {
@@ -32,6 +33,8 @@ const routes = [
       { path: SCREEN_PATH.DASHBOARD, element: <Dashboard /> },
       { path: SCREEN_PATH.CUSTOMER_LIST, element: <CustomersList /> },
       { path: SCREEN_PATH.CUSTOMER_LIST_UNIQUE, element: <SpecificCustomer /> },
+      { path: SCREEN_PATH.ADD_NEW_CUSTOMER, element: <AddCustomer /> },
+
     ],
   },
 ];
