@@ -21,17 +21,15 @@ import { API_END_POINT, API_TYPE, SCREEN_PATH } from "@/Constant";
 import SkeletonTable from "@/Commons/SkeletonTable";
 
 const columns = [
-  { header: "ID", accessorKey: "id" },
   {
     header: "Name",
     accessorKey: "fullName",
     cell: ({ row }) => {
-      const fullName = row.getValue("fullName");
+      const fullName = row.getValue("company_name");
       const id = row.getValue("id");
       return (
         <Link to={`/customer/${id}`} className="text-primary hover:underline">
-          {/* {fullName} */}
-          Talha
+          {fullName}
         </Link>
       );
     },
@@ -48,9 +46,11 @@ const columns = [
       );
     },
   },
-  { header: "Email", accessorKey: "email" },
-  { header: "Phone", accessorKey: "phoneNumber" },
-  { header: "Address", accessorKey: "address" },
+  { header: "User Name", accessorKey: "username" },
+  { header: "Sip Trunks", accessorKey: "sip_trunks" },
+
+  { header: "Balance", accessorKey: "balance" },
+
 ];
 
 export default function CustomersList() {
@@ -68,6 +68,7 @@ export default function CustomersList() {
       API_TYPE.GET,
       API_END_POINT.CUSTOMER_LIST,
       setloading,
+      null,
       setData,
       setCount
     );

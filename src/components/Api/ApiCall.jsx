@@ -6,20 +6,36 @@ export const APICALL = async (
   METHOD,
   API_URL,
   setloading,
+  DATA = null,
   setData,
   setCount,
-  DATA = null,
   toastMessage = null
 ) => {
   try {
     switch (METHOD) {
-      case "post":
-        const response = await axios.post(API_URL, DATA);
-        if (toastMessage) {
-          // toast.success(`${toastMessage} added succesfully`);
+      case API_TYPE.POST:
+        try {
+          const setloadingExist = typeof setloading === "function";
+          if (setloadingExist) {
+            setloading(true);
+          }
+          const response = await axios.post(API_URL, DATA);
+          if (toastMessage) {
+            toast({
+              description: toastMessage,
+            });
+          }
+          return response;
+        } catch (error) {
+          toast({
+            variant: "destructive",
+            title: error?.response?.data?.detail || "Something went wrong",
+          });
+        } finally {
+          setloading(false);
         }
-        return response.data.data;
         break;
+
       case "patch":
         try {
           const response = await axios.patch(API_URL, DATA);
@@ -32,11 +48,11 @@ export const APICALL = async (
         break;
 
       case API_TYPE.GET:
-        const setloadingExist = typeof setloading === "function";
-        if (setloadingExist) {
-          setloading(true);
-        }
         try {
+          const setloadingExist = typeof setloading === "function";
+          if (setloadingExist) {
+            setloading(true);
+          }
           const response = await axios.get(API_URL, { params: DATA });
           setData(response?.data?.data);
           setCount(response?.data?.count);

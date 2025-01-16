@@ -110,6 +110,7 @@ export default function SipTrunksCusotmer() {
       API_TYPE.GET,
       `${API_END_POINT.SIP_TRUNK}/${id}`,
       setloading,
+      null,
       setData,
       setCount
     );

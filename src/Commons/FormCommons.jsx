@@ -15,20 +15,37 @@ export const InputCommon = ({
   PLACEHOLDER,
   CONTROL,
   CLASSNAME,
+  ICON,
 }) => {
   return (
     <>
       <FormField
         control={CONTROL}
         name={NAME}
-        render={({ field ,fieldState }) => (
+        render={({ field, fieldState }) => (
           <FormItem>
             <FormLabel>
               {LABEL}
               {IS_REQUIRED && <span className="text-red-500">*</span>}
             </FormLabel>
             <FormControl>
-              <Input placeholder={PLACEHOLDER} type={TYPE} {...field} className={fieldState.error ? "border-red-500" : CLASSNAME}  />
+              <div className="relative">
+                {ICON && (
+                  <span className="absolute inset-y-0 left-3 flex items-center text-gray-400">
+                    <span className="w-4 h-4 flex justify-center items-center">
+                      {ICON}
+                    </span>
+                  </span>
+                )}
+                <Input
+                  placeholder={PLACEHOLDER}
+                  type={TYPE}
+                  {...field}
+                  className={`${ICON ? "pl-10" : ""} ${
+                    fieldState.error ? "border-red-500" : CLASSNAME
+                  }`}
+                />
+              </div>
             </FormControl>
             <FormMessage />
           </FormItem>

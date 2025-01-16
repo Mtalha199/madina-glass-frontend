@@ -1,6 +1,15 @@
 import CardDetailCommon from "@/Commons/CardDetailCommon";
 import SkeletonCardLayout from "@/Commons/SkelotonCard";
 import { APICALL } from "@/components/Api/ApiCall";
+import BillingDetailForm from "@/components/Forms/CustomerForms/BillingDetailForm";
+import CompanyDetailForm from "@/components/Forms/CustomerForms/CompanyDetailForm";
+import NotificationDetailForm from "@/components/Forms/CustomerForms/NotificationDetailForm";
+import PortalCredientials from "@/components/Forms/CustomerForms/PortalCredientials";
+import PrimaryContactDetailForm from "@/components/Forms/CustomerForms/PrimaryContactDetailForm";
+import TechnicalDetailForm from "@/components/Forms/CustomerForms/TechnicalDetailForm";
+import { useContactDetail } from "@/components/Hooks/CustomHooks";
+import { Button } from "@/components/ui/button";
+import { Form } from "@/components/ui/form";
 import { API_END_POINT, API_TYPE, BILLING_DETAIL, COMPANY_DETAIL, PRIMARY_DETAIL, TECH_DETAIL } from "@/Constant";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -9,9 +18,61 @@ export const ProfileCustomer = () => {
   const [loading, setloading] = useState(false);
   const [count, setCount] = useState(0);
   const [data, setData] = useState([]);
+  const form = useContactDetail();
 
   const [customers, setCustomers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+    async function onSubmit(data) {
+      const payload = {
+        user: {
+          username: data.user_name,
+          password: data.password,
+        },
+        customer: {
+          company_name: data.company_name,
+          company_type: data.company_type,
+          company_frn: data.company_frn,
+          company_id: data.company_id,
+          company_address: `${data.company_street_1}, ${data.company_street_2}, ${data.company_city}, ${data.company_state}, ${data.company_zip_code}, ${data.company_country}`,
+  
+          primary_contact_name: data.primary_contact_name,
+          primary_contact_email: data.primary_contact_email,
+          primary_contact_phone: data.primary_contact_phone,
+          primary_contact_skype: data.primary_contact_skype,
+          primary_contact_mobile: data.primary_contact_mobile,
+  
+          billing_contact_name: data.billing_contact_name,
+          billing_contact_email: data.billing_contact_email,
+          billing_contact_phone: data.billing_contact_phone,
+          billing_contact_skype: data.billing_contact_skype,
+          billing_contact_mobile: data.billing_contact_mobile,
+          billing_contact_address: `${data.billing_contact_street_1}, ${data.billing_contact_street_2}, ${data.billing_contact_city}, ${data.billing_contact_state}, ${data.billing_contact_zip_code}, ${data.billing_contact_country}`,
+  
+          tech_contact_name: data.techinical_contact_name,
+          tech_contact_email: data.techinical_contact_email,
+          tech_contact_phone: data.techinical_contact_phone,
+          tech_contact_skype: data.techinical_contact_skype,
+          tech_contact_mobile: data.techinical_contact_mobile,
+  
+          trouble_ticket_email: data.notification_trouble_ticket_email,
+          rates_notification_email: data.notification_rate_email,
+          balance_notification_email: data.notification_balance_email,
+          general_notice_email: data.notification_notice_email,
+        },
+      };
+      // const response = await APICALL(
+      //   API_TYPE.POST,
+      //   API_END_POINT.ADD_CUSTOMER,
+      //   setLoading,
+      //   payload,
+      //   null,
+      //   null,
+      //   "Customer Added Successfully"
+      // );
+      // if (response !== undefined) {
+      //   navigate(SCREEN_PATH.CUSTOMER_LIST);
+      // }
+    }
   useEffect(() => {
     getData();
   }, []);
@@ -20,6 +81,7 @@ export const ProfileCustomer = () => {
       API_TYPE.GET,
       `${API_END_POINT.CUSTOMER_LIST}/${id}`,
       setloading,
+      null,
       setData,
       setCount,
     );
@@ -33,10 +95,32 @@ export const ProfileCustomer = () => {
       {loading ? (
         <SkeletonCardLayout ROWS={10} COLUMNS={3} />
       ) : (
-        <CardDetailCommon HEADING_NAME={"Company Detail"} DATA={Company_detail} />
+        <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          {loading ? (
+            <FormSkeleton />
+          ) : (
+            <>
+              <CompanyDetailForm form={form} />
+              <PortalCredientials form={form} />
+              <PrimaryContactDetailForm form={form} />
+              <BillingDetailForm form={form} />
+              <TechnicalDetailForm form={form} />
+              <NotificationDetailForm form={form} />
+            </>
+          )}
+
+          <div className="col-span-2 flex justify-end mt-4">
+            <Button type="submit" className="">
+              Save
+            </Button>
+          </div>
+        </form>
+      </Form>
+        // <CardDetailCommon HEADING_NAME={"Company Detail"} DATA={Company_detail} />
       )}
 
-      <div className="grid lg:grid-cols-2 md:grid-cols-1 gap-4 mt-6   ">
+      {/* <div className="grid lg:grid-cols-2 md:grid-cols-1 gap-4 mt-6   ">
         <CardDetailCommon
           HEADING_NAME={"Primary Contact Detail"}
           DATA={Primary_detail}
@@ -59,7 +143,7 @@ export const ProfileCustomer = () => {
           DATA={Primary_detail}
           IS_TWO_COLUMNS={false}
         />
-      </div>
+      </div> */}
     </>
   );
 };
