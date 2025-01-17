@@ -20,6 +20,7 @@ export const ProfileCustomer = () => {
   const [data, setData] = useState([]);
   const form = useContactDetail();
 
+  const [mode,setMode]=useState("view");
   const [customers, setCustomers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
     async function onSubmit(data) {
@@ -90,6 +91,7 @@ export const ProfileCustomer = () => {
   const Primary_detail=PRIMARY_DETAIL(data)
   const Billing_detail=BILLING_DETAIL(data)
   const Tech_detail=TECH_DETAIL(data)
+console.log(data,"data")
   return (
     <>
       {loading ? (
@@ -101,7 +103,7 @@ export const ProfileCustomer = () => {
             <FormSkeleton />
           ) : (
             <>
-              <CompanyDetailForm form={form} />
+              <CompanyDetailForm form={form} MODE={mode} SETMODE={setMode} DATA={data} />
               <PortalCredientials form={form} />
               <PrimaryContactDetailForm form={form} />
               <BillingDetailForm form={form} />

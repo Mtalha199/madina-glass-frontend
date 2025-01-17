@@ -88,7 +88,7 @@ export const AddCustomer = () => {
             <FormSkeleton />
           ) : (
             <>
-              <CompanyDetailForm form={form} />
+              <CompanyDetailForm form={form} MODE={"Add"} />
               <PortalCredientials form={form} />
               <PrimaryContactDetailForm form={form} />
               <BillingDetailForm form={form} />

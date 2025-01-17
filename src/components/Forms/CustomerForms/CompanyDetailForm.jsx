@@ -7,11 +7,51 @@ import {
   Globe,
   Mail,
   Badge,
+  Edit,
 } from "lucide-react";
 import { InputCommon } from "@/Commons/FormCommons";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { useFormContext } from "react-hook-form";
+import { CustomerViewCommon } from "@/Commons/CustomerViewCommon";
 
-const CompanyDetailForm = ({ form }) => {
+const CompanyDetailForm = ({ form, MODE, SETMODE, DATA }) => {
+  const [edit, setEdit] = useState(false);
+  const handleEditClick = () => {
+    setEdit(!edit);
+  };
+  const { setValue, formState } = useFormContext();
+  useEffect(() => {
+    if (edit && DATA?.account?.company_name) {
+      setValue("company_name", DATA.account.company_name);
+      setValue("company_type", DATA.account.company_type);
+    }
+  }, [edit, DATA, setValue]);
+
+  const renderField = ({ label, name, type, placeholder, icon, value }) => {
+    return (
+      <>
+        {MODE === "view" && !edit ? (
+          <CustomerViewCommon
+            TITLE={label}
+            ICON={icon}
+            VALUE={value || "N/A"}
+          />
+        ) : (
+          <InputCommon
+            LABEL={label}
+            IS_REQUIRED={true}
+            NAME={name}
+            TYPE={type}
+            PLACEHOLDER={placeholder}
+            CONTROL={form.control}
+            ICON={icon}
+          />
+        )}
+      </>
+    );
+  };
+
   return (
     <>
       <div className="border-b">
@@ -22,27 +62,26 @@ const CompanyDetailForm = ({ form }) => {
               Specify the company detail you want to add.
             </p>
           </div>
+          <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
+            {renderField({
+              label: "Company Name",
+              name: "company_name",
+              type:"text",
+              placeholder: "e.g., Tech Solutions Inc.",
+              icon: <Building />,
+              value: DATA?.account?.company_name,
+            })}
+          </div>
 
           <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
-            <InputCommon
-              LABEL={"Company Name"}
-              IS_REQUIRED={true}
-              NAME={"company_name"}
-              TYPE={"text"}
-              PLACEHOLDER={"e.g., Tech Solutions Inc."}
-              CONTROL={form.control}
-              ICON={<Building />}
-            />
-          </div>
-          <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
-            <InputCommon
-              LABEL={"Company Type"}
-              NAME={"company_type"}
-              TYPE={"text"}
-              PLACEHOLDER={"e.g., LLC."}
-              CONTROL={form.control}
-              ICON={<Factory />}
-            />
+            {renderField({
+              label: "Company Type",
+              name: "company_type",
+              type:"text",
+              placeholder: "e.g., LLC.",
+              icon: <Factory />,
+              value: DATA?.account?.company_type,
+            })}
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-5 gap-6 space-y-4 ">
@@ -134,6 +173,28 @@ const CompanyDetailForm = ({ form }) => {
               CONTROL={form.control}
               ICON={<Globe />}
             />
+          </div>
+        </div>
+        <div className="col-span-2 flex justify-end mt-4 mb-4">
+          <div className="space-x-2">
+            {MODE === "view" && (
+              <>
+                {edit ? (
+                  <Button variant="secondary" onClick={handleEditClick}>
+                    Cancel
+                  </Button>
+                ) : null}
+              </>
+            )}
+            {MODE === "view" && (
+              <>
+                {edit ? (
+                  <Button>Save</Button>
+                ) : (
+                  <Button onClick={handleEditClick}>Edit</Button>
+                )}
+              </>
+            )}
           </div>
         </div>
       </div>
