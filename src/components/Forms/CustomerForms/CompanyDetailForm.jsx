@@ -15,20 +15,20 @@ import { Button } from "@/components/ui/button";
 import { useFormContext } from "react-hook-form";
 import { CustomerViewCommon } from "@/Commons/CustomerViewCommon";
 
-const CompanyDetailForm = ({ form, MODE, SETMODE, DATA }) => {
+const CompanyDetailForm = ({ form, MODE,DATA }) => {
   const [edit, setEdit] = useState(false);
-  const handleEditClick = () => {
-    setEdit(!edit);
-  };
-  const { setValue, formState } = useFormContext();
+  const { setValue } = useFormContext();
+
   useEffect(() => {
-    if (edit && DATA?.account?.company_name) {
-      setValue("company_name", DATA.account.company_name);
-      setValue("company_type", DATA.account.company_type);
+    if (edit && DATA?.account) {
+      setValue("company_name", DATA.account.company_name || "");
+      setValue("company_type", DATA.account.company_type || "");
+      setValue("company_frn", DATA.account.company_frn || "");
+      setValue("company_id", DATA.account.company_id || "");
     }
   }, [edit, DATA, setValue]);
 
-  const renderField = ({ label, name, type, placeholder, icon, value }) => {
+  const renderField = ({ label, name, type, placeholder, icon, value ,isRequired =false }) => {
     return (
       <>
         {MODE === "view" && !edit ? (
@@ -40,18 +40,34 @@ const CompanyDetailForm = ({ form, MODE, SETMODE, DATA }) => {
         ) : (
           <InputCommon
             LABEL={label}
-            IS_REQUIRED={true}
+            IS_REQUIRED={isRequired}
             NAME={name}
             TYPE={type}
             PLACEHOLDER={placeholder}
             CONTROL={form.control}
             ICON={icon}
+            VALUE={value}
           />
         )}
       </>
     );
   };
-
+  // useEffect(() => {
+  //   if (DATA?.account?.company_address) {
+  //     const addressParts = DATA.account.company_address.split(","); // Split by commas
+  //     if (addressParts.length >= 6) {
+  //       // Assigning values to form fields based on the address components
+  //       setValue("company_street_1", addressParts[0]?.trim());
+  //       setValue("company_street_2", addressParts[1]?.trim());
+  //       setValue("company_city", addressParts[2]?.trim());
+  //       setValue("company_state", addressParts[3]?.trim());
+  //       setValue("company_zip_code", addressParts[4]?.trim());
+  //       setValue("company_country", addressParts[5]?.trim());
+  //     } else {
+  //       console.warn("Address format seems incorrect, expected 6 parts.");
+  //     }
+  //   }
+  // }, [DATA, setValue]);
   return (
     <>
       <div className="border-b">
@@ -66,10 +82,11 @@ const CompanyDetailForm = ({ form, MODE, SETMODE, DATA }) => {
             {renderField({
               label: "Company Name",
               name: "company_name",
-              type:"text",
+              type: "text",
               placeholder: "e.g., Tech Solutions Inc.",
               icon: <Building />,
               value: DATA?.account?.company_name,
+              isRequired:true,
             })}
           </div>
 
@@ -77,7 +94,7 @@ const CompanyDetailForm = ({ form, MODE, SETMODE, DATA }) => {
             {renderField({
               label: "Company Type",
               name: "company_type",
-              type:"text",
+              type: "text",
               placeholder: "e.g., LLC.",
               icon: <Factory />,
               value: DATA?.account?.company_type,
@@ -87,92 +104,92 @@ const CompanyDetailForm = ({ form, MODE, SETMODE, DATA }) => {
         <div className="grid grid-cols-1 md:grid-cols-5 gap-6 space-y-4 ">
           <div className="hidden lg:block lg:col-span-1"></div>
           <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
-            <InputCommon
-              LABEL={"FRN"}
-              NAME={"company_frn"}
-              TYPE={"text"}
-              PLACEHOLDER={"e.g., 123456789 (FRN)"}
-              CONTROL={form.control}
-              ICON={<Badge />}
-            />
+            {renderField({
+              label: "FRN",
+              name: "company_frn",
+              type: "text",
+              placeholder: "e.g., 123456789 (FRN)",
+              icon: <Badge />,
+              value: DATA?.account?.company_frn,
+            })}
           </div>
           <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
-            <InputCommon
-              LABEL={"499-A-ID"}
-              NAME={"company_id"}
-              TYPE={"text"}
-              PLACEHOLDER={"e.g., ABC-12345"}
-              CONTROL={form.control}
-              ICON={<Mail />}
-            />
+            {renderField({
+              label: "499-A-ID",
+              name: "company_id",
+              type: "text",
+              placeholder: "e.g., ABC-12345",
+              icon: <Mail />,
+              value: DATA?.account?.company_id,
+            })}
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-5 gap-6 space-y-4">
           <div className="hidden lg:block lg:col-span-1"></div>
           <div className="col-span-1 md:col-span-4 lg:col-span-2 xl:col-span-1 gap-4">
-            <InputCommon
-              LABEL={"Address 1"}
-              NAME={"company_street_1"}
-              TYPE={"text"}
-              PLACEHOLDER={"e.g., 123 Main St, Apt 101"}
-              CONTROL={form.control}
-              ICON={<Home />}
-            />
+            {renderField({
+              label: "Address 1",
+              name: "company_street_1",
+              type: "text",
+              placeholder: "e.g., 123 Main St, Apt 101",
+              icon: <Home />,
+              value: DATA?.account?.company_street_1,
+            })}
           </div>
           <div className="col-span-1 md:col-span-1 lg:hidden"></div>
           <div className="col-span-1 md:col-span-4 lg:col-span-2 xl:col-span-1 gap-4">
-            <InputCommon
-              LABEL={"Address 2"}
-              NAME={"company_street_2"}
-              TYPE={"text"}
-              PLACEHOLDER={"e.g., Landmark or Suite Number"}
-              CONTROL={form.control}
-              ICON={<Landmark />}
-            />
+            {renderField({
+              label: "Address 2",
+              name: "company_street_2",
+              type: "text",
+              placeholder: "e.g., Landmark or Suite Number",
+              icon: <Landmark />,
+              value: DATA?.account?.company_street_2,
+            })}
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-5 gap-6 space-y-4 mb-4">
           <div className="hidden lg:block lg:col-span-1"></div>
           <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
-            <InputCommon
-              LABEL={"City"}
-              NAME={"company_city"}
-              TYPE={"text"}
-              PLACEHOLDER={"e.g., San Francisco"}
-              CONTROL={form.control}
-              ICON={<MapPin />}
-            />
+            {renderField({
+              label: "City",
+              name: "company_city",
+              type: "text",
+              placeholder: "e.g., San Francisco",
+              icon: <MapPin />,
+              value: DATA?.account?.company_city,
+            })}
           </div>
           <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
-            <InputCommon
-              LABEL={"State"}
-              NAME={"company_state"}
-              TYPE={"text"}
-              PLACEHOLDER={"e.g., California"}
-              CONTROL={form.control}
-              ICON={<MapPin />}
-            />
+            {renderField({
+              label: "State",
+              name: "company_state",
+              type: "text",
+              placeholder: "e.g., California",
+              icon: <MapPin />,
+              value: DATA?.account?.company_state,
+            })}
           </div>
           <div className="col-span-1 md:col-span-1 lg:hidden"></div>
           <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
-            <InputCommon
-              LABEL={"Zipcode"}
-              NAME={"company_zip_code"}
-              TYPE={"text"}
-              PLACEHOLDER={"e.g., 94103"}
-              CONTROL={form.control}
-              ICON={<MapPin />}
-            />
+            {renderField({
+              label: "Zipcode",
+              name: "company_zip_code",
+              type: "text",
+              placeholder: "e.g., 94103",
+              icon: <MapPin />,
+              value: DATA?.account?.company_zip_code,
+            })}
           </div>
           <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
-            <InputCommon
-              LABEL={"Country"}
-              NAME={"company_country"}
-              TYPE={"text"}
-              PLACEHOLDER={"e.g., United States"}
-              CONTROL={form.control}
-              ICON={<Globe />}
-            />
+            {renderField({
+              label: "Country",
+              name: "company_country",
+              type: "text",
+              placeholder: "e.g., United States",
+              icon: <Globe />,
+              value: DATA?.account?.company_country,
+            })}
           </div>
         </div>
         <div className="col-span-2 flex justify-end mt-4 mb-4">
@@ -180,18 +197,20 @@ const CompanyDetailForm = ({ form, MODE, SETMODE, DATA }) => {
             {MODE === "view" && (
               <>
                 {edit ? (
-                  <Button variant="secondary" onClick={handleEditClick}>
-                    Cancel
-                  </Button>
-                ) : null}
-              </>
-            )}
-            {MODE === "view" && (
-              <>
-                {edit ? (
-                  <Button>Save</Button>
+                  <>
+                    <Button
+                      variant="secondary"
+                      type="button"
+                      onClick={() => setEdit(!edit)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button type="submit">Save</Button>
+                  </>
                 ) : (
-                  <Button onClick={handleEditClick}>Edit</Button>
+                  <Button type="button" onClick={() => setEdit(true)}>
+                    Edit
+                  </Button>
                 )}
               </>
             )}
