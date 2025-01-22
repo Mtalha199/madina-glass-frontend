@@ -135,3 +135,66 @@ export const ContactFormSchema = z.object({
     .email({ message: "Please enter a valid email address." })
     .optional(),
 });
+
+
+export const ContactFormSchemaEdit = z.object({
+  company_name: z.string().min(2, { message: "Company name is required" }),
+  company_type: z.string().optional(),
+  company_frn: z.string().optional(),
+  company_id: z.string().optional(),
+  company_street_1: z.string().optional(),
+  company_street_2: z.string().optional(),
+  company_city: z.string().optional(),
+  company_state: z.string().optional(),
+  company_zip_code: z.string().optional(),
+  company_country: z.string().optional(),
+
+  primary_contact_name: z.string().optional(),
+  primary_contact_email: z
+    .string()
+    .email({ message: "Please enter a valid email address." }),
+  primary_contact_skype: z.string().optional(),
+  primary_contact_phone: z.string().optional(),
+  primary_contact_mobile: z.string().optional(),
+
+  billing_contact_name: z.string().optional(),
+  billing_contact_email: z
+    .string()
+    .email({ message: "Please enter a valid email address." })
+    .optional(),
+  billing_contact_skype: z.string().optional(),
+  billing_contact_phone: z.string().optional(),
+  billing_contact_mobile: z.string().optional(),
+  billing_contact_street_1: z.string().optional(),
+  billing_contact_street_2: z.string().optional(),
+  billing_contact_city: z.string().optional(),
+  billing_contact_state: z.string().optional(),
+  billing_contact_zip_code: z.string().optional(),
+  billing_contact_country: z.string().optional(),
+
+  techinical_contact_name: z.string().optional(),
+  techinical_contact_email: z
+    .string()
+    .email({ message: "Please enter a valid email address." })
+    .optional(),
+  techinical_contact_skype: z.string().optional(),
+  techinical_contact_phone: z.string().optional(),
+  techinical_contact_mobile: z.string().optional(),
+
+  notification_notice_email: z
+    .string()
+    .email({ message: "Please enter a valid email address." })
+    .optional(),
+  notification_rate_email: z
+    .string()
+    .email({ message: "Please enter a valid email address." })
+    .optional(),
+  notification_balance_email: z
+    .string()
+    .email({ message: "Please enter a valid email address." })
+    .optional(),
+  notification_trouble_ticket_email: z
+    .string()
+    .email({ message: "Please enter a valid email address." })
+    .optional(),
+});

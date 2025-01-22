@@ -10,6 +10,8 @@ import SpecificCustomer from "./Pages/Customers/List/specificCustomer";
 import Dashboard from "./Pages/DashBoard";
 import AuthGuard from "./Auth/AuthGaurd";
 import { AddCustomer } from "./Pages/Customers/List/AddCustomer";
+import SipTrunkList from "./Pages/Customers/SIPTrunks";
+import { AddSipTrunk } from "./Pages/Customers/SIPTrunks/AddSipTrunk";
 
 const routes = [
   {
@@ -34,6 +36,11 @@ const routes = [
       { path: SCREEN_PATH.CUSTOMER_LIST, element: <CustomersList /> },
       { path: SCREEN_PATH.CUSTOMER_LIST_UNIQUE, element: <SpecificCustomer /> },
       { path: SCREEN_PATH.ADD_NEW_CUSTOMER, element: <AddCustomer /> },
+
+      { path: SCREEN_PATH.SIP_TRUNK_LIST, element: <SipTrunkList /> },
+      { path: SCREEN_PATH.ADD_NEW_SIP_TRUNK, element: <AddSipTrunk /> },
+
+
 
     ],
   },

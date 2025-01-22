@@ -7,8 +7,8 @@ export const AUTHENTICATION_VALUE = {
 export const API_END_POINT = {
   AUTH_LOGIN: "auth/login",
   CUSTOMER_LIST: "admin/customers",
-  SIP_TRUNK:"admin/siptrunk",
   ADD_CUSTOMER: "admin/register",
+  SIP_TRUNK_LIST: "admin/siptrunk",
 };
 
 export const API_TYPE = {
@@ -26,16 +26,15 @@ export const SCREEN_PATH = {
   REGISTER: "/register",
   FORGOT_PASSWORD: "/forgot-password",
   RESET_PASSWORD: "/reset-password",
+
   DASHBOARD: "/dashboard",
-  NUMBER_REPUTATION_NEW_GROUPS: "/number-reputation/new-group",
-  NUMBER_REPUTATION_SPECIFIC_GROUP: "/number-reputation/:groupId",
-  ROTATOR: "/rotatar",
-  ROTATOR_NEW_URL: "/rotator/new-url",
-  DNC_SCRUBBER: "/dnc-scrubber",
-  CALENDER: "/specific-number/calender",
+
   CUSTOMER_LIST: "/customer-list",
   CUSTOMER_LIST_UNIQUE: "/customer/:id",
   ADD_NEW_CUSTOMER:"/customer/register",
+
+  SIP_TRUNK_LIST:"/siptrunk",
+  ADD_NEW_SIP_TRUNK:"/siptrunk/register",
 };
 // ----------------------------------------NAVIGATION----------------------------------
 import {
@@ -95,7 +94,7 @@ export const NAVIGATION = {
         },
         {
           title: "SIP trunks",
-          url: "/customer-sip-trunks",
+          url: SCREEN_PATH.SIP_TRUNK_LIST,
         },
         {
           title: "Payments",
@@ -413,3 +412,9 @@ export const TECH_DETAIL = (DATA) => [
     value: DATA?.account?.[0]?.tech_contact_skype || null,
   },
 ];
+
+export const DATA_VIEW_MODE ={
+  VIEW:"view",
+  EDIT:"edit",
+  ADD:"add",
+}

@@ -8,31 +8,17 @@ import {
   Mail,
   Badge,
   Edit,
+  Server,
+  Network,
 } from "lucide-react";
 import { InputCommon } from "@/Commons/FormCommons";
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useFormContext } from "react-hook-form";
 import { CustomerViewCommon } from "@/Commons/CustomerViewCommon";
-
-const CompanyDetailForm = ({ form, MODE, DATA }) => {
+import { InputFieldAndView } from "../CustomerForms/InputFieldAndView";
+export const BasicDetailForm = ({ form, MODE, DATA }) => {
   const [edit, setEdit] = useState(false);
-  const { setValue } = useFormContext();
-
-  useEffect(() => {
-    if (edit && DATA?.account) {
-      setValue("company_name", DATA.account.company_name || "");
-      setValue("company_type", DATA.account.company_type || "");
-      setValue("company_frn", DATA.account.company_frn || "");
-      setValue("company_id", DATA.account.company_id || "");
-      setValue("company_street_1", DATA.account.company_address1 || "");
-      setValue("company_street_2", DATA.account.company_address2 || "");
-      setValue("company_city", DATA.account.company_city || "");
-      setValue("company_state", DATA.account.company_state || "");
-      setValue("company_zip_code", DATA.account.company_zipcode || "");
-      setValue("company_country", DATA.account.company_country || "");
-    }
-  }, [edit, DATA, setValue]);
 
   const renderField = ({
     label,
@@ -71,35 +57,42 @@ const CompanyDetailForm = ({ form, MODE, DATA }) => {
       <div className="border-b">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-6 ">
           <div className="col-span-1 md:col-span-5 lg:col-span-1 gap-4">
-            <h2 className="text-lg font-semibold mb-2">Company Detail</h2>
+            <h2 className="text-lg font-semibold mb-2">Sip Trunk Detail</h2>
             <p className="text-sm text-muted-foreground mb-4">
-              Specify the company detail you want to add.
+              Specify the sip trunk detail you want to add.
             </p>
           </div>
           <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
-            {renderField({
-              label: "Company Name",
-              name: "company_name",
-              type: "text",
-              placeholder: "e.g., Tech Solutions Inc.",
-              icon: <Building />,
-              value: DATA?.account?.company_name,
-              isRequired: true,
+            {InputFieldAndView({
+              LABEL: "SIP Trunk Name",
+              NAME: "trunk_name",
+              TYPE: "text",
+              PLACEHOLDER: "e.g., Global Voice Solutions",
+              ICON:<Network />,
+              VALUE: DATA?.account?.company_name,
+              IS_REQUIRED: true,
+              MODE: MODE,
+              EDIT: edit,
+              FORM: form,
             })}
           </div>
 
           <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
-            {renderField({
-              label: "Company Type",
-              name: "company_type",
-              type: "text",
-              placeholder: "e.g., LLC.",
-              icon: <Factory />,
-              value: DATA?.account?.company_type,
+            {InputFieldAndView({
+              LABEL: "SIP Trunk ID",
+              NAME: "sip_trunk_id",
+              TYPE: "text",
+              PLACEHOLDER: "e.g., TRK12345",
+              ICON: <Server />,
+              VALUE: DATA?.account?.company_type,
+              IS_REQUIRED: true,
+              MODE: MODE,
+              EDIT: edit,
+              FORM: form,
             })}
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 space-y-4 ">
+        {/* <div className="grid grid-cols-1 md:grid-cols-5 gap-6 space-y-4 ">
           <div className="hidden lg:block lg:col-span-1"></div>
           <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
             {renderField({
@@ -145,12 +138,12 @@ const CompanyDetailForm = ({ form, MODE, DATA }) => {
               value: DATA?.account?.company_address2,
             })}
           </div>
-        </div>
+        </div> */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-6 space-y-4 mb-4">
           <div className="hidden lg:block lg:col-span-1"></div>
           <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
             {renderField({
-              label: "City",
+              label: "CPS Limit",
               name: "company_city",
               type: "text",
               placeholder: "e.g., San Francisco",
@@ -160,8 +153,8 @@ const CompanyDetailForm = ({ form, MODE, DATA }) => {
           </div>
           <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
             {renderField({
-              label: "State",
-              name: "company_state",
+              label: "Session Limit",
+              name: "session_limit",
               type: "text",
               placeholder: "e.g., California",
               icon: <MapPin />,
@@ -171,18 +164,18 @@ const CompanyDetailForm = ({ form, MODE, DATA }) => {
           <div className="col-span-1 md:col-span-1 lg:hidden"></div>
           <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
             {renderField({
-              label: "Zipcode",
-              name: "company_zip_code",
+              label: "DNIS Call Limit",
+              name: "dnis_call_limit",
               type: "text",
               placeholder: "e.g., 94103",
               icon: <MapPin />,
-              value: DATA?.account?.company_zip_code,
+              value: DATA?.account?.company_zip_code || 0,
             })}
           </div>
           <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
             {renderField({
-              label: "Country",
-              name: "company_country",
+              label: "ANI Call Limit",
+              name: "ani_call_limit",
               type: "text",
               placeholder: "e.g., United States",
               icon: <Globe />,
@@ -204,7 +197,7 @@ const CompanyDetailForm = ({ form, MODE, DATA }) => {
                       Cancel
                     </Button>
                     <Button type="submit">Save</Button>
-                  </> 
+                  </>
                 ) : (
                   <Button type="button" onClick={() => setEdit(true)}>
                     Edit
@@ -218,5 +211,3 @@ const CompanyDetailForm = ({ form, MODE, DATA }) => {
     </>
   );
 };
-
-export default CompanyDetailForm;

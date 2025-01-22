@@ -5,7 +5,7 @@ import CompanyDetailForm from "@/components/Forms/CustomerForms/CompanyDetailFor
 import NotificationDetailForm from "@/components/Forms/CustomerForms/NotificationDetailForm";
 import PrimaryContactDetailForm from "@/components/Forms/CustomerForms/PrimaryContactDetailForm";
 import TechnicalDetailForm from "@/components/Forms/CustomerForms/TechnicalDetailForm";
-import { useContactDetail } from "@/components/Hooks/CustomHooks";
+import {useContactDetailEdit } from "@/components/Hooks/CustomHooks";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import {
@@ -19,11 +19,12 @@ export const ProfileCustomer = () => {
   const [loading, setloading] = useState(false);
   const [count, setCount] = useState(0);
   const [data, setData] = useState([]);
-  const form = useContactDetail();
+  const form = useContactDetailEdit();
   const [mode, setMode] = useState("view");
   const [customers, setCustomers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   async function onSubmit(data) {
+    debugger
     const payload = {
       user: {
         username: data.user_name,
@@ -34,7 +35,12 @@ export const ProfileCustomer = () => {
         company_type: data.company_type,
         company_frn: data.company_frn,
         company_id: data.company_id,
-        company_address: `${data.company_street_1}, ${data.company_street_2}, ${data.company_city}, ${data.company_state}, ${data.company_zip_code}, ${data.company_country}`,
+        company_address1:data.company_street_1,
+        company_address2: data.company_street_2,
+        company_city: data.company_city,
+        company_state:data.company_state,
+        company_zipcode: data.company_zip_code,
+        company_country:data.company_country,
 
         primary_contact_name: data.primary_contact_name,
         primary_contact_email: data.primary_contact_email,
@@ -47,7 +53,12 @@ export const ProfileCustomer = () => {
         billing_contact_phone: data.billing_contact_phone,
         billing_contact_skype: data.billing_contact_skype,
         billing_contact_mobile: data.billing_contact_mobile,
-        billing_contact_address: `${data.billing_contact_street_1}, ${data.billing_contact_street_2}, ${data.billing_contact_city}, ${data.billing_contact_state}, ${data.billing_contact_zip_code}, ${data.billing_contact_country}`,
+        billing_address1:data.billing_contact_street_1,
+        billing_address2: data.billing_contact_street_2,
+        billing_city: data.billing_contact_city,
+        billing_state:data.billing_contact_state,
+        billing_zipcode: data.billing_contact_zip_code,
+        billing_country:data.billing_contact_country,
 
         tech_contact_name: data.techinical_contact_name,
         tech_contact_email: data.techinical_contact_email,
@@ -98,6 +109,7 @@ export const ProfileCustomer = () => {
               <FormSkeleton />
             ) : (
               <>
+              <p>sdfsd</p>
                 <CompanyDetailForm form={form} MODE={mode} DATA={data} />
                 <PrimaryContactDetailForm form={form} MODE={mode} DATA={data} />
                 <BillingDetailForm form={form} MODE={mode} DATA={data} />
@@ -105,7 +117,7 @@ export const ProfileCustomer = () => {
                 <NotificationDetailForm form={form} MODE={mode} DATA={data} />
               </>
             )}
-
+            
             <div className="col-span-2 flex justify-end mt-4">
               <Button type="submit" className="">
                 Save
