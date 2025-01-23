@@ -11,7 +11,6 @@ export const APICALL = async (
   setCount,
   toastMessage = null
 ) => {
-  try {
     switch (METHOD) {
       case API_TYPE.POST:
         try {
@@ -57,6 +56,7 @@ export const APICALL = async (
           setData(response?.data?.data);
           setCount(response?.data?.count);
         } catch (error) {
+          debugger
           toast({
             variant: "destructive",
             title: error?.response?.data?.detail || "Something went wrong",
@@ -69,8 +69,5 @@ export const APICALL = async (
         try {
         } catch (error) {}
     }
-  } catch (error) {
-    const e = error?.response?.data?.title;
-    toast.error(e || error);
-  }
+
 };

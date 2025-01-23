@@ -1,39 +1,115 @@
 import { CustomerViewCommon } from "@/Commons/CustomerViewCommon";
-import { InputCommon } from "@/Commons/FormCommons";
+import { CheckboxCommon, ComboboxCommon, InputCommon, RadioGroupCommon } from "@/Commons/FormCommons";
 import { DATA_VIEW_MODE } from "@/Constant";
 
 export const InputFieldAndView = ({
-    LABEL,
-    NAME,
-    TYPE,
-    PLACEHOLDER,
-    ICON,
-    VALUE,
-    IS_REQUIRED = false,
-    MODE,
-    EDIT,
-    FORM,
-  }) => {
-    return (
-      <>
-        {MODE === DATA_VIEW_MODE.VIEW && !EDIT ? (
-          <CustomerViewCommon
-            TITLE={LABEL}
-            ICON={ICON}
-            VALUE={VALUE || "N/A"}
-          />
-        ) : (
-          <InputCommon
-            LABEL={LABEL}
-            IS_REQUIRED={IS_REQUIRED}
-            NAME={NAME}
-            TYPE={TYPE}
-            PLACEHOLDER={PLACEHOLDER}
-            CONTROL={FORM.control}
-            ICON={ICON}
-            VALUE={VALUE}
-          />
-        )}
-      </>
-    );
-  };
+  LABEL,
+  NAME,
+  TYPE,
+  PLACEHOLDER,
+  ICON,
+  VALUE,
+  IS_REQUIRED = false,
+  MODE,
+  EDIT,
+  FORM,
+}) => {
+  return (
+    <>
+      {MODE === DATA_VIEW_MODE.VIEW && !EDIT ? (
+        <CustomerViewCommon TITLE={LABEL} ICON={ICON} VALUE={VALUE || "N/A"} />
+      ) : (
+        <InputCommon
+          LABEL={LABEL}
+          IS_REQUIRED={IS_REQUIRED}
+          NAME={NAME}
+          TYPE={TYPE}
+          PLACEHOLDER={PLACEHOLDER}
+          CONTROL={FORM.control}
+          ICON={ICON}
+          VALUE={VALUE}
+        />
+      )}
+    </>
+  );
+};
+
+export const CheckboxFieldAndView = ({
+  LABEL,
+  NAME,
+  ICON,
+  VALUE,
+  MODE,
+  EDIT,
+  FORM,
+}) => {
+  return (
+    <>
+      {MODE === DATA_VIEW_MODE.VIEW && !EDIT ? (
+        <CustomerViewCommon TITLE={LABEL} ICON={ICON} VALUE={VALUE || "N/A"} />
+      ) : (
+        <CheckboxCommon
+          LABEL={LABEL}
+          NAME={NAME}
+          CONTROL={FORM.control}
+        />
+      )}
+    </>
+  );
+};
+export const RadioGroupAndView = ({
+  LABEL,
+  NAME,
+  ICON,
+  OPTIONS,
+  VALUE,
+  MODE,
+  EDIT,
+  FORM,
+}) => {
+  return (
+    <>
+      {MODE === DATA_VIEW_MODE.VIEW && !EDIT ? (
+        <CustomerViewCommon TITLE={LABEL} ICON={ICON} VALUE={VALUE || "N/A"} />
+      ) : (
+        <RadioGroupCommon
+        LABEL={LABEL}
+        IS_REQUIRED={true}
+        NAME={NAME}
+        OPTIONS={OPTIONS}
+        CONTROL={FORM.control}
+        ICON={ICON}
+      />
+      )}
+    </>
+  );
+};
+export const SelectAndView = ({
+  LABEL,
+  NAME,
+  PLACEHOLDER,
+  OPTIONS,
+  ICON,
+  VALUE,
+  IS_REQUIRED = false,
+  MODE,
+  EDIT,
+  FORM,
+}) => {
+  return (
+    <>
+      {MODE === DATA_VIEW_MODE.VIEW && !EDIT ? (
+        <CustomerViewCommon TITLE={LABEL} ICON={ICON} VALUE={VALUE || "N/A"} />
+      ) : (
+            <ComboboxCommon
+              LABEL={LABEL}
+              NAME={NAME}
+              OPTIONS={OPTIONS}
+              CONTROL={FORM.control}
+              IS_REQUIRED={IS_REQUIRED}
+              PLACEHOLDER={PLACEHOLDER}
+            />
+      )}
+    </>
+  );
+};

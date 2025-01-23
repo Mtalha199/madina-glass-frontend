@@ -9,6 +9,7 @@ export const API_END_POINT = {
   CUSTOMER_LIST: "admin/customers",
   ADD_CUSTOMER: "admin/register",
   SIP_TRUNK_LIST: "admin/siptrunk",
+  ADD_NEW_SIP_TRUNK:"/admin/siptrunk",
 };
 
 export const API_TYPE = {
@@ -418,3 +419,19 @@ export const DATA_VIEW_MODE ={
   EDIT:"edit",
   ADD:"add",
 }
+
+
+
+export const RADIOGROUP_YES_NO = [
+ {value:"true",label:"Yes"},
+ {value:"false",label:"No"}
+]
+export const TRUNK_TYPE_OPTIONS = [
+  {value:"inbound",label:"In Bound"},
+  {value:"outbound",label:"Out Bound"},
+  {value:"both",label:"Both"}
+ ]
+ export const TRUNK_TYPE_STATUS_OPTIONS = [
+  {value:"true",label:"Enable"},
+  {value:"false",label:"disable"},
+ ]

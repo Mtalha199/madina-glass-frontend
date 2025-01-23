@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ContactFormSchema, ContactFormSchemaEdit, loginFormSchema, NewGroupFormSchema, NewUrlFormSchema, SignUpFormSchema } from "../Schema/auth";
+import { ContactFormSchema, ContactFormSchemaEdit, loginFormSchema, NewGroupFormSchema, NewUrlFormSchema, SignUpFormSchema, SipTrunkForm } from "../Schema/auth";
 
 export function useLoginForm() {
   return useForm({
@@ -149,6 +149,31 @@ export function useContactDetailEdit(){
         notification_balance_email:"",
         notification_trouble_ticket_email:"",
         
+
+
+      },
+    });
+}
+
+
+
+export function useSipTrunk(){
+  return useForm({
+      resolver: zodResolver(SipTrunkForm),
+      defaultValues: {
+        trunk_name:"",
+        trunk_type:"",
+        customer:"",
+        global_ani_block:false,
+        global_dnis_block:false,
+        customer_ani_block:false,
+        customer_dnis_block:false,
+        cps_limit:"0",
+        session_limit:"0",
+        dnis_call_limit:"0",
+        ani_call_limit:"0",
+        status:"",
+
 
 
       },

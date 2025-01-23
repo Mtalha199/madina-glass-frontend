@@ -1,51 +1,84 @@
+import FormSkeleton from "@/Commons/FormSkeloton";
+import { APICALL } from "@/components/Api/ApiCall";
 import { BasicDetailForm } from "@/components/Forms/SipTrunkForms/BasicDetailForm";
-import { useContactDetailEdit } from "@/components/Hooks/CustomHooks";
+import {
+  useContactDetailEdit,
+  useSipTrunk,
+} from "@/components/Hooks/CustomHooks";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { DATA_VIEW_MODE, SCREEN_PATH } from "@/Constant";
+import { API_END_POINT, API_TYPE, DATA_VIEW_MODE, SCREEN_PATH } from "@/Constant";
 import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export const AddSipTrunk = () => {
-    const navigate = useNavigate();
-  
-      const form = useContactDetailEdit();
-        const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const form = useSipTrunk();
+  const [loading, setLoading] = useState(false);
   async function onSubmit(data) {
     console.log(data);
+    const payload = {
+      trunk_name: data?.trunk_name,
+      sip_trunk_id: "123455899",
+      trunk_type: data?.trunk_type,
+      cps_limit: data?.cps_limit,
+      session_limit: data?.session_limit,
+      dnis_call_limit: data?.dnis_call_limit,
+      ani_call_limit: data?.ani_call_limit,
+      global_ani_block: data?.global_ani_block,
+      global_dnis_block: data?.global_dnis_block,
+      customer_ani_block: data?.customer_ani_block,
+      customer_dnis_block: data?.customer_dnis_block,
+      status: data?.status,
+      customer_id: data?.customer,
+    };
+ 
+    const response = await APICALL(
+      API_TYPE.POST,
+      API_END_POINT.ADD_NEW_SIP_TRUNK,
+      setLoading,
+      payload,
+      null,
+      null,
+      "Sip Trunk Added Successfully"
+    );
+    if (response !== undefined) {
+      navigate(SCREEN_PATH.CUSTOMER_LIST);
+    }
   }
-    return (
-        <>
-         <div className="p-6">
-         <Button
-        variant="ghost"
-        onClick={() => navigate(SCREEN_PATH.SIP_TRUNK_LIST)}
-        className="mb-4"
-      >
-        <ArrowLeft />
-        Sip Trunk List
-      </Button>
-      <h1 className="text-2xl font-bold mb-4">Add Sip Trunk</h1>
-      
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-          {loading ? (
-            <FormSkeleton />
-          ) : (
-            <>
-              <BasicDetailForm form={form} MODE={DATA_VIEW_MODE.ADD} />
-            </>
-          )}
+  return (
+    <>
+      <div className="p-6">
+        <Button
+          variant="ghost"
+          onClick={() => navigate(SCREEN_PATH.SIP_TRUNK_LIST)}
+          className="mb-4"
+        >
+          <ArrowLeft />
+          Sip Trunk List
+        </Button>
+        <h1 className="text-2xl font-bold mb-4">Add Sip Trunk</h1>
 
-          <div className="col-span-2 flex justify-end mt-4">
-            <Button type="submit" className="">
-              Save
-            </Button>
-          </div>
-        </form>
-      </Form>
-    </div>
-        </>
-    )
-}
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            {loading ? (
+              <FormSkeleton />
+            ) : (
+              <>
+                <BasicDetailForm form={form} MODE={DATA_VIEW_MODE.ADD} />
+              </>
+            )}
+
+            <div className="col-span-2 flex justify-end mt-4">
+              <Button type="submit" className="">
+                Save
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </div>
+    </>
+  );
+};

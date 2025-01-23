@@ -198,3 +198,20 @@ export const ContactFormSchemaEdit = z.object({
     .email({ message: "Please enter a valid email address." })
     .optional(),
 });
+export const SipTrunkForm = z.object({
+  trunk_name: z
+    .string()
+    .min(2, { message: "truck name must be at least 2 characters" }),
+    customer: z.string().min(1, { message: "Customer name is required" }),
+    trunk_type:z.string(),
+    global_ani_block: z.boolean().optional(),  
+    global_dnis_block: z.boolean().optional(),
+    customer_ani_block: z.boolean().optional(),
+    customer_dnis_block: z.boolean().optional(),
+    cps_limit: z.string().optional(),
+    session_limit: z.string().optional(),
+    dnis_call_limit: z.string().optional(),
+    ani_call_limit :z.string().optional(),
+    status:z.string().optional(),
+
+});
