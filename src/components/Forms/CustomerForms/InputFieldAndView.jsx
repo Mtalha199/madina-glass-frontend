@@ -66,6 +66,7 @@ export const RadioGroupAndView = ({
   MODE,
   EDIT,
   FORM,
+  DEFAULT_VALUE,
 }) => {
   return (
     <>
@@ -79,6 +80,7 @@ export const RadioGroupAndView = ({
         OPTIONS={OPTIONS}
         CONTROL={FORM.control}
         ICON={ICON}
+        DEFAULT_VALUE={DEFAULT_VALUE} 
       />
       )}
     </>

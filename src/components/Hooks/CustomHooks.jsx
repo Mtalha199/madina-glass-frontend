@@ -164,17 +164,17 @@ export function useSipTrunk(){
         trunk_name:"",
         trunk_type:"",
         customer:"",
-        global_ani_block:false,
-        global_dnis_block:false,
-        customer_ani_block:false,
-        customer_dnis_block:false,
+        global_ani_block:true,
+        global_dnis_block:true,
+        customer_ani_block:true,
+        customer_dnis_block:true,
         cps_limit:"0",
         session_limit:"0",
         dnis_call_limit:"0",
         ani_call_limit:"0",
-        status:"",
+        status:true,
 
-
+        ipEntries: [],
 
       },
     });

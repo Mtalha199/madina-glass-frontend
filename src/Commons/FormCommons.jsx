@@ -79,11 +79,13 @@ export const RadioGroupCommon = ({
   CLASSNAME = "",
   DIRECTION = "row",
   ICON = null,
+  DEFAULT_VALUE = true,
 }) => {
   return (
     <FormField
       control={CONTROL}
       name={NAME}
+      defaultValue={DEFAULT_VALUE}
       render={({ field, fieldState }) => (
         <FormItem>
           <div className="flex items-center space-x-2 mb-4">
@@ -97,7 +99,7 @@ export const RadioGroupCommon = ({
             <FormControl>
               <RadioGroup
                 onValueChange={field.onChange}
-                defaultValue={field.value}
+                defaultValue={field.value || DEFAULT_VALUE}
                 className={`
                   ${
                     DIRECTION === "row"

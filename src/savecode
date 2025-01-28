@@ -561,3 +561,175 @@ export const InputCommon = (
           </div>
           <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" />
         </div> */}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // ---------------------------------------------------------------------------------------------------DRAWER ADD SIP IP---------------------------------
+      //   <Drawer open={open} onOpenChange={setOpen}>
+      //   <DrawerTrigger asChild>
+      //     <Button>
+      //       <Plus className="mr-2 h-4 w-4" />
+      //       Add IP Whitelisting
+      //     </Button>
+      //   </DrawerTrigger>
+      //   <DrawerContent className="h-[80vh] p-4 flex flex-col pl-10">
+      //     <DrawerHeader className="border-b p-4">
+      //       <div className="flex justify-between items-center">
+      //         <DrawerTitle>Add IP Whitelist Entry</DrawerTitle>
+      //         <div className="flex space-x-2">
+      //           <DrawerClose asChild>
+      //             <Button variant="outline" size="sm">
+      //               <X className="mr-2 h-4 w-4" />
+      //               Cancel
+      //             </Button>
+      //           </DrawerClose>
+      //           <Button size="sm" onClick={form.handleSubmit(onSubmit)}>
+      //             Save
+      //           </Button>
+      //         </div>
+      //       </div>
+      //     </DrawerHeader>
+      //     <div className="flex-1 overflow-y-auto">
+      //       <Form {...form}>
+      //         <form
+      //           onSubmit={form.handleSubmit(onSubmit)}
+      //           className="space-y-4"
+      //         >
+      //           <div className="flex gap-10 pb-2 border-b mt-2">
+      //             <p className="w-[150px] flex-shrink-0 text-sm font-medium text-gray-700">
+      //               Customer IP <span className="text-red-500">*</span>
+      //             </p>
+      //             <p className="w-[150px] flex-shrink-0 text-sm font-medium text-gray-700">
+      //               SIP Map IP <span className="text-red-500">*</span>
+      //             </p>
+      //             <p className="w-[150px] flex-shrink-0 text-sm font-medium text-gray-700">
+      //               CPS Limit <span className="text-red-500">*</span>
+      //             </p>
+      //             <p className="w-[150px] flex-shrink-0 text-sm font-medium text-gray-700">
+      //               Session Limit <span className="text-red-500">*</span>
+      //             </p>
+      //             <p className="w-[150px] flex-shrink-0 text-sm font-medium text-gray-700">
+      //               Tech Prefix
+      //             </p>
+      //             <p className="w-[150px] flex-shrink-0 text-sm font-medium text-gray-700">
+      //               Suffix
+      //             </p>
+      //             <p className="w-[150px] flex-shrink-0 text-sm font-medium text-gray-700">
+      //               Status <span className="text-red-500">*</span>
+      //             </p>
+      //           </div>
+
+      //           {fields.map((field, index) => (
+      //             <div
+      //               key={field.id}
+      //               className="flex gap-10 pb-4 border-b"
+      //             >
+      //               <div className="w-[150px]">
+      //                 <InputCommon
+      //                   NAME={`ipEntries.${index}.customer_ip`}
+      //                   TYPE="text"
+      //                   PLACEHOLDER="1.1.1.1"
+      //                   CONTROL={form.control}
+      //                 />
+      //               </div>
+      //               <div className="w-[150px]">
+      //                 <InputCommon
+      //                   NAME={`ipEntries.${index}.sip_map_ip`}
+      //                   TYPE="text"
+      //                   PLACEHOLDER="2.2.2.2"
+      //                   CONTROL={form.control}
+      //                 />
+      //               </div>
+      //               <div className="w-[150px]">
+      //                 <InputCommon
+      //                   NAME={`ipEntries.${index}.cps_limit`}
+      //                   TYPE="number"
+      //                   PLACEHOLDER="0"
+      //                   CONTROL={form.control}
+      //                 />
+      //               </div>
+      //               <div className="w-[150px]">
+      //                 <InputCommon
+      //                   NAME={`ipEntries.${index}.session_limit`}
+      //                   TYPE="number"
+      //                   PLACEHOLDER="0"
+      //                   CONTROL={form.control}
+      //                 />
+      //               </div>
+      //               <div className="w-[150px]">
+      //                 <InputCommon
+      //                   NAME={`ipEntries.${index}.tech_prefix`}
+      //                   TYPE="text"
+      //                   PLACEHOLDER="Tech Prefix"
+      //                   CONTROL={form.control}
+      //                 />
+      //               </div>
+      //               <div className="w-[150px]">
+      //                 <InputCommon
+      //                   NAME={`ipEntries.${index}.suffix`}
+      //                   TYPE="text"
+      //                   PLACEHOLDER="Suffix"
+      //                   CONTROL={form.control}
+      //                 />
+      //               </div>
+      //               <div className="w-[150px]">
+      //                 <RadioGroupCommon
+      //                   NAME={`ipEntries.${index}.status`}
+      //                   OPTIONS={TRUNK_TYPE_STATUS_OPTIONS}
+      //                   CONTROL={form.control}
+      //                 />
+      //               </div>
+      //               {index > 0 && (
+      //                 <Button
+      //                   type="button"
+      //                   variant="outline"
+      //                   size="sm"
+      //                   onClick={() => remove(index)}
+      //                   className="self-start flex justify-end mt-2 "
+      //                 >
+      //                   <X className=" h-4 w-4" />
+      //                   {/* Remove */}
+      //                 </Button>
+      //               )}
+      //             </div>
+      //           ))}
+
+      //           <Button
+      //             type="button"
+      //             variant="outline"
+      //             size="sm"
+      //             onClick={() =>
+      //               append({
+      //                 customer_ip: "",
+      //                 sip_map_ip: "",
+      //                 cps_limit: "",
+      //                 session_limit: "",
+      //                 status: true,
+      //                 tech_prefix: "",
+      //                 suffix: "",
+      //               })
+      //             }
+      //           >
+      //             <Plus className="mr-2 h-4 w-4" />
+      //             Add Another Entry
+      //           </Button>
+      //         </form>
+      //       </Form>
+      //     </div>
+      //   </DrawerContent>
+      // </Drawer>

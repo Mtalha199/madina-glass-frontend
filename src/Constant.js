@@ -10,6 +10,7 @@ export const API_END_POINT = {
   ADD_CUSTOMER: "admin/register",
   SIP_TRUNK_LIST: "admin/siptrunk",
   ADD_NEW_SIP_TRUNK:"/admin/siptrunk",
+  ADD_IP_WHITE_LISTING:"/admin/ip-auth",
 };
 
 export const API_TYPE = {
@@ -423,8 +424,8 @@ export const DATA_VIEW_MODE ={
 
 
 export const RADIOGROUP_YES_NO = [
- {value:"true",label:"Yes"},
- {value:"false",label:"No"}
+ {value:true,label:"Yes"},
+ {value:false,label:"No"}
 ]
 export const TRUNK_TYPE_OPTIONS = [
   {value:"inbound",label:"In Bound"},
@@ -432,6 +433,6 @@ export const TRUNK_TYPE_OPTIONS = [
   {value:"both",label:"Both"}
  ]
  export const TRUNK_TYPE_STATUS_OPTIONS = [
-  {value:"true",label:"Enable"},
-  {value:"false",label:"disable"},
+  {value:true,label:"Enable"},
+  {value:false,label:"Disable"},
  ]

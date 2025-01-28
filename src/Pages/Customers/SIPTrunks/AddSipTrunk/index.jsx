@@ -1,13 +1,19 @@
 import FormSkeleton from "@/Commons/FormSkeloton";
 import { APICALL } from "@/components/Api/ApiCall";
 import { BasicDetailForm } from "@/components/Forms/SipTrunkForms/BasicDetailForm";
+import IpWhiteListingForm from "@/components/Forms/SipTrunkForms/IpWhiteListingForn";
 import {
   useContactDetailEdit,
   useSipTrunk,
 } from "@/components/Hooks/CustomHooks";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { API_END_POINT, API_TYPE, DATA_VIEW_MODE, SCREEN_PATH } from "@/Constant";
+import {
+  API_END_POINT,
+  API_TYPE,
+  DATA_VIEW_MODE,
+  SCREEN_PATH,
+} from "@/Constant";
 import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -21,7 +27,6 @@ export const AddSipTrunk = () => {
     console.log(data);
     const payload = {
       trunk_name: data?.trunk_name,
-      sip_trunk_id: "123455899",
       trunk_type: data?.trunk_type,
       cps_limit: data?.cps_limit,
       session_limit: data?.session_limit,
@@ -34,7 +39,7 @@ export const AddSipTrunk = () => {
       status: data?.status,
       customer_id: data?.customer,
     };
- 
+
     const response = await APICALL(
       API_TYPE.POST,
       API_END_POINT.ADD_NEW_SIP_TRUNK,
@@ -42,10 +47,47 @@ export const AddSipTrunk = () => {
       payload,
       null,
       null,
-      "Sip Trunk Added Successfully"
+      data?.ipEntries.length === 0 ? "Sip Trunk Added Successfully" : null
     );
     if (response !== undefined) {
-      navigate(SCREEN_PATH.CUSTOMER_LIST);
+      console.log(response?.data, "response");
+      if (data?.ipEntries.length == 0) {
+        navigate(SCREEN_PATH.SIP_TRUNK_LIST);
+      } else {
+        const payload1 = data.ipEntries.map(
+          ({
+            customer_ip,
+            sip_map_ip,
+            cps_limit,
+            session_limit,
+            status,
+            tech_prefix = "",
+            suffix = "",
+          }) => ({
+            name: "mazhar",
+            trunk_id: response?.data?.sip_trunk_id,
+            customer_ip,
+            sip_map_ip,
+            cps_limit: cps_limit ?? 0,
+            session_limit: session_limit ?? 0,
+            status,
+            tech_prefix,
+            suffix,
+          })
+        );
+        const apiResponse = await APICALL(
+          API_TYPE.POST,
+          API_END_POINT.ADD_IP_WHITE_LISTING,
+          setLoading,
+          payload1,
+          null,
+          null,
+          "Sip Trunk Added Successfully"
+        );
+        if (apiResponse !== undefined) {
+          navigate(SCREEN_PATH.SIP_TRUNK_LIST);
+        }
+      }
     }
   }
   return (
@@ -68,14 +110,14 @@ export const AddSipTrunk = () => {
             ) : (
               <>
                 <BasicDetailForm form={form} MODE={DATA_VIEW_MODE.ADD} />
+                <IpWhiteListingForm form={form} />
+                <div className="col-span-2 flex justify-end mt-4">
+                  <Button type="submit" className="">
+                    Save
+                  </Button>
+                </div>
               </>
             )}
-
-            <div className="col-span-2 flex justify-end mt-4">
-              <Button type="submit" className="">
-                Save
-              </Button>
-            </div>
           </form>
         </Form>
       </div>

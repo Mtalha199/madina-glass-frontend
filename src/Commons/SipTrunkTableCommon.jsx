@@ -13,6 +13,8 @@ const SipTrunkCommonTable = ({ id }) => {
   const columns = [
     { header: "ID", accessorKey: "id" },
     { header: "Name", accessorKey: "trunk_name" },
+    { header: "Customer Name", accessorKey: "company_name" },
+
     {
       header: "Status",
       accessorKey: "status",
