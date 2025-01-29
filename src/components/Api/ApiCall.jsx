@@ -35,14 +35,26 @@ export const APICALL = async (
         }
         break;
 
-      case "patch":
+      case API_TYPE.PATCH:
         try {
+          const setloadingExist = typeof setloading === "function";
+          if (setloadingExist) {
+            setloading(true);
+          }
           const response = await axios.patch(API_URL, DATA);
-          // toast.success(`${toastMessage} updated succesfully`);
-          return response.data.data;
+          if (toastMessage) {
+            toast({
+              description: toastMessage,
+            });
+          }
+          return response
         } catch (error) {
-          const e = error?.response?.data?.title;
-          toast.error(e || error);
+          toast({
+            variant: "destructive",
+            title: error?.response?.data?.detail || "Something went wrong",
+          });
+        }finally {
+          setloading(false);
         }
         break;
 
@@ -56,7 +68,6 @@ export const APICALL = async (
           setData(response?.data?.data);
           setCount(response?.data?.count);
         } catch (error) {
-          debugger
           toast({
             variant: "destructive",
             title: error?.response?.data?.detail || "Something went wrong",

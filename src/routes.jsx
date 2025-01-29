@@ -12,6 +12,7 @@ import AuthGuard from "./Auth/AuthGaurd";
 import { AddCustomer } from "./Pages/Customers/List/AddCustomer";
 import SipTrunkList from "./Pages/Customers/SIPTrunks";
 import { AddSipTrunk } from "./Pages/Customers/SIPTrunks/AddSipTrunk";
+import SpecificSipTrunk from "./Pages/Customers/SIPTrunks/SpecificSipTrunk";
 
 const routes = [
   {
@@ -39,6 +40,8 @@ const routes = [
 
       { path: SCREEN_PATH.SIP_TRUNK_LIST, element: <SipTrunkList /> },
       { path: SCREEN_PATH.ADD_NEW_SIP_TRUNK, element: <AddSipTrunk /> },
+      { path: SCREEN_PATH.SIP_TRUNK_LIST_UNIQUE, element: <SpecificSipTrunk /> },
+
 
 
 

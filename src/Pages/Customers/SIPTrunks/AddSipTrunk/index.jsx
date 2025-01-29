@@ -24,7 +24,6 @@ export const AddSipTrunk = () => {
   const form = useSipTrunk();
   const [loading, setLoading] = useState(false);
   async function onSubmit(data) {
-    console.log(data);
     const payload = {
       trunk_name: data?.trunk_name,
       trunk_type: data?.trunk_type,
@@ -50,12 +49,12 @@ export const AddSipTrunk = () => {
       data?.ipEntries.length === 0 ? "Sip Trunk Added Successfully" : null
     );
     if (response !== undefined) {
-      console.log(response?.data, "response");
       if (data?.ipEntries.length == 0) {
         navigate(SCREEN_PATH.SIP_TRUNK_LIST);
       } else {
         const payload1 = data.ipEntries.map(
           ({
+            name,
             customer_ip,
             sip_map_ip,
             cps_limit,
@@ -64,7 +63,7 @@ export const AddSipTrunk = () => {
             tech_prefix = "",
             suffix = "",
           }) => ({
-            name: "mazhar",
+            name: name,
             trunk_id: response?.data?.sip_trunk_id,
             customer_ip,
             sip_map_ip,
@@ -110,7 +109,7 @@ export const AddSipTrunk = () => {
             ) : (
               <>
                 <BasicDetailForm form={form} MODE={DATA_VIEW_MODE.ADD} />
-                <IpWhiteListingForm form={form} />
+                <IpWhiteListingForm form={form} MODE={DATA_VIEW_MODE.ADD} />
                 <div className="col-span-2 flex justify-end mt-4">
                   <Button type="submit" className="">
                     Save

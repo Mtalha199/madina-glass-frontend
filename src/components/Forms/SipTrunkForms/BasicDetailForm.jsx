@@ -11,6 +11,7 @@ import {
   Server,
   Network,
   User,
+  Bell,
 } from "lucide-react";
 import {
   RadioGroupCommon,
@@ -18,6 +19,7 @@ import {
   CheckboxCommon,
   SelectCommon,
   ComboboxCommon,
+  SwitchCommon,
 } from "@/Commons/FormCommons";
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -26,6 +28,7 @@ import {
   InputFieldAndView,
   RadioGroupAndView,
   SelectAndView,
+  SwitchAndView,
 } from "../CustomerForms/InputFieldAndView";
 import {
   API_END_POINT,
@@ -34,9 +37,29 @@ import {
   TRUNK_TYPE_STATUS_OPTIONS,
 } from "@/Constant";
 import { APICALL } from "@/components/Api/ApiCall";
+import { useFormContext } from "react-hook-form";
 export const BasicDetailForm = ({ form, MODE, DATA }) => {
+  const { setValue, watch } = useFormContext();
   const [edit, setEdit] = useState(false);
-  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    if (DATA) {
+      setValue("trunk_name", DATA?.trunk_name || "");
+      setValue("customer", String(DATA.customer_id));
+      setValue("trunk_type", DATA?.trunk_type);
+      setValue("status", DATA?.status);
+      setValue("status", DATA?.status);
+      setValue("cps_limit", String(DATA?.cps_limit));
+      setValue("session_limit", String(DATA?.session_limit));
+      setValue("dnis_call_limit", String(DATA?.dnis_call_limit));
+      setValue("ani_call_limit", String(DATA?.ani_call_limit));
+      setValue("global_ani_block", DATA?.global_ani_block);
+      setValue("global_dnis_block", DATA?.global_dnis_block);
+      setValue("customer_ani_block", DATA?.customer_ani_block);
+      setValue("customer_dnis_block", DATA?.customer_dnis_block);
+    }
+  }, [ DATA, setValue]);
+  const [customerData, setCustomerData] = useState([]);
   const [loading, setloading] = useState(false);
   const [count, setCount] = useState(0);
   useEffect(() => {
@@ -48,7 +71,7 @@ export const BasicDetailForm = ({ form, MODE, DATA }) => {
       API_END_POINT.CUSTOMER_LIST,
       setloading,
       null,
-      setData,
+      setCustomerData,
       setCount
     );
   };
@@ -83,11 +106,11 @@ export const BasicDetailForm = ({ form, MODE, DATA }) => {
               NAME: "customer",
               PLACEHOLDER: "Select Customer",
               ICON: <Server />,
-              OPTIONS: data?.map((item) => ({
+              OPTIONS: customerData?.map((item) => ({
                 value: String(item?.id),
                 label: item?.company_name,
               })),
-              VALUE: DATA?.customer.name,
+              VALUE: DATA?.company_name,
               IS_REQUIRED: true,
               MODE: MODE,
               EDIT: edit,
@@ -107,15 +130,13 @@ export const BasicDetailForm = ({ form, MODE, DATA }) => {
               MODE: MODE,
               EDIT: edit,
               FORM: form,
-              
             })}
           </div>
           <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
-            {RadioGroupAndView({
+            {SwitchAndView({
               LABEL: "STATUS",
               NAME: "status",
               ICON: <Badge />,
-              OPTIONS: TRUNK_TYPE_STATUS_OPTIONS,
               VALUE: DATA?.status,
               MODE: MODE,
               EDIT: edit,
@@ -182,11 +203,10 @@ export const BasicDetailForm = ({ form, MODE, DATA }) => {
         <div className="grid grid-cols-1 md:grid-cols-5 gap-6 space-y-4 mt-2 mb-2">
           <div className="hidden lg:block lg:col-span-1"></div>
           <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
-            {RadioGroupAndView({
+            {SwitchAndView({
               LABEL: "Global ANI Block",
               NAME: "global_ani_block",
               ICON: <Server />,
-              OPTIONS: TRUNK_TYPE_STATUS_OPTIONS,
               VALUE: DATA?.global_ani_block,
               MODE: MODE,
               EDIT: edit,
@@ -194,11 +214,10 @@ export const BasicDetailForm = ({ form, MODE, DATA }) => {
             })}
           </div>
           <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
-            {RadioGroupAndView({
+            {SwitchAndView({
               LABEL: "Global DNIS Block",
               NAME: "global_dnis_block",
               ICON: <Server />,
-              OPTIONS: TRUNK_TYPE_STATUS_OPTIONS,
               VALUE: DATA?.global_dnis_block,
               MODE: MODE,
               EDIT: edit,
@@ -207,11 +226,10 @@ export const BasicDetailForm = ({ form, MODE, DATA }) => {
           </div>
           <div className="col-span-1 md:col-span-1 lg:hidden"></div>
           <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
-            {RadioGroupAndView({
+            {SwitchAndView({
               LABEL: "Customer ANI Block",
               NAME: "customer_ani_block",
               ICON: <Server />,
-              OPTIONS: TRUNK_TYPE_STATUS_OPTIONS,
               VALUE: DATA?.customer_ani_block,
               MODE: MODE,
               EDIT: edit,
@@ -219,11 +237,10 @@ export const BasicDetailForm = ({ form, MODE, DATA }) => {
             })}
           </div>
           <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
-            {RadioGroupAndView({
+            {SwitchAndView({
               LABEL: "Customer DNIS Block",
               NAME: "customer_dnis_block",
               ICON: <Server />,
-              OPTIONS: TRUNK_TYPE_STATUS_OPTIONS,
               VALUE: DATA?.global_dnis_block,
               MODE: MODE,
               EDIT: edit,

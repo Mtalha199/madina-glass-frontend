@@ -2,12 +2,12 @@
 
 
 .tableWidth{
-  max-width:   calc(100vw - 7rem) !important;
+  max-width:   calc(100vw - 6.1rem) !important;
 
 }
 
 .group[data-state="expanded"] ~ main .tableWidth {
-    width: calc(100vw - 21rem);
+    width: calc(100vw - 20.2rem);
     transition: width 0.2s ease-in-out;
 
   }

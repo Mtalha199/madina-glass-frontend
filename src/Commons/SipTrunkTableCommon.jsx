@@ -1,9 +1,10 @@
-import { API_END_POINT, API_TYPE } from "@/Constant";
+import { API_END_POINT, API_TYPE, SCREEN_PATH } from "@/Constant";
 import React, { useState, useEffect } from "react";
 import HeaderCommon from "./HeaderCommon";
 import { APICALL } from "@/components/Api/ApiCall";
 import SkeletonTable from "./SkeletonTable";
 import { Badge } from "@/components/ui/badge";
+import { Link } from "react-router-dom";
 
 const SipTrunkCommonTable = ({ id }) => {
   const [loading, setloading] = useState(false);
@@ -12,7 +13,19 @@ const SipTrunkCommonTable = ({ id }) => {
 
   const columns = [
     { header: "ID", accessorKey: "id" },
-    { header: "Name", accessorKey: "trunk_name" },
+    {
+      header: "Name",
+      accessorKey: "trunk_name",
+      cell: ({ row }) => {
+        const fullName = row.getValue("trunk_name");
+        const id = row.getValue("id");
+        return (
+          <Link to={`/siptrunk/${id}`}>
+            <span className="text-primary hover:underline">{fullName}</span>
+          </Link>
+        );
+      },
+    },
     { header: "Customer Name", accessorKey: "company_name" },
 
     {
@@ -86,20 +99,13 @@ const SipTrunkCommonTable = ({ id }) => {
 
   useEffect(() => {
     getData();
-  }, [id]); // Re-fetch data when `id` changes
+  }, [id]);
 
   const getData = async () => {
     const endpoint = id
       ? `${API_END_POINT.SIP_TRUNK_LIST}/${id}`
       : `${API_END_POINT.SIP_TRUNK_LIST}`;
-    await APICALL(
-      API_TYPE.GET,
-      endpoint,
-      setloading,
-      null,
-      setData,
-      setCount
-    );
+    await APICALL(API_TYPE.GET, endpoint, setloading, null, setData, setCount);
   };
 
   return (

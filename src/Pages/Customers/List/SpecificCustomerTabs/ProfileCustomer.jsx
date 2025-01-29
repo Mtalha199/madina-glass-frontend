@@ -24,7 +24,6 @@ export const ProfileCustomer = () => {
   const [customers, setCustomers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   async function onSubmit(data) {
-    debugger
     const payload = {
       user: {
         username: data.user_name,
@@ -109,7 +108,6 @@ export const ProfileCustomer = () => {
               <FormSkeleton />
             ) : (
               <>
-              <p>sdfsd</p>
                 <CompanyDetailForm form={form} MODE={mode} DATA={data} />
                 <PrimaryContactDetailForm form={form} MODE={mode} DATA={data} />
                 <BillingDetailForm form={form} MODE={mode} DATA={data} />

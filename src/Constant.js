@@ -37,6 +37,8 @@ export const SCREEN_PATH = {
 
   SIP_TRUNK_LIST:"/siptrunk",
   ADD_NEW_SIP_TRUNK:"/siptrunk/register",
+  SIP_TRUNK_LIST_UNIQUE: "/siptrunk/:id",
+
 };
 // ----------------------------------------NAVIGATION----------------------------------
 import {

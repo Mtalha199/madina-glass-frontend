@@ -21,6 +21,18 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import React, { useState } from "react";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 
 export const InputCommon = ({
   LABEL,
@@ -98,8 +110,9 @@ export const RadioGroupCommon = ({
             {/* {ICON && <span className="text-gray-500">{ICON}</span>} */}
             <FormControl>
               <RadioGroup
+              value={field.value}
                 onValueChange={field.onChange}
-                defaultValue={field.value || DEFAULT_VALUE}
+                // defaultValue={field.value || DEFAULT_VALUE}
                 className={`
                   ${
                     DIRECTION === "row"
@@ -133,17 +146,7 @@ export const RadioGroupCommon = ({
   );
 };
 
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { Check, ChevronsUpDown } from "lucide-react";
+
 
 export const CheckboxCommon = ({
   LABEL,
@@ -346,6 +349,49 @@ export const ComboboxCommon = ({
           </FormItem>
         );
       }}
+    />
+  );
+};
+export const SwitchCommon = ({
+  LABEL,
+  IS_REQUIRED = false,
+  NAME,
+  CONTROL,
+  DESCRIPTION,
+  CLASSNAME = '',
+  DISABLED = false,
+  ICON,
+  DEFAULT_VALUE,
+}) => {
+  return (
+    <FormField
+      control={CONTROL}
+      name={NAME}
+      render={({ field }) => (
+        <FormItem className={`space-y-2 ${CLASSNAME}`}>
+          <FormLabel className="text-base">
+            {LABEL}
+            {IS_REQUIRED && <span className="text-red-500">*</span>}
+          </FormLabel>
+          <div className="flex items-center gap-3">
+            {ICON && (
+              <span className="text-gray-400">
+                <span className="w-4 h-4 flex justify-center items-center">
+                  {ICON}
+                </span>
+              </span>
+            )}
+            <FormControl>
+              <Switch
+                checked={field.value}
+                onCheckedChange={field.onChange}
+                disabled={DISABLED}
+                className="data-[state=checked]:bg-primary"
+              />
+            </FormControl>
+          </div>
+        </FormItem>
+      )}
     />
   );
 };

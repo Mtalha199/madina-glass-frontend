@@ -221,6 +221,7 @@ export const SipTrunkForm = z.object({
 
     ipEntries: z.array(
       z.object({
+        name: z.string().min(1, { message: "Name is required" }),
         customer_ip: z
           .string()
           .regex(

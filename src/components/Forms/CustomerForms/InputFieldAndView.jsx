@@ -1,5 +1,12 @@
 import { CustomerViewCommon } from "@/Commons/CustomerViewCommon";
-import { CheckboxCommon, ComboboxCommon, InputCommon, RadioGroupCommon } from "@/Commons/FormCommons";
+import {
+  CheckboxCommon,
+  ComboboxCommon,
+  InputCommon,
+  RadioGroupCommon,
+  SwitchCommon,
+} from "@/Commons/FormCommons";
+import { Badge } from "@/components/ui/badge";
 import { DATA_VIEW_MODE } from "@/Constant";
 
 export const InputFieldAndView = ({
@@ -17,7 +24,11 @@ export const InputFieldAndView = ({
   return (
     <>
       {MODE === DATA_VIEW_MODE.VIEW && !EDIT ? (
-        <CustomerViewCommon TITLE={LABEL} ICON={ICON} VALUE={VALUE || "N/A"} />
+        <CustomerViewCommon
+          TITLE={LABEL}
+          ICON={ICON}
+          VALUE={VALUE == 0 ? 0 : VALUE || "N/A"}
+        />
       ) : (
         <InputCommon
           LABEL={LABEL}
@@ -48,11 +59,7 @@ export const CheckboxFieldAndView = ({
       {MODE === DATA_VIEW_MODE.VIEW && !EDIT ? (
         <CustomerViewCommon TITLE={LABEL} ICON={ICON} VALUE={VALUE || "N/A"} />
       ) : (
-        <CheckboxCommon
-          LABEL={LABEL}
-          NAME={NAME}
-          CONTROL={FORM.control}
-        />
+        <CheckboxCommon LABEL={LABEL} NAME={NAME} CONTROL={FORM.control} />
       )}
     </>
   );
@@ -74,14 +81,14 @@ export const RadioGroupAndView = ({
         <CustomerViewCommon TITLE={LABEL} ICON={ICON} VALUE={VALUE || "N/A"} />
       ) : (
         <RadioGroupCommon
-        LABEL={LABEL}
-        IS_REQUIRED={true}
-        NAME={NAME}
-        OPTIONS={OPTIONS}
-        CONTROL={FORM.control}
-        ICON={ICON}
-        DEFAULT_VALUE={DEFAULT_VALUE} 
-      />
+          LABEL={LABEL}
+          IS_REQUIRED={true}
+          NAME={NAME}
+          OPTIONS={OPTIONS}
+          CONTROL={FORM.control}
+          ICON={ICON}
+          DEFAULT_VALUE={DEFAULT_VALUE}
+        />
       )}
     </>
   );
@@ -103,14 +110,49 @@ export const SelectAndView = ({
       {MODE === DATA_VIEW_MODE.VIEW && !EDIT ? (
         <CustomerViewCommon TITLE={LABEL} ICON={ICON} VALUE={VALUE || "N/A"} />
       ) : (
-            <ComboboxCommon
-              LABEL={LABEL}
-              NAME={NAME}
-              OPTIONS={OPTIONS}
-              CONTROL={FORM.control}
-              IS_REQUIRED={IS_REQUIRED}
-              PLACEHOLDER={PLACEHOLDER}
-            />
+        <ComboboxCommon
+          LABEL={LABEL}
+          NAME={NAME}
+          OPTIONS={OPTIONS}
+          CONTROL={FORM.control}
+          IS_REQUIRED={IS_REQUIRED}
+          PLACEHOLDER={PLACEHOLDER}
+        />
+      )}
+    </>
+  );
+};
+export const SwitchAndView = ({
+  LABEL,
+  NAME,
+  ICON,
+  VALUE,
+  IS_REQUIRED = false,
+  MODE,
+  EDIT,
+  FORM,
+  DEFAULT_VALUE,
+
+}) => {
+  return (
+    <>
+      {MODE === DATA_VIEW_MODE.VIEW && !EDIT ? (
+        <CustomerViewCommon
+          TITLE={LABEL}
+          ICON={ICON}
+          VALUE={VALUE == false ? <Badge variant="secondary">Disable</Badge>: <Badge>Enable</Badge> || "N/A"}
+        />
+      ) : (
+        <SwitchCommon
+          LABEL={LABEL}
+          IS_REQUIRED={IS_REQUIRED}
+          VALUE={VALUE}
+          NAME={NAME}
+          CONTROL={FORM.control}
+          ICON={ICON}
+          DEFAULT_VALUE={DEFAULT_VALUE}
+
+        />
       )}
     </>
   );
