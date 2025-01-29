@@ -13,8 +13,7 @@ const BillingDetailForm = ({ form, MODE, DATA }) => {
   const [edit, setEdit] = useState(false);
 
   useEffect(() => {
-    if (edit && DATA?.account) {
-      // Dynamically set values based on field names
+    if (DATA?.account) {
       setValue("billing_contact_name", DATA.account.billing_contact_name || "");
       setValue("billing_contact_email", DATA.account.billing_contact_email || "");
       setValue("billing_contact_skype", DATA.account.billing_contact_skype || "");
@@ -27,7 +26,7 @@ const BillingDetailForm = ({ form, MODE, DATA }) => {
       setValue("billing_contact_zip_code", DATA.account.billing_contact_zip_code || "");
       setValue("billing_contact_country", DATA.account.billing_contact_country || "");
     }
-  }, [edit, DATA, setValue]);
+  }, [ DATA, setValue]);
 
   const renderField = ({ label, name, type, placeholder, icon, value, isRequired = false }) => {
     return (

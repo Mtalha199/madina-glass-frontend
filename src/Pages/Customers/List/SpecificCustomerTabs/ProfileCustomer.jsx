@@ -11,11 +11,14 @@ import { Form } from "@/components/ui/form";
 import {
   API_END_POINT,
   API_TYPE,
+  SCREEN_PATH,
 } from "@/Constant";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 export const ProfileCustomer = () => {
   const { id } = useParams();
+    const navigate = useNavigate();
+  
   const [loading, setloading] = useState(false);
   const [count, setCount] = useState(0);
   const [data, setData] = useState([]);
@@ -25,10 +28,6 @@ export const ProfileCustomer = () => {
   const [searchTerm, setSearchTerm] = useState("");
   async function onSubmit(data) {
     const payload = {
-      user: {
-        username: data.user_name,
-        password: data.password,
-      },
       customer: {
         company_name: data.company_name,
         company_type: data.company_type,
@@ -72,16 +71,18 @@ export const ProfileCustomer = () => {
       },
     };
     const response = await APICALL(
-      API_TYPE.POST,
-      API_END_POINT.ADD_CUSTOMER,
+      API_TYPE.PATCH,
+      `${API_END_POINT.ADD_CUSTOMER}/${id}`,
       setloading,
       payload,
       null,
       null,
-      "Customer Added Successfully"
+      "Customer updated successfully"
     );
+    debugger
     if (response !== undefined) {
-      navigate(SCREEN_PATH.CUSTOMER_LIST);
+      // navigate(SCREEN_PATH.CUSTOMER_LIST);
+      getData();
     }
   }
   useEffect(() => {

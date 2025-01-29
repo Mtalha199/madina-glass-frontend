@@ -20,7 +20,7 @@ const CompanyDetailForm = ({ form, MODE, DATA }) => {
   const { setValue } = useFormContext();
 
   useEffect(() => {
-    if (edit && DATA?.account) {
+    if ( DATA?.account) {
       setValue("company_name", DATA.account.company_name || "");
       setValue("company_type", DATA.account.company_type || "");
       setValue("company_frn", DATA.account.company_frn || "");
@@ -32,7 +32,7 @@ const CompanyDetailForm = ({ form, MODE, DATA }) => {
       setValue("company_zip_code", DATA.account.company_zipcode || "");
       setValue("company_country", DATA.account.company_country || "");
     }
-  }, [edit, DATA, setValue]);
+  }, [DATA, setValue]);
 
   const renderField = ({
     label,

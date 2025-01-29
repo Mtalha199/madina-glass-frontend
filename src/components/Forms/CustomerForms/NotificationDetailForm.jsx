@@ -17,7 +17,7 @@ const NotificationDetailForm = ({ form, MODE, DATA }) => {
   const balanceChecked = watch("notification_balance_checked");
   const troubleChecked = watch("notification_trouble_checked");
   useEffect(() => {
-    if (edit && DATA?.account) {
+    if (DATA?.account) {
       setValue(
         "notification_notice_email",
         DATA?.account?.general_notice_email || ""
@@ -35,7 +35,7 @@ const NotificationDetailForm = ({ form, MODE, DATA }) => {
         DATA?.account?.trouble_ticket_email || ""
       );
     }
-  }, [edit, DATA, setValue]);
+  }, [DATA, setValue]);
   const handleCheckboxChange = (fieldName, checked) => {
     setValue(fieldName, checked ? primaryContactEmail : "");
   };

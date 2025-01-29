@@ -12,7 +12,7 @@ const PrimaryContactDetailForm = ({ form, MODE,DATA }) => {
     const { setValue } = useFormContext();
     const [edit, setEdit] = useState(false);
   useEffect(() => {
-    if (edit && DATA?.account) {
+    if (DATA?.account) {
       setValue("primary_contact_email", DATA.account.primary_contact_email || "");
       setValue("primary_contact_mobile", DATA.account.primary_contact_mobile || "");
       setValue("primary_contact_phone", DATA.account.primary_contact_phone || "");
@@ -20,7 +20,7 @@ const PrimaryContactDetailForm = ({ form, MODE,DATA }) => {
       setValue("primary_contact_name", DATA.account.primary_contact_name || "");
 
     }
-  }, [edit, DATA, setValue]);
+  }, [ DATA, setValue]);
   const renderField = ({ label, name, type, placeholder, icon, value, form, isRequired = false }) => {
     return (
       <>

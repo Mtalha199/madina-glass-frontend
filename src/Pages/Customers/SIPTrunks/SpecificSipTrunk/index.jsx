@@ -82,7 +82,7 @@ export default function SpecificSipTrunk() {
       if (data?.ipEntries.length == 0) {
         navigate(SCREEN_PATH.SIP_TRUNK_LIST);
       } else {
-        const payload1 = data.ipEntries.map(
+        const payloadIPWhiteListing = data.ipEntries.map(
           ({
             name,
             customer_ip,
@@ -109,7 +109,7 @@ export default function SpecificSipTrunk() {
           API_TYPE.PATCH,
           API_END_POINT.ADD_IP_WHITE_LISTING,
           setloading,
-          payload1,
+          payloadIPWhiteListing,
           null,
           null,
           "Sip trunk updated successfully"
@@ -165,11 +165,6 @@ export default function SpecificSipTrunk() {
                 MODE={DATA_VIEW_MODE.VIEW}
                 DATA={ipWhiteListing}
               />
-              {/* <div className="col-span-2 flex justify-end mt-4">
-                <Button type="submit" className="">
-                  Save
-                </Button>
-              </div> */}
             </>
           )}
         </form>

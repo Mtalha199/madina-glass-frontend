@@ -13,14 +13,14 @@ const TechnicalDetailForm = ({ form ,MODE,DATA}) => {
   
   const { setValue, watch } = useFormContext();
   useEffect(() => {
-    if (edit && DATA) {
+    if ( DATA) {
       setValue("techinical_contact_name", DATA?.account?.tech_contact_name || "");
       setValue("techinical_contact_email", DATA?.account?.tech_contact_email || "");
       setValue("techinical_contact_skype", DATA?.account?.tech_contact_skype || "");
       setValue("techinical_contact_phone", DATA?.account?.tech_contact_phone|| "");
       setValue("techinical_contact_mobile", DATA?.account?.tech_contact_mobile || "");
     }
-  }, [edit, DATA, setValue]);
+  }, [DATA, setValue]);
 
   const renderField = ({ label, name, type, placeholder, icon, value ,isRequired =false }) => {
     return (
