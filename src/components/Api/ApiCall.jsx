@@ -76,9 +76,28 @@ export const APICALL = async (
           setloading(false);
         }
         break;
-      case "delete":
+      case API_TYPE.DELETE:
         try {
-        } catch (error) {}
+          const setloadingExist = typeof setloading === "function";
+        if (setloadingExist) {
+          setloading(true);
+        }
+        const response = await axios.delete(API_URL, { data: DATA }); // Use { data: DATA } for DELETE with body
+        if (toastMessage) {
+          toast({
+            description: toastMessage,
+          });
+        }
+        return response;
+        } catch (error) {
+          toast({
+            variant: "destructive",
+            title: error?.response?.data?.detail || "Something went wrong",
+          });
+        } finally {
+          setloading(false);
+        }
+        break;
     }
 
 };

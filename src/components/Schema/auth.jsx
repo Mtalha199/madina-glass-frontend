@@ -244,3 +244,51 @@ export const SipTrunkForm = z.object({
       })
     ).optional(),
 });
+
+
+
+export const BasicSipTrunkSchemaForEdit = z.object({
+  trunk_name: z
+    .string()
+    .min(2, { message: "Trunk name must be at least 2 characters" }),
+  customer: z.string().min(1, { message: "Customer is required" }),
+  trunk_type: z.string().min(1, { message: "Trunk type is required" }),
+  status: z.boolean().optional(),
+  
+  cps_limit: z.string().optional(),
+  session_limit: z.string().optional(),
+  dnis_call_limit: z.string().optional(),
+  ani_call_limit: z.string().optional(),
+
+  global_ani_block: z.boolean().optional(),  
+  global_dnis_block: z.boolean().optional(),
+  customer_ani_block: z.boolean().optional(),
+  customer_dnis_block: z.boolean().optional(),
+});
+
+export const IpWhitelistSchemaForEdit = z.object({
+  ipEntries: z.array(
+    z.object({
+      name: z.string().min(1, { message: "Name is required" }),
+      customer_ip: z
+        .string()
+        .regex(
+          /^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}$/,
+          "Customer IP must be a valid IPv4 address."
+        )
+        .optional(),
+      sip_map_ip: z
+        .string()
+        .regex(
+          /^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}$/,
+          "Sip map IP must be a valid IPv4 address."
+        )
+        .optional(),
+      cps_limit: z.coerce.number().optional(),
+      session_limit: z.coerce.number().optional(), 
+      status: z.boolean().optional(),
+      tech_prefix: z.string().optional(),
+      suffix: z.string().optional(),
+    })
+  ).optional(),
+});

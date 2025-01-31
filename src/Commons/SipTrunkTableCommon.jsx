@@ -103,7 +103,7 @@ const SipTrunkCommonTable = ({ id }) => {
 
   const getData = async () => {
     const endpoint = id
-      ? `${API_END_POINT.SIP_TRUNK_LIST}/${id}`
+      ? `${API_END_POINT.SIP_TRUNK_LIST_CUSTOMER}/${id}`
       : `${API_END_POINT.SIP_TRUNK_LIST}`;
     await APICALL(API_TYPE.GET, endpoint, setloading, null, setData, setCount);
   };

@@ -1,11 +1,24 @@
-import React, { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useFieldArray } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { TRUNK_TYPE_STATUS_OPTIONS } from "@/Constant";
-import { Plus, X } from "lucide-react";
+import { API_TYPE, TRUNK_TYPE_STATUS_OPTIONS } from "@/Constant";
+import { Plus, X, Edit, Trash, Save, ArrowLeft } from "lucide-react";
 import { InputCommon, SwitchCommon } from "@/Commons/FormCommons";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import axios from "axios"; // Assuming you're using axios for API calls
+import { APICALL } from "@/components/Api/ApiCall";
 
-const IpWhiteListingForm = ({ form, MODE, DATA }) => {
+const IpWhiteListingForm = ({ form, MODE, DATA ,onsubmit}) => {
+  const [editIndex, setEditIndex] = useState(-1);
+  const [newEntries, setNewEntries] = useState([]);
+
   const { fields, append, remove, replace } = useFieldArray({
     control: form.control,
     name: "ipEntries",
@@ -15,8 +28,9 @@ const IpWhiteListingForm = ({ form, MODE, DATA }) => {
       replace(DATA);
     }
   }, [MODE, DATA, replace]);
+
   const onAddEntry = () => {
-    append({
+    const newEntry = {
       name: "",
       customer_ip: "",
       sip_map_ip: "",
@@ -25,8 +39,157 @@ const IpWhiteListingForm = ({ form, MODE, DATA }) => {
       status: true,
       tech_prefix: "",
       suffix: "",
-    });
+    };
+    append(newEntry);
+    setNewEntries((prev) => [...prev, fields.length]);
   };
+
+  const onEdit = (index) => {
+    setEditIndex(index);
+  };
+
+  const handleCancel = () => {
+    setEditIndex(-1);
+  };
+  const [loading, setloading] = useState(false);
+  const [count, setCount] = useState(0);
+  const [data, setData] = useState([]);
+  const handleSave = async () => {
+      onsubmit(newEntries)
+  };
+
+  const deleteEntryFromBackend = async (id) => {
+    const API_URL = `/items/${id}`;
+    const toastMessage = "Item deleted successfully!";
+    const response = await APICALL(
+      API_TYPE.DELETE,
+      API_URL,
+      setloading,
+      null,
+      setData,
+      setCount,
+      toastMessage
+    );
+    if(response!== undefined)
+    {
+      return true;
+    }
+  };
+
+  const handleDelete = async (index) => {
+    const field = fields[index];
+    if (newEntries.includes(index)) {
+      remove(index);
+      setNewEntries((prev) =>
+        prev.filter((i) => i !== index).map((i) => (i > index ? i - 1 : i))
+      );
+      return;
+    }
+    const isDeleted = await deleteEntryFromBackend(field.id);
+    if (isDeleted) {
+      remove(index);
+    }
+  };
+
+  const renderEditableRow = (index) => (
+    <TableRow>
+      <TableCell>
+        <InputCommon
+          NAME={`ipEntries.${index}.name`}
+          TYPE="text"
+          PLACEHOLDER="e.g., Jane Smith"
+          CONTROL={form.control}
+        />
+      </TableCell>
+      <TableCell>
+        <InputCommon
+          NAME={`ipEntries.${index}.customer_ip`}
+          TYPE="text"
+          PLACEHOLDER="1.1.1.1"
+          CONTROL={form.control}
+        />
+      </TableCell>
+      <TableCell>
+        <InputCommon
+          NAME={`ipEntries.${index}.sip_map_ip`}
+          TYPE="text"
+          PLACEHOLDER="2.2.2.2"
+          CONTROL={form.control}
+        />
+      </TableCell>
+      <TableCell>
+        <InputCommon
+          NAME={`ipEntries.${index}.cps_limit`}
+          TYPE="number"
+          PLACEHOLDER="0"
+          CONTROL={form.control}
+        />
+      </TableCell>
+      <TableCell>
+        <InputCommon
+          NAME={`ipEntries.${index}.session_limit`}
+          TYPE="number"
+          PLACEHOLDER="0"
+          CONTROL={form.control}
+        />
+      </TableCell>
+      <TableCell>
+        <InputCommon
+          NAME={`ipEntries.${index}.tech_prefix`}
+          TYPE="text"
+          PLACEHOLDER="Tech Prefix"
+          CONTROL={form.control}
+        />
+      </TableCell>
+      <TableCell>
+        <InputCommon
+          NAME={`ipEntries.${index}.suffix`}
+          TYPE="text"
+          PLACEHOLDER="Suffix"
+          CONTROL={form.control}
+        />
+      </TableCell>
+      <TableCell>
+        <SwitchCommon
+          NAME={`ipEntries.${index}.status`}
+          OPTIONS={TRUNK_TYPE_STATUS_OPTIONS}
+          CONTROL={form.control}
+        />
+      </TableCell>
+      <TableCell>
+        {/* Show cross icon for new entries */}
+        {newEntries.includes(index) ? (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => handleDelete(index)}
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        ) : (
+          <div className="flex space-x-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => handleSave(index)}
+            >
+              <Save className="h-4 w-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleCancel}
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
+      </TableCell>
+    </TableRow>
+  );
 
   return (
     <div className="space-y-6">
@@ -40,147 +203,103 @@ const IpWhiteListingForm = ({ form, MODE, DATA }) => {
               Specify the SIP trunk detail to add.
             </p>
           </div>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={onAddEntry}
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Add Another Entry
-          </Button>
+          <div className="flex space-x-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={onAddEntry}
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Add Another Entry
+            </Button>
+          </div>
         </div>
 
         {fields.length > 0 && (
-          <div className="">
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-2 space-y-4 ">
-              <div className="hidden lg:block lg:col-span-1"></div>
-              <div className="col-span-1 md:col-span-1 lg:col-span-1 gap-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <p className="text-sm font-medium text-gray-700">
-                    Name <span className="text-red-500">*</span>
-                  </p>
-                  <p className="text-sm font-medium text-gray-700">
-                    Customer IP <span className="text-red-500">*</span>
-                  </p>
-                </div>
-              </div>
-              <div className="col-span-1 md:col-span-1 lg:col-span-1 gap-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <p className="text-sm font-medium text-gray-700">
-                    SIP Map IP <span className="text-red-500">*</span>
-                  </p>
-                  <p className="text-sm font-medium text-gray-700">
-                    CPS Limit <span className="text-red-500">*</span>
-                  </p>
-                </div>
-              </div>
-              <div className="col-span-1 md:col-span-1 lg:col-span-1 gap-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <p className="text-sm font-medium text-gray-700">
-                    Session Limit <span className="text-red-500">*</span>
-                  </p>
-                  <p className="text-sm font-medium text-gray-700">
-                    Tech Prefix
-                  </p>
-                </div>
-              </div>
-              <div className="col-span-1 md:col-span-1 lg:col-span-1 gap-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <p className="text-sm font-medium text-gray-700">Suffix</p>
-
-                  <p className="text-sm font-medium text-gray-700">
-                    Status <span className="text-red-500">*</span>
-                  </p>
-                </div>
-              </div>
-            </div>
-            {fields.map((field, index) => (
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-                <div className="hidden lg:block lg:col-span-1"></div>
-
-                <div
-                  key={field.id}
-                  className="col-span-4 grid grid-cols-1 md:grid-cols-4 gap-6 border-b pb-4"
-                >
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <InputCommon
-                      NAME={`ipEntries.${index}.name`}
-                      TYPE="text"
-                      PLACEHOLDER="e.g., Jane Smith"
-                      CONTROL={form.control}
-                    />
-                    <InputCommon
-                      NAME={`ipEntries.${index}.customer_ip`}
-                      TYPE="text"
-                      PLACEHOLDER="1.1.1.1"
-                      CONTROL={form.control}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <InputCommon
-                      NAME={`ipEntries.${index}.sip_map_ip`}
-                      TYPE="text"
-                      PLACEHOLDER="2.2.2.2"
-                      CONTROL={form.control}
-                    />
-                    <InputCommon
-                      NAME={`ipEntries.${index}.cps_limit`}
-                      TYPE="number"
-                      PLACEHOLDER="0"
-                      CONTROL={form.control}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <InputCommon
-                      NAME={`ipEntries.${index}.session_limit`}
-                      TYPE="number"
-                      PLACEHOLDER="0"
-                      CONTROL={form.control}
-                    />
-                    <InputCommon
-                      NAME={`ipEntries.${index}.tech_prefix`}
-                      TYPE="text"
-                      PLACEHOLDER="Tech Prefix"
-                      CONTROL={form.control}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <InputCommon
-                      NAME={`ipEntries.${index}.suffix`}
-                      TYPE="text"
-                      PLACEHOLDER="Suffix"
-                      CONTROL={form.control}
-                    />
-                    <div className="flex items-center space-x-2">
-                      <SwitchCommon
-                        NAME={`ipEntries.${index}.status`}
-                        OPTIONS={TRUNK_TYPE_STATUS_OPTIONS}
-                        CONTROL={form.control}
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => remove(index)}
-                        className="self-start w-8 mt-2"
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[150px]">Name</TableHead>
+                  <TableHead className="w-[150px]">Customer IP</TableHead>
+                  <TableHead className="w-[150px]">SIP Map IP</TableHead>
+                  <TableHead className="w-[120px]">CPS Limit</TableHead>
+                  <TableHead className="w-[120px]">Session Limit</TableHead>
+                  <TableHead className="w-[150px]">Tech Prefix</TableHead>
+                  <TableHead className="w-[150px]">Suffix</TableHead>
+                  <TableHead className="w-[100px]">Status</TableHead>
+                  <TableHead className="w-[100px]">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {fields.map((field, index) =>
+                  // If in add mode, or the row is marked as a new entry, or it's being edited, render editable row
+                  MODE === "add" ||
+                  newEntries.includes(index) ||
+                  editIndex === index ? (
+                    renderEditableRow(index)
+                  ) : (
+                    // Otherwise, render view mode row
+                    <TableRow key={field.id}>
+                      <TableCell className="w-[150px]">{field.name}</TableCell>
+                      <TableCell className="w-[150px]">
+                        {field.customer_ip}
+                      </TableCell>
+                      <TableCell className="w-[150px]">
+                        {field.sip_map_ip}
+                      </TableCell>
+                      <TableCell className="w-[120px]">
+                        {field.cps_limit}
+                      </TableCell>
+                      <TableCell className="w-[120px]">
+                        {field.session_limit}
+                      </TableCell>
+                      <TableCell className="w-[150px]">
+                        {field.tech_prefix}
+                      </TableCell>
+                      <TableCell className="w-[150px]">
+                        {field.suffix}
+                      </TableCell>
+                      <TableCell className="w-[100px]">
+                        {field.status ? "Active" : "Inactive"}
+                      </TableCell>
+                      <TableCell className="w-[100px]">
+                        <div className="flex space-x-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => onEdit(index)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDelete(index)}
+                          >
+                            <Trash className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )
+                )}
+              </TableBody>
+            </Table>
           </div>
         )}
-        {MODE === "view" && fields.length > 0 && (
-          <div className="col-span-2 flex justify-end mt-4">
-            <Button type="submit" className="">
-              Save
+
+        {MODE === "view" && newEntries.length > 0 && (
+          <div className="flex justify-end border-t pt-4">
+            <Button
+              type="submit"
+              variant="default"
+              size="sm"
+              onClick={handleSave}
+            >
+              <Save className="mr-2 h-4 w-4" />
+              Save New Entries
             </Button>
           </div>
         )}

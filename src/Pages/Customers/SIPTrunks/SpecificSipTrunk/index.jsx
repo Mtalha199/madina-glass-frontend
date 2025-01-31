@@ -15,7 +15,11 @@ import TabsCommon from "@/Commons/TabsCommon";
 import { CUSTOMER_LIST_TABS } from "@/components/Tabs/TabConfig";
 import DropdownMenuWithDrawer from "../../List/dropDownmenu";
 import { BasicDetailForm } from "@/components/Forms/SipTrunkForms/BasicDetailForm";
-import { useSipTrunk } from "@/components/Hooks/CustomHooks";
+import {
+  useBasicSipTrunkFormForEdit,
+  useIpWhitelistFormForEdit,
+  useSipTrunk,
+} from "@/components/Hooks/CustomHooks";
 import { APICALL } from "@/components/Api/ApiCall";
 import { useEffect, useState } from "react";
 import FormSkeleton from "@/Commons/FormSkeloton";
@@ -29,8 +33,10 @@ export default function SpecificSipTrunk() {
   const [count, setCount] = useState(0);
   const [data, setData] = useState([]);
   const [ipWhiteListing, setIPWhiteListing] = useState([]);
-
-  const form = useSipTrunk();
+  const [newEntries, setNewEntries] = useState();
+  // const form = useSipTrunk();
+  const basicForm = useBasicSipTrunkFormForEdit();
+  const ipWhitelistForm = useIpWhitelistFormForEdit();
   useEffect(() => {
     getData();
   }, []);
@@ -53,8 +59,10 @@ export default function SpecificSipTrunk() {
     );
   };
   async function onSubmit(data) {
+    console.log(data, "data");
+
     const payload = {
-      id:id,
+      id: id,
       trunk_name: data?.trunk_name,
       trunk_type: data?.trunk_type,
       cps_limit: data?.cps_limit,
@@ -93,7 +101,7 @@ export default function SpecificSipTrunk() {
             tech_prefix = "",
             suffix = "",
           }) => ({
-            id:id,
+            id: id,
             name: name,
             trunk_id: response?.data?.sip_trunk_id,
             customer_ip,
@@ -120,6 +128,69 @@ export default function SpecificSipTrunk() {
       }
     }
   }
+  const onBasicSubmit = (basicData) => {
+    // Validate and handle basic form submission
+    basicForm.trigger().then((isValid) => {
+      if (isValid) {
+        // Proceed with basic form validation or initial submission
+        console.log("Basic Form Data:", basicData);
+      }
+    });
+  };
+
+  const onIpWhitelistSubmit = async (ipData) => {
+    try {
+      const isValid = await ipWhitelistForm.trigger();
+      if (isValid) {
+        const filteredEntries = ipData?.ipEntries.filter((entry, index) =>
+          newEntries.includes(index)
+        );
+                const payload1 = filteredEntries?.map(
+                  ({
+                    name,
+                    customer_ip,
+                    sip_map_ip,
+                    cps_limit,
+                    session_limit,
+                    status,
+                    tech_prefix = "",
+                    suffix = "",
+                  }) => ({
+                    name: name,
+                    trunk_id: id,
+                    customer_ip,
+                    sip_map_ip,
+                    cps_limit: cps_limit ?? 0,
+                    session_limit: session_limit ?? 0,
+                    status,
+                    tech_prefix,
+                    suffix,
+                  })
+                );
+                const apiResponse = await APICALL(
+                  API_TYPE.POST,
+                  API_END_POINT.ADD_IP_WHITE_LISTING,
+                  setloading,
+                  payload1,
+                  null,
+                  null,
+                  "IP White listing updated successfully"
+                );
+                if (apiResponse !== undefined) {
+                  // navigate(SCREEN_PATH.SIP_TRUNK_LIST);
+                  getData();
+                }
+      }
+    } catch (error) {
+      console.error("Error in onIpWhitelistSubmit:", error);
+      // Handle error (e.g., show an error message to the user)
+    }
+  
+  };
+  const handleNewEntries = (data) => {
+    setNewEntries(data);
+  };
+  console.log(newEntries, "new entries indexies");
   return (
     <div className="p-6">
       <Button
@@ -149,7 +220,7 @@ export default function SpecificSipTrunk() {
           {/* <DropdownMenuWithDrawer /> */}
         </div>
       </div>
-      <Form {...form}>
+      {/* <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           {loading ? (
             <FormSkeleton />
@@ -166,6 +237,34 @@ export default function SpecificSipTrunk() {
                 DATA={ipWhiteListing}
               />
             </>
+          )}
+        </form>
+      </Form> */}
+      <Form {...basicForm}>
+        <form onSubmit={basicForm.handleSubmit(onBasicSubmit)}>
+          {loading ? (
+            <FormSkeleton />
+          ) : (
+            <BasicDetailForm
+              form={basicForm}
+              MODE={DATA_VIEW_MODE.VIEW}
+              DATA={data[0]}
+            />
+          )}
+        </form>
+      </Form>
+
+      <Form {...ipWhitelistForm}>
+        <form onSubmit={ipWhitelistForm.handleSubmit(onIpWhitelistSubmit)}>
+          {loading ? (
+            <FormSkeleton />
+          ) : (
+            <IpWhiteListingForm
+              form={ipWhitelistForm}
+              MODE={DATA_VIEW_MODE.VIEW}
+              DATA={ipWhiteListing}
+              onsubmit={handleNewEntries}
+            />
           )}
         </form>
       </Form>

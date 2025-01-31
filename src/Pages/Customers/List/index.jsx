@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Headers } from "@tanstack/react-table";
 import HeaderCommon from "@/Commons/HeaderCommon";
 import axios from "@/components/Api/Axios";
@@ -20,40 +20,11 @@ import { APICALL } from "@/components/Api/ApiCall";
 import { API_END_POINT, API_TYPE, SCREEN_PATH } from "@/Constant";
 import SkeletonTable from "@/Commons/SkeletonTable";
 
-const columns = [
-  {
-    header: "Name",
-    accessorKey: "fullName",
-    cell: ({ row }) => {
-      const fullName = row.getValue("company_name");
-      const id = row.getValue("id");
-      return (
-        <Link to={`/customer/${id}`} className="text-primary hover:underline">
-          {fullName}
-        </Link>
-      );
-    },
-  },
-  {
-    header: "Status",
-    accessorKey: "is_active",
-    cell: ({ row }) => {
-      const status = row.getValue("is_active");
-      return (
-        <Badge variant={status === true ? "success" : "destructive"}>
-          {status === true ? "Active" : "Suspended"}
-        </Badge>
-      );
-    },
-  },
-  { header: "User Name", accessorKey: "username" },
-  { header: "Sip Trunks", accessorKey: "sip_trunks" },
 
-  { header: "Balance", accessorKey: "balance" },
-
-];
 
 export default function CustomersList() {
+  const navigate = useNavigate();
+
   const [loading, setloading] = useState(false);
   const [count, setCount] = useState(0);
   const [data,setData]= useState([]);
@@ -73,6 +44,49 @@ export default function CustomersList() {
       setCount
     );
   };
+  const columns = [
+    {
+      header: "Name",
+      accessorKey: "fullName",
+      cell: ({ row }) => {
+        const fullName = row.getValue("company_name");
+        const id = row.getValue("id");
+        const status = row.getValue("is_active");
+
+        const handleNavigation = () => {
+          navigate(`/customer/${id}`, {
+            state: { name: fullName, is_active: status },
+          });
+        };
+
+        return (
+          <span
+            className="text-primary hover:underline cursor-pointer"
+            onClick={handleNavigation}
+          >
+            {fullName}
+          </span>
+        );
+      },
+    },
+    {
+      header: "Status",
+      accessorKey: "is_active",
+      cell: ({ row }) => {
+        const status = row.getValue("is_active");
+        return (
+          <Badge variant={status === true ? "success" : "destructive"}>
+            {status === true ? "Active" : "Suspended"}
+          </Badge>
+        );
+      },
+    },
+    { header: "User Name", accessorKey: "username" },
+    { header: "Sip Trunks", accessorKey: "sip_trunks" },
+  
+    { header: "Balance", accessorKey: "balance" },
+  
+  ];
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">

@@ -11,6 +11,8 @@ export const API_END_POINT = {
   SIP_TRUNK_LIST: "admin/siptrunk",
   ADD_NEW_SIP_TRUNK:"/admin/siptrunk",
   ADD_IP_WHITE_LISTING:"/admin/ip-auth",
+  SIP_TRUNK_LIST_CUSTOMER: "admin/siptrunk-customer",
+
 };
 
 export const API_TYPE = {
