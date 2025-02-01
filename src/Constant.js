@@ -432,8 +432,8 @@ export const RADIOGROUP_YES_NO = [
  {value:false,label:"No"}
 ]
 export const TRUNK_TYPE_OPTIONS = [
-  {value:"inbound",label:"In Bound"},
-  {value:"outbound",label:"Out Bound"},
+  {value:"inbound",label:"Inbound"},
+  {value:"outbound",label:"Outbound"},
   {value:"both",label:"Both"}
  ]
  export const TRUNK_TYPE_STATUS_OPTIONS = [

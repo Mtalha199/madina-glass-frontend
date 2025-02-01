@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { BasicSipTrunkSchemaForEdit, ContactFormSchema, ContactFormSchemaEdit, IpWhitelistSchemaForEdit, loginFormSchema, NewGroupFormSchema, NewUrlFormSchema, SignUpFormSchema, SipTrunkForm } from "../Schema/auth";
+import { TRUNK_TYPE_OPTIONS } from "@/Constant";
 
 export function useLoginForm() {
   return useForm({
@@ -162,7 +163,7 @@ export function useSipTrunk(){
       resolver: zodResolver(SipTrunkForm),
       defaultValues: {
         trunk_name:"",
-        trunk_type:"",
+        trunk_type:TRUNK_TYPE_OPTIONS[2].value,
         customer:"",
         global_ani_block:false,
         global_dnis_block:false,

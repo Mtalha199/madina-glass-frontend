@@ -2,6 +2,7 @@ import FormSkeleton from "@/Commons/FormSkeloton";
 import { APICALL } from "@/components/Api/ApiCall";
 import { BasicDetailForm } from "@/components/Forms/SipTrunkForms/BasicDetailForm";
 import IpWhiteListingForm from "@/components/Forms/SipTrunkForms/IpWhiteListingForn";
+import StirAndShaken from "@/components/Forms/SipTrunkForms/StirAndShaken";
 import {
   useContactDetailEdit,
   useSipTrunk,
@@ -95,28 +96,30 @@ export const AddSipTrunk = () => {
   return (
     <>
       <div className="p-6">
-        {
-          id == undefined  ?     <Button
-          variant="ghost"
-          onClick={() => navigate(SCREEN_PATH.SIP_TRUNK_LIST)}
-          className="mb-4"
-        >
-          <ArrowLeft />
-          Sip Trunk List 
-        </Button> : 
-           <Button
-           variant="ghost"
-           onClick={() =>  navigate(`/customer/${id}`, {
-            state: { activeTab: CUSTOMER_LIST_TABS[3].value  },
-          })}
-          
-           className="mb-4"
-         >
-           <ArrowLeft />
-           Sip Trunk List
-         </Button>
-        }
-     
+        {id == undefined ? (
+          <Button
+            variant="ghost"
+            onClick={() => navigate(SCREEN_PATH.SIP_TRUNK_LIST)}
+            className="mb-4"
+          >
+            <ArrowLeft />
+            Sip Trunk List
+          </Button>
+        ) : (
+          <Button
+            variant="ghost"
+            onClick={() =>
+              navigate(`/customer/${id}`, {
+                state: { activeTab: CUSTOMER_LIST_TABS[3].value },
+              })
+            }
+            className="mb-4"
+          >
+            <ArrowLeft />
+            Sip Trunk List
+          </Button>
+        )}
+
         <h1 className="text-2xl font-bold mb-4">Add Sip Trunk</h1>
 
         <Form {...form}>
@@ -125,9 +128,15 @@ export const AddSipTrunk = () => {
               <FormSkeleton />
             ) : (
               <>
-                <BasicDetailForm form={form} MODE={DATA_VIEW_MODE.ADD} ID={id} />
+                <BasicDetailForm
+                  form={form}
+                  MODE={DATA_VIEW_MODE.ADD}
+                  ID={id}
+                />
                 <IpWhiteListingForm form={form} MODE={DATA_VIEW_MODE.ADD} />
-                <div className="col-span-2 flex justify-end mt-4">
+                <StirAndShaken form={form} MODE={DATA_VIEW_MODE.ADD} />
+
+                <div className="col-span-2 flex justify-end mt-4 border-t pt-4">
                   <Button type="submit" className="">
                     Save
                   </Button>

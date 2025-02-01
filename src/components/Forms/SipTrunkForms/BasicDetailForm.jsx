@@ -83,7 +83,7 @@ export const BasicDetailForm = ({ form, MODE, DATA ,ID }) => {
   return (
     <>
       <div className="">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 ">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 ">
           <div className="col-span-1 md:col-span-5 lg:col-span-1 gap-4">
             <h2 className="text-lg font-semibold mb-2">Sip Trunk Detail</h2>
             <p className="text-sm text-muted-foreground mb-4">
@@ -126,7 +126,7 @@ export const BasicDetailForm = ({ form, MODE, DATA ,ID }) => {
             }
         
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 space-y-4 ">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 space-y-4 ">
           <div className="hidden lg:block lg:col-span-1"></div>
           <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
             {RadioGroupAndView({
@@ -152,7 +152,7 @@ export const BasicDetailForm = ({ form, MODE, DATA ,ID }) => {
             })}
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 space-y-4 mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 space-y-4 mb-4">
           <div className="hidden lg:block lg:col-span-1"></div>
           <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
             {InputFieldAndView({
@@ -208,7 +208,7 @@ export const BasicDetailForm = ({ form, MODE, DATA ,ID }) => {
             })}
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 space-y-4 mt-2 mb-2">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 space-y-4 mt-2 mb-2">
           <div className="hidden lg:block lg:col-span-1"></div>
           <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
             {SwitchAndView({
