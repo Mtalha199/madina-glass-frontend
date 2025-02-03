@@ -440,3 +440,12 @@ export const TRUNK_TYPE_OPTIONS = [
   {value:true,label:"Enable"},
   {value:false,label:"Disable"},
  ]
+
+ export const ATTESTATION_OPTIONS = [
+  {value:"default",label:"Default"},
+
+  {value:"inbound",label:"A"},
+  {value:"outbound",label:"B"},
+  {value:"both",label:"C"},
+
+ ]

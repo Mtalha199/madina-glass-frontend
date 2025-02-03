@@ -66,7 +66,7 @@ const CommonDrawer = ({
               </DrawerClose> */}
             </div>
           </DrawerHeader>
-          <div className={`p-4 pb-0 overflow-y-auto`} style={{ maxHeight: maxHeightContent }}>
+          <div className={`p-4 pb-0 overflow-y-auto`} style={{ maxHeight: maxHeightContent ,paddingBottom:"6rem" }}>
             {children}
           </div>
         </div>

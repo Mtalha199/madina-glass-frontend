@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CloudUpload, X, CheckCircle, AlertCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Progress } from "@/components/ui/progress";
@@ -10,6 +11,8 @@ const FileUpload = () => {
   const [progress, setProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState("");
+  const [headers, setHeaders] = useState([]);
+  const [selectedHeader, setSelectedHeader] = useState("");
   const fileInputRef = useRef(null);
   const progressContainerRef = useRef(null);
 
@@ -37,13 +40,15 @@ const FileUpload = () => {
     Papa.parse(selectedFile, {
       header: true,
       complete: (result) => {
-        const headers = Object.keys(result.data[0] || {});
-        if (!headers.includes("number")) {
-          setError("File must contain a 'number' column header.");
+        const fileHeaders = Object.keys(result.data[0] || {});
+        
+        if (fileHeaders.length === 0) {
+          setError("The file appears to be empty or cannot be parsed.");
           setFile(null);
           return;
         }
 
+        setHeaders(fileHeaders);
         setFile(selectedFile);
         startUpload();
       },
@@ -91,6 +96,8 @@ const FileUpload = () => {
     setProgress(0);
     setIsUploading(false);
     setError("");
+    setHeaders([]);
+    setSelectedHeader("");
   };
 
   return (
@@ -100,6 +107,8 @@ const FileUpload = () => {
         className="border bg-muted h-[20rem] rounded-lg p-8 text-center flex flex-col justify-center items-center cursor-pointer"
         onDrop={handleDrop}
         onDragOver={handleDragOver}
+        onClick={handleBrowseClick}
+
       >
         <CloudUpload className="mb-4" />
         <div className="mb-4">
@@ -107,7 +116,6 @@ const FileUpload = () => {
         </div>
         <div className="inline-block text-sm underline">
           <span
-            onClick={handleBrowseClick}
             className="text-primary ml-auto inline-block text-sm underline font-bold cursor-pointer"
           >
             Browse
@@ -121,19 +129,13 @@ const FileUpload = () => {
         />
       </div>
 
+     
+
       <div className="flex mt-4">
         <p className="text-sm text-gray-500">
           <span className="font-bold">Supported File Type:</span> .csv, .xls,
           .xlsx
         </p>
-        <div className="ml-auto inline-block text-sm underline">
-          <Link
-            to=""
-            className="text-primary ml-auto inline-block text-sm underline font-bold"
-          >
-            Download Template
-          </Link>
-        </div>
       </div>
 
       <div ref={progressContainerRef}>
@@ -170,6 +172,26 @@ const FileUpload = () => {
             <Progress value={progress} className="h-2 rounded-full" />
           </div>
         )}
+         {headers.length > 0 && (
+        <div className="mt-4">
+          <Label>Select to map</Label>
+          <Select 
+            value={selectedHeader} 
+            onValueChange={setSelectedHeader}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Choose a header" />
+            </SelectTrigger>
+            <SelectContent>
+              {headers.map((header) => (
+                <SelectItem key={header} value={header}>
+                  {header}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
       </div>
     </div>
   );
