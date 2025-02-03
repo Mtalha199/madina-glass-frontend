@@ -32,7 +32,7 @@ const CommonDrawer = ({
       <DrawerTrigger asChild>
         {trigger || <Button variant="outline">Open Drawer</Button>}
       </DrawerTrigger>
-      <DrawerContent className={`h-[${contentHeight}] fixed top-[10vh]`}>
+      <DrawerContent className={`h-[${contentHeight}] fixed `}>
         <div className={`${fullWidth ? 'w-full px-4' : 'max-w-4xl mx-auto'} w-full`}>
           <DrawerHeader className="relative border-b">
             <div className="flex justify-between items-center pr-32">
@@ -66,7 +66,7 @@ const CommonDrawer = ({
               </DrawerClose> */}
             </div>
           </DrawerHeader>
-          <div className={`p-4 pb-0 overflow-y-auto`} style={{ maxHeight: maxHeightContent ,paddingBottom:"6rem" }}>
+          <div className={`p-4 pb-0 overflow-y-auto`} style={{ maxHeight: maxHeightContent ,paddingBottom:"2rem" }}>
             {children}
           </div>
         </div>

@@ -153,7 +153,13 @@ const FileUpload = () => {
               </div>
             </div>
             {progress === 100 ? (
+              <>
+              <div className="flex justify-end space-x-4">
               <CheckCircle className="text-green-500 w-6 h-6" />
+              <X className="cursor-pointer" onClick={resetFile} />
+              </div>
+              </>
+
             ) : (
               <X className="cursor-pointer" onClick={resetFile} />
             )}
@@ -173,8 +179,9 @@ const FileUpload = () => {
           </div>
         )}
          {headers.length > 0 && (
+          <>
         <div className="mt-4">
-          <Label>Select to map</Label>
+          <Label>Select DID Column<span className="text-red-500">*</span></Label>
           <Select 
             value={selectedHeader} 
             onValueChange={setSelectedHeader}
@@ -191,6 +198,25 @@ const FileUpload = () => {
             </SelectContent>
           </Select>
         </div>
+          <div className="mt-4">
+          <Label>Select Note Column</Label>
+          <Select 
+            value={selectedHeader} 
+            onValueChange={setSelectedHeader}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Choose a header" />
+            </SelectTrigger>
+            <SelectContent>
+              {headers.map((header) => (
+                <SelectItem key={header} value={header}>
+                  {header}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        </>
       )}
       </div>
     </div>
