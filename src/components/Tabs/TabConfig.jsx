@@ -1,7 +1,9 @@
-import { PaymentsCustomer } from "@/Pages/Customers/List/SpecificCustomerTabs/PaymentsCustomer";
-import { ProfileCustomer } from "@/Pages/Customers/List/SpecificCustomerTabs/ProfileCustomer";
-import { SettingCustomer } from "@/Pages/Customers/List/SpecificCustomerTabs/SettingCustomer";
-import SipTrunksCusotmer from "@/Pages/Customers/List/SpecificCustomerTabs/SipTrunksCustomer";
+import { ProfileCustomer } from "@/components/Tabs/CustomerTabs/ProfileCustomer";
+import { SettingCustomer } from "@/components/Tabs/CustomerTabs/SettingCustomer";
+import SipTrunksCusotmer from "@/components/Tabs/CustomerTabs/SipTrunksCustomer";
+import LcrTab from "@/components/Tabs/SipTrunkTabs/LcrTab";
+import Percentage from "@/components/Tabs/SipTrunkTabs/Percentage";
+import { PaymentsCustomer } from "./CustomerTabs/PaymentCustomer";
 
 export const CUSTOMER_LIST_TABS = [
   { value: "profile", label: "Profile", component: <ProfileCustomer /> },
@@ -12,4 +14,9 @@ export const CUSTOMER_LIST_TABS = [
     label: "SIP Trunks",
     component: <SipTrunksCusotmer />,
   },
+];
+
+export const ROUTING_TABS = [
+  { value: "lcr", label: "LCR", component: <LcrTab /> },
+  { value: "percentage", label: "Percentage", component: <Percentage /> },
 ];

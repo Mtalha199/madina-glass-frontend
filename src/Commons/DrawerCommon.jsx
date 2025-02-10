@@ -21,8 +21,8 @@ const CommonDrawer = ({
   onOpenChange,
   onSave,
   showActions = true,
-  fullWidth = false, // New prop to control width
-  height, // New prop for dynamic height
+  fullWidth = false,
+  height,
 }) => {
   const contentHeight = height || '90vh';
   const maxHeightContent = `calc(${contentHeight} - 120px)`;
@@ -30,7 +30,9 @@ const CommonDrawer = ({
   return (
     <Drawer open={isOpen} onOpenChange={onOpenChange}>
       <DrawerTrigger asChild>
-        {trigger || <Button variant="outline">Open Drawer</Button>}
+        {trigger 
+        //  <Button variant="outline">Open Drawer</Button>
+         }
       </DrawerTrigger>
       <DrawerContent className={`h-[${contentHeight}] fixed `}>
         <div className={`${fullWidth ? 'w-full px-4' : 'max-w-4xl mx-auto'} w-full`}>

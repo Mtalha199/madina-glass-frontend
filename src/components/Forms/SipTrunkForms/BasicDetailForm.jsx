@@ -235,7 +235,7 @@ export const BasicDetailForm = ({ form, MODE, DATA ,ID }) => {
           <div className="col-span-1 md:col-span-1 lg:hidden"></div>
           <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
             {SwitchAndView({
-              LABEL: "Customer ANI Block",
+              LABEL: "ANI Block",
               NAME: "customer_ani_block",
               ICON: <Server />,
               VALUE: DATA?.customer_ani_block,
@@ -246,7 +246,7 @@ export const BasicDetailForm = ({ form, MODE, DATA ,ID }) => {
           </div>
           <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
             {SwitchAndView({
-              LABEL: "Customer DNIS Block",
+              LABEL: "DNIS Block",
               NAME: "customer_dnis_block",
               ICON: <Server />,
               VALUE: DATA?.global_dnis_block,

@@ -2,6 +2,7 @@ import FormSkeleton from "@/Commons/FormSkeloton";
 import { APICALL } from "@/components/Api/ApiCall";
 import { BasicDetailForm } from "@/components/Forms/SipTrunkForms/BasicDetailForm";
 import IpWhiteListingForm from "@/components/Forms/SipTrunkForms/IpWhiteListingForn";
+import Routing from "@/components/Forms/SipTrunkForms/Routing";
 import StirAndShaken from "@/components/Forms/SipTrunkForms/StirAndShaken";
 import {
   useContactDetailEdit,
@@ -135,6 +136,8 @@ export const AddSipTrunk = () => {
                 />
                 <IpWhiteListingForm form={form} MODE={DATA_VIEW_MODE.ADD} />
                 <StirAndShaken form={form} MODE={DATA_VIEW_MODE.ADD} />
+                <Routing form={form} MODE={DATA_VIEW_MODE.ADD} />
+
 
                 <div className="col-span-2 flex justify-end mt-4 border-t pt-4">
                   <Button type="submit" className="">

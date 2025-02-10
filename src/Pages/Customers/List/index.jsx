@@ -1,21 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { DataTable } from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { Link, useNavigate } from "react-router-dom";
-import { Headers } from "@tanstack/react-table";
 import HeaderCommon from "@/Commons/HeaderCommon";
-import axios from "@/components/Api/Axios";
-import { toast } from "@/hooks/use-toast";
 import { APICALL } from "@/components/Api/ApiCall";
 import { API_END_POINT, API_TYPE, SCREEN_PATH } from "@/Constant";
 import SkeletonTable from "@/Commons/SkeletonTable";

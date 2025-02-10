@@ -449,7 +449,6 @@ export const TRUNK_TYPE_OPTIONS = [
  ]
  export const ATTESTATION_OPTIONS_DEFAULT = [
   {value:"inbound1",label:"Do Not Sign"},
-
   {value:"inbound2",label:"Attest A"},
   {value:"outbound",label:"Attest B"},
   {value:"both",label:"Attest C"},

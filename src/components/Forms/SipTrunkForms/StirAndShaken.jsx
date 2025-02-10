@@ -14,94 +14,91 @@ const StirAndShaken = ({ form, MODE }) => {
 
   return (
     <>
-    <div className="space-y-6 border-t mt-4 pt-4">
-      <div className="flex justify-between items-start mb-6">
-        <div>
-          <h2 className="text-lg font-semibold mb-2">Stir/Shaken Detail</h2>
-          <p className="text-sm text-muted-foreground">
-            Specify the Stir/Shaken detail to add.
-          </p>
-        </div>
-        <div className="flex space-x-2">
-          <CommonDrawer
-            title="Add Single DID"
-            description="Please enter single number and choose the attestation label"
-            isOpen={openSingle}
-            onOpenChange={setOpenSingle}
-            trigger={
-              <Button type="button" variant="outline" size="sm">
-                <Plus className="mr-2 h-4 w-4" />
-                Add Single
-              </Button>
-            }
-            // height={"60vh"}
-          >
-            <InputCommon
-              LABEL={"DID Number"}
-              NAME={"phone_number"}
-              PLACEHOLDER={"+1 234 567 89"}
-              TYPE={"number"}
-            />
-
-            <div className="space-y-4 pt-4">
-              <RadioGroupCommon
-                LABEL={"Attestation Type"}
-                NAME={"attestation"}
-                OPTIONS={ATTESTATION_OPTIONS}
-              />
-            </div>
-
-            <div>
-              <div className="pt-4">
-                <Label>Notes</Label>
-                <Textarea
-                  // value={textAreaContent}
-                  // onChange={(e) => setTextAreaContent(e.target.value)}
-                  placeholder="Enter Notes"
-                  rows={8}
+      <div className="space-y-6 border-t mt-4 pt-4">
+        <div className="flex justify-between items-start mb-6">
+          <div>
+            <h2 className="text-lg font-semibold mb-2">Stir/Shaken Detail</h2>
+            <p className="text-sm text-muted-foreground">
+              Specify the Stir/Shaken detail to add.
+            </p>
+          </div>
+          <div className="flex space-x-2">
+            <CommonDrawer
+              title="Add Single DID"
+              description="Please enter single number and choose the attestation label"
+              isOpen={openSingle}
+              onOpenChange={setOpenSingle}
+              trigger={
+                <Button type="button" variant="outline" size="sm">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Single
+                </Button>
+              }
+            >
+              <div className="space-y-4 pb-4">
+                <RadioGroupCommon
+                  LABEL={"Attestation Type"}
+                  NAME={"attestation"}
+                  OPTIONS={ATTESTATION_OPTIONS}
                 />
               </div>
-            </div>
-          </CommonDrawer>
-          <CommonDrawer
-            title="Add Bulk DID"
-            description="Please upload file and choose the attestation label"
-            isOpen={open}
-            onOpenChange={setOpen}
-            trigger={
-              <Button type="button" variant="outline" size="sm">
-                <Plus className="mr-2 h-4 w-4" />
-                Add Bulk
-              </Button>
-            }
-          >
-            <FileUpload />
-            <div className="space-y-4 pt-4">
-              <RadioGroupCommon
-                LABEL={"Attestation"}
-                NAME={"attestation"}
-                OPTIONS={ATTESTATION_OPTIONS}
+
+              <InputCommon
+                LABEL={"DID Number"}
+                NAME={"phone_number"}
+                PLACEHOLDER={"+1 234 567 89"}
+                TYPE={"number"}
               />
-            </div>
-          </CommonDrawer>
+
+              <div>
+                <div className="pt-4">
+                  <Label>Notes</Label>
+                  <Textarea
+                    // value={textAreaContent}
+                    // onChange={(e) => setTextAreaContent(e.target.value)}
+                    placeholder="Enter Notes"
+                    rows={8}
+                  />
+                </div>
+              </div>
+            </CommonDrawer>
+            <CommonDrawer
+              title="Add Bulk DID"
+              description="Please upload file and choose the attestation label"
+              isOpen={open}
+              onOpenChange={setOpen}
+              trigger={
+                <Button type="button" variant="outline" size="sm">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Bulk
+                </Button>
+              }
+            >
+                      <div className="space-y-4 pb-4">
+                <RadioGroupCommon
+                  LABEL={"Attestation"}
+                  NAME={"attestation"}
+                  OPTIONS={ATTESTATION_OPTIONS}
+                />
+              </div>
+              <FileUpload />
+      
+            </CommonDrawer>
+          </div>
+        </div>
+        <div></div>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 space-y-4 ">
+        <div className="hidden lg:block lg:col-span-1"></div>
+        <div className="col-span-4 md:col-span-4 lg:col-span-4 gap-4">
+          <RadioGroupCommon
+            LABEL={"Default Action"}
+            NAME={"attestation"}
+            OPTIONS={ATTESTATION_OPTIONS_DEFAULT}
+          />
         </div>
       </div>
-      <div>
-   
-      </div>
-      
-    </div>
-    <div className="flex justify-center pt-4">
-  {/* <div className="bg-muted p-4 rounded-md inline-block"> */}
-    <RadioGroupCommon
-      LABEL={"Default Action"}
-      NAME={"attestation"}
-      OPTIONS={ATTESTATION_OPTIONS_DEFAULT}
-    />
-  {/* </div> */}
-</div>
-
-     </>
+    </>
   );
 };
 

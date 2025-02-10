@@ -6,7 +6,7 @@ import ForgotPassword from "./Auth/ForgotPassword";
 import ResetPassword from "./Auth/ResetPassword";
 import PrivateLayout from "./components/Layouts/PrivateLayout";
 import CustomersList from "./Pages/Customers/List";
-import SpecificCustomer from "./Pages/Customers/List/specificCustomer";
+import SpecificCustomer from "./Pages/Customers/List/SpecificCustomer/specificCustomer";
 import Dashboard from "./Pages/DashBoard";
 import AuthGuard from "./Auth/AuthGaurd";
 import { AddCustomer } from "./Pages/Customers/List/AddCustomer";

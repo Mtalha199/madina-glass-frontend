@@ -13,7 +13,6 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import TabsCommon from "@/Commons/TabsCommon";
 import { CUSTOMER_LIST_TABS } from "@/components/Tabs/TabConfig";
-import DropdownMenuWithDrawer from "../../List/dropDownmenu";
 import { BasicDetailForm } from "@/components/Forms/SipTrunkForms/BasicDetailForm";
 import {
   useBasicSipTrunkFormForEdit,
@@ -217,7 +216,6 @@ export default function SpecificSipTrunk() {
           </div>
         </div>
         <div className="mt-4 md:mt-0 flex gap-2">
-          {/* <DropdownMenuWithDrawer /> */}
         </div>
       </div>
       {/* <Form {...form}>

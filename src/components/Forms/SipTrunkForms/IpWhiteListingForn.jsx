@@ -217,7 +217,9 @@ const IpWhiteListingForm = ({ form, MODE, DATA ,onsubmit}) => {
         </div>
 
         {fields.length > 0 && (
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto grid grid-cols-1 md:grid-cols-5 gap-4 space-y-4 ">
+            <div className="hidden lg:block lg:col-span-1"></div>
+            <div className="col-span-1 md:col-span-4 lg:col-span-4 gap-4 border rounded-md" >
             <Table>
               <TableHeader>
                 <TableRow>
@@ -287,6 +289,7 @@ const IpWhiteListingForm = ({ form, MODE, DATA ,onsubmit}) => {
                 )}
               </TableBody>
             </Table>
+            </div>
           </div>
         )}
 
