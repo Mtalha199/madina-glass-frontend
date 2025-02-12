@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { BasicSipTrunkSchemaForEdit, ContactFormSchema, ContactFormSchemaEdit, IpWhitelistSchemaForEdit, loginFormSchema, NewGroupFormSchema, NewUrlFormSchema, SignUpFormSchema, SipTrunkForm, StirShakenFormBulk, StirShakenFormSingle } from "../Schema/auth";
+import { BasicSipTrunkSchema, ContactFormSchema, ContactFormSchemaEdit, IpWhitelistSchemaForEdit, loginFormSchema, NewGroupFormSchema, NewUrlFormSchema, SignUpFormSchema, SipTrunkForm, StirShakenFormBulk, StirShakenFormSingle } from "../Schema/auth";
 import { ATTESTATION_OPTIONS, TRUNK_TYPE_OPTIONS } from "@/Constant";
 
 export function useLoginForm() {
@@ -162,20 +162,20 @@ export function useSipTrunk(){
   return useForm({
       resolver: zodResolver(SipTrunkForm),
       defaultValues: {
-        trunk_name:"",
-        trunk_type:TRUNK_TYPE_OPTIONS[2].value,
-        customer:"",
-        global_ani_block:false,
-        global_dnis_block:false,
-        customer_ani_block:false,
-        customer_dnis_block:false,
-        cps_limit:"0",
-        session_limit:"0",
-        dnis_call_limit:"0",
-        ani_call_limit:"0",
-        status:true,
+        // trunk_name:"",
+        // trunk_type:TRUNK_TYPE_OPTIONS[2].value,
+        // customer:"",
+        // global_ani_block:false,
+        // global_dnis_block:false,
+        // customer_ani_block:false,
+        // customer_dnis_block:false,
+        // cps_limit:"0",
+        // session_limit:"0",
+        // dnis_call_limit:"0",
+        // ani_call_limit:"0",
+        // status:true,
 
-        ipEntries: [],
+        // ipEntries: [],
 
       },
     });
@@ -184,9 +184,9 @@ export function useSipTrunk(){
 
 
 
-export function useBasicSipTrunkFormForEdit() {
+export function useBasicSipTrunkForm() {
   return useForm({
-    resolver: zodResolver(BasicSipTrunkSchemaForEdit),
+    resolver: zodResolver(BasicSipTrunkSchema),
     defaultValues: {
       trunk_name: "",
       trunk_type: "",
@@ -204,7 +204,7 @@ export function useBasicSipTrunkFormForEdit() {
   });
 }
 
-export function useIpWhitelistFormForEdit() {
+export function useIpWhitelistForm() {
   return useForm({
     resolver: zodResolver(IpWhitelistSchemaForEdit),
     defaultValues: {

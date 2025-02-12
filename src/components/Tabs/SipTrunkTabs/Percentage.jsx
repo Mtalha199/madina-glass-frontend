@@ -118,9 +118,9 @@ const Percentage = () => {
  <div className="text-red-500">{errorMessage}</div>
       )}
       
-      <div className="flex justify-between items-center">
+      {/* <div className="flex justify-between items-center">
         <h3 className="text-lg font-medium">Total Percentage: {totalPercentage}%</h3>
-      </div>
+      </div> */}
 
       <div className="grid grid-cols-4 gap-4">
         {items.map((item) => (

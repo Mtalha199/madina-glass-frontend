@@ -244,7 +244,7 @@ export const SipTrunkForm = z.object({
     .optional(),
 });
 
-export const BasicSipTrunkSchemaForEdit = z.object({
+export const BasicSipTrunkSchema = z.object({
   trunk_name: z
     .string()
     .min(2, { message: "Trunk name must be at least 2 characters" }),

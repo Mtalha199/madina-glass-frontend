@@ -15,8 +15,10 @@ import TabsCommon from "@/Commons/TabsCommon";
 import { CUSTOMER_LIST_TABS } from "@/components/Tabs/TabConfig";
 import { BasicDetailForm } from "@/components/Forms/SipTrunkForms/BasicDetailForm";
 import {
-  useBasicSipTrunkFormForEdit,
-  useIpWhitelistFormForEdit,
+  useBasicSipTrunkForm,
+  useIpWhitelistForm,
+  // useBasicSipTrunkFormForEdit,
+  // useIpWhitelistFormForEdit,
   useSipTrunk,
 } from "@/components/Hooks/CustomHooks";
 import { APICALL } from "@/components/Api/ApiCall";
@@ -34,8 +36,8 @@ export default function SpecificSipTrunk() {
   const [ipWhiteListing, setIPWhiteListing] = useState([]);
   const [newEntries, setNewEntries] = useState();
   // const form = useSipTrunk();
-  const basicForm = useBasicSipTrunkFormForEdit();
-  const ipWhitelistForm = useIpWhitelistFormForEdit();
+  const basicForm = useBasicSipTrunkForm();
+  const ipWhitelistForm = useIpWhitelistForm();
   useEffect(() => {
     getData();
   }, []);

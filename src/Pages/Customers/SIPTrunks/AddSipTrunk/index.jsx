@@ -5,7 +5,10 @@ import IpWhiteListingForm from "@/components/Forms/SipTrunkForms/IpWhiteListingF
 import Routing from "@/components/Forms/SipTrunkForms/Routing";
 import StirAndShaken from "@/components/Forms/SipTrunkForms/StirAndShaken";
 import {
+  useBasicSipTrunkForm,
+  // useBasicSipTrunkFormForEdit,
   useContactDetailEdit,
+  useIpWhitelistForm,
   useSipTrunk,
 } from "@/components/Hooks/CustomHooks";
 import { CUSTOMER_LIST_TABS } from "@/components/Tabs/TabConfig";
@@ -24,9 +27,14 @@ import { useLocation, useNavigate } from "react-router-dom";
 export const AddSipTrunk = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
-  const id = state?.id;
 
-  const form = useSipTrunk();
+  const id = state?.id;
+  const [trunkId, setTrunkId] = useState(null);
+  const form = useBasicSipTrunkForm();
+  const formIpWhiteListing = useIpWhitelistForm();
+  const stirAndShakenListing = useIpWhitelistForm();
+  const routingListing = useIpWhitelistForm();
+
   const [loading, setLoading] = useState(false);
   async function onSubmit(data) {
     const payload = {
@@ -51,48 +59,44 @@ export const AddSipTrunk = () => {
       payload,
       null,
       null,
-      data?.ipEntries.length === 0 ? "Sip Trunk Added Successfully" : null
+      "Sip Trunk Added Successfully"
     );
     if (response !== undefined) {
-      if (data?.ipEntries.length == 0) {
-        navigate(SCREEN_PATH.SIP_TRUNK_LIST);
-      } else {
-        const payload1 = data.ipEntries.map(
-          ({
-            name,
-            customer_ip,
-            sip_map_ip,
-            cps_limit,
-            session_limit,
-            status,
-            tech_prefix = "",
-            suffix = "",
-          }) => ({
-            name: name,
-            trunk_id: response?.data?.sip_trunk_id,
-            customer_ip,
-            sip_map_ip,
-            cps_limit: cps_limit ?? 0,
-            session_limit: session_limit ?? 0,
-            status,
-            tech_prefix,
-            suffix,
-          })
-        );
-        const apiResponse = await APICALL(
-          API_TYPE.POST,
-          API_END_POINT.ADD_IP_WHITE_LISTING,
-          setLoading,
-          payload1,
-          null,
-          null,
-          "Sip Trunk Added Successfully"
-        );
-        if (apiResponse !== undefined) {
-          navigate(SCREEN_PATH.SIP_TRUNK_LIST);
-        }
-      }
+      setTrunkId(response?.data?.sip_trunk_id);
     }
+  }
+  async function onSubmitIpWhiteListing(data) {
+    const payload1 = data.ipEntries.map(
+      ({
+        name,
+        customer_ip,
+        sip_map_ip,
+        cps_limit,
+        session_limit,
+        status,
+        tech_prefix = "",
+        suffix = "",
+      }) => ({
+        name: name,
+        trunk_id: trunkId,
+        customer_ip,
+        sip_map_ip,
+        cps_limit: cps_limit ?? 0,
+        session_limit: session_limit ?? 0,
+        status,
+        tech_prefix,
+        suffix,
+      })
+    );
+    await APICALL(
+      API_TYPE.POST,
+      API_END_POINT.ADD_IP_WHITE_LISTING,
+      setLoading,
+      payload1,
+      null,
+      null,
+      "IP white listing Added Succussfully"
+    );
   }
   return (
     <>
@@ -123,31 +127,78 @@ export const AddSipTrunk = () => {
 
         <h1 className="text-2xl font-bold mb-4">Add Sip Trunk</h1>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
-            {loading ? (
-              <FormSkeleton />
-            ) : (
-              <>
+        {loading ? (
+          <FormSkeleton />
+        ) : (
+          <>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)}>
                 <BasicDetailForm
                   form={form}
                   MODE={DATA_VIEW_MODE.ADD}
                   ID={id}
                 />
-                <IpWhiteListingForm form={form} MODE={DATA_VIEW_MODE.ADD} />
-                <StirAndShaken form={form} MODE={DATA_VIEW_MODE.ADD} />
-                <Routing form={form} MODE={DATA_VIEW_MODE.ADD} />
-
-
-                <div className="col-span-2 flex justify-end mt-4 border-t pt-4">
+                <div className="col-span-2 flex justify-end">
                   <Button type="submit" className="">
                     Save
                   </Button>
                 </div>
-              </>
-            )}
-          </form>
-        </Form>
+              </form>
+            </Form>
+            <Form {...formIpWhiteListing}>
+              <form
+                onSubmit={formIpWhiteListing.handleSubmit(
+                  onSubmitIpWhiteListing
+                )}
+              >
+                <IpWhiteListingForm form={form} MODE={DATA_VIEW_MODE.ADD} />
+                <div className="col-span-2 flex justify-end mt-4">
+                  <Button
+                    type="submit"
+                    disabled={trunkId === null}
+                    className=""
+                  >
+                    Save
+                  </Button>
+                </div>
+              </form>
+            </Form>
+            <Form {...stirAndShakenListing}>
+              <form
+                onSubmit={stirAndShakenListing.handleSubmit(
+                  onSubmitIpWhiteListing
+                )}
+              >
+                <StirAndShaken form={form} MODE={DATA_VIEW_MODE.ADD} />
+                <div className="col-span-2 flex justify-end mt-4">
+                  <Button
+                    type="submit"
+                    disabled={trunkId === null}
+                    className=""
+                  >
+                    Save
+                  </Button>
+                </div>
+              </form>
+            </Form>
+            <Form {...routingListing}>
+              <form
+                onSubmit={routingListing.handleSubmit(onSubmitIpWhiteListing)}
+              >
+                <Routing form={form} MODE={DATA_VIEW_MODE.ADD} />
+                <div className="col-span-2 flex justify-end mt-4">
+                  <Button
+                    type="submit"
+                    disabled={trunkId === null}
+                    className=""
+                  >
+                    Save
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </>
+        )}
       </div>
     </>
   );
