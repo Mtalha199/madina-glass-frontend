@@ -189,7 +189,6 @@ export default function SpecificSipTrunk() {
   const handleNewEntries = (data) => {
     setNewEntries(data);
   };
-  console.log(newEntries, "new entries indexies");
   return (
     <div className="p-6">
       <Button
@@ -200,44 +199,6 @@ export default function SpecificSipTrunk() {
         <ArrowLeft />
         Sip Trunk List
       </Button>
-
-      <div className="flex flex-col md:flex-row items-center md:justify-between mb-6">
-        <div className="flex items-center gap-4">
-          <Avatar className="w-16 h-16">
-            <AvatarImage
-              src="/images/avatar-placeholder.png"
-              alt="User Avatar"
-            />
-            <AvatarFallback>CR</AvatarFallback>
-          </Avatar>
-          <div>
-            <h2 className="text-2xl font-semibold">Charlie Romance</h2>
-            <Badge>Active</Badge>
-          </div>
-        </div>
-        <div className="mt-4 md:mt-0 flex gap-2">
-        </div>
-      </div>
-      {/* <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-          {loading ? (
-            <FormSkeleton />
-          ) : (
-            <>
-              <BasicDetailForm
-                form={form}
-                MODE={DATA_VIEW_MODE.VIEW}
-                DATA={data[0]}
-              />
-              <IpWhiteListingForm
-                form={form}
-                MODE={DATA_VIEW_MODE.VIEW}
-                DATA={ipWhiteListing}
-              />
-            </>
-          )}
-        </form>
-      </Form> */}
       <Form {...basicForm}>
         <form onSubmit={basicForm.handleSubmit(onBasicSubmit)}>
           {loading ? (

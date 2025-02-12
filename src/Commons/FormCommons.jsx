@@ -33,6 +33,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 
 export const InputCommon = ({
   LABEL,
@@ -390,6 +391,44 @@ export const SwitchCommon = ({
               />
             </FormControl>
           </div>
+        </FormItem>
+      )}
+    />
+  );
+};
+
+export const TextareaCommon = ({
+  LABEL,
+  IS_REQUIRED = false,
+  NAME,
+  PLACEHOLDER,
+  CONTROL,
+  CLASSNAME,
+  ROWS = 4,
+  DISABLED = false,
+}) => {
+  return (
+    <FormField
+      control={CONTROL}
+      name={NAME}
+      render={({ field, fieldState }) => (
+        <FormItem>
+          <FormLabel>
+            {LABEL}
+            {IS_REQUIRED && <span className="text-red-500">*</span>}
+          </FormLabel>
+          <FormControl>
+            <Textarea
+              placeholder={PLACEHOLDER}
+              rows={ROWS}
+              disabled={DISABLED}
+              {...field}
+              className={`resize-none ${
+                fieldState.error ? "border-red-500" : CLASSNAME
+              }`}
+            />
+          </FormControl>
+          <FormMessage />
         </FormItem>
       )}
     />

@@ -2,17 +2,22 @@ import React, { useState, useEffect, useRef } from "react";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CloudUpload, X, CheckCircle, AlertCircle } from "lucide-react";
-import { Link } from "react-router-dom";
 import { Progress } from "@/components/ui/progress";
 import Papa from "papaparse";
 
-const FileUpload = () => {
+const FileUpload = ({onMappingComplete }) => {
   const [file, setFile] = useState(null);
   const [progress, setProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState("");
   const [headers, setHeaders] = useState([]);
-  const [selectedHeader, setSelectedHeader] = useState("");
+  const [didColumn, setDidColumn] = useState("");
+  const [noteColumn, setNoteColumn] = useState("");
+  const [parsedData, setParsedData] = useState([]);
+  const [mappedData, setMappedData] = useState({
+    phoneNumbers: [],
+    notes: []
+  });
   const fileInputRef = useRef(null);
   const progressContainerRef = useRef(null);
 
@@ -49,6 +54,7 @@ const FileUpload = () => {
         }
 
         setHeaders(fileHeaders);
+        setParsedData(result.data);
         setFile(selectedFile);
         startUpload();
       },
@@ -57,6 +63,19 @@ const FileUpload = () => {
       },
     });
   };
+
+  // Update mapped data when columns are selected
+  useEffect(() => {
+    if (parsedData.length > 0 && didColumn && noteColumn) {
+      const mapped = {
+        phoneNumbers: parsedData.map(row => row[didColumn]),
+        notes: parsedData.map(row => row[noteColumn])
+      };
+      setMappedData(mapped);
+      onMappingComplete(mapped);
+      console.log("Mapped Data:", mapped); // For debugging
+    }
+  }, [parsedData, didColumn, noteColumn]);
 
   const startUpload = () => {
     setIsUploading(true);
@@ -81,12 +100,6 @@ const FileUpload = () => {
     return () => clearInterval(interval);
   }, [isUploading]);
 
-  useEffect(() => {
-    if (progress > 0 && progress < 100 && !error) {
-      progressContainerRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [progress]);
-
   const handleBrowseClick = () => {
     fileInputRef.current.click();
   };
@@ -97,7 +110,10 @@ const FileUpload = () => {
     setIsUploading(false);
     setError("");
     setHeaders([]);
-    setSelectedHeader("");
+    setDidColumn("");
+    setNoteColumn("");
+    setParsedData([]);
+    setMappedData({ phoneNumbers: [], notes: [] });
   };
 
   return (
@@ -108,16 +124,13 @@ const FileUpload = () => {
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onClick={handleBrowseClick}
-
       >
         <CloudUpload className="mb-4" />
         <div className="mb-4">
           <p className="text-gray-500">Drag and Drop a file</p>
         </div>
         <div className="inline-block text-sm underline">
-          <span
-            className="text-primary ml-auto inline-block text-sm underline font-bold cursor-pointer"
-          >
+          <span className="text-primary ml-auto inline-block text-sm underline font-bold cursor-pointer">
             Browse
           </span>
         </div>
@@ -126,15 +139,13 @@ const FileUpload = () => {
           ref={fileInputRef}
           onChange={handleFileChange}
           className="hidden"
+          accept=".csv,.xls,.xlsx"
         />
       </div>
 
-     
-
       <div className="flex mt-4">
         <p className="text-sm text-gray-500">
-          <span className="font-bold">Supported File Type:</span> .csv, .xls,
-          .xlsx
+          <span className="font-bold">Supported File Type:</span> .csv, .xls, .xlsx
         </p>
       </div>
 
@@ -153,13 +164,10 @@ const FileUpload = () => {
               </div>
             </div>
             {progress === 100 ? (
-              <>
               <div className="flex justify-end space-x-4">
-              <CheckCircle className="text-green-500 w-6 h-6" />
-              <X className="cursor-pointer" onClick={resetFile} />
+                <CheckCircle className="text-green-500 w-6 h-6" />
+                <X className="cursor-pointer" onClick={resetFile} />
               </div>
-              </>
-
             ) : (
               <X className="cursor-pointer" onClick={resetFile} />
             )}
@@ -178,46 +186,47 @@ const FileUpload = () => {
             <Progress value={progress} className="h-2 rounded-full" />
           </div>
         )}
-         {headers.length > 0 && (
+
+        {headers.length > 0 && (
           <>
-        <div className="mt-4">
-          <Label>Select DID Column<span className="text-red-500">*</span></Label>
-          <Select 
-            value={selectedHeader} 
-            onValueChange={setSelectedHeader}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Choose a header" />
-            </SelectTrigger>
-            <SelectContent>
-              {headers.map((header) => (
-                <SelectItem key={header} value={header}>
-                  {header}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-          <div className="mt-4">
-          <Label>Select Note Column</Label>
-          <Select 
-            value={selectedHeader} 
-            onValueChange={setSelectedHeader}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Choose a header" />
-            </SelectTrigger>
-            <SelectContent>
-              {headers.map((header) => (
-                <SelectItem key={header} value={header}>
-                  {header}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        </>
-      )}
+            <div className="mt-4">
+              <Label>Select DID Column<span className="text-red-500">*</span></Label>
+              <Select 
+                value={didColumn} 
+                onValueChange={setDidColumn}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Choose a header" />
+                </SelectTrigger>
+                <SelectContent>
+                  {headers.map((header) => (
+                    <SelectItem key={header} value={header}>
+                      {header}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="mt-4">
+              <Label>Select Note Column</Label>
+              <Select 
+                value={noteColumn} 
+                onValueChange={setNoteColumn}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Choose a header" />
+                </SelectTrigger>
+                <SelectContent>
+                  {headers.map((header) => (
+                    <SelectItem key={header} value={header}>
+                      {header}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

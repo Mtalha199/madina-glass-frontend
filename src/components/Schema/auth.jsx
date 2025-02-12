@@ -136,7 +136,6 @@ export const ContactFormSchema = z.object({
     .optional(),
 });
 
-
 export const ContactFormSchemaEdit = z.object({
   company_name: z.string().min(2, { message: "Company name is required" }),
   company_type: z.string().optional(),
@@ -202,24 +201,23 @@ export const SipTrunkForm = z.object({
   trunk_name: z
     .string()
     .min(2, { message: "Trunk name must be at least 2 characters" }),
-    customer: z.string().min(1, { message: "Customer is required" }),
+  customer: z.string().min(1, { message: "Customer is required" }),
 
-    trunk_type: z.string().min(1, { message: "Trunk type is required" }),
-    status:z.boolean().optional(),
+  trunk_type: z.string().min(1, { message: "Trunk type is required" }),
+  status: z.boolean().optional(),
 
-    cps_limit: z.string().optional(),
-    session_limit: z.string().optional(),
-    dnis_call_limit: z.string().optional(),
-    ani_call_limit :z.string().optional(),
+  cps_limit: z.string().optional(),
+  session_limit: z.string().optional(),
+  dnis_call_limit: z.string().optional(),
+  ani_call_limit: z.string().optional(),
 
-    global_ani_block: z.boolean().optional(),  
-    global_dnis_block: z.boolean().optional(),
-    customer_ani_block: z.boolean().optional(),
-    customer_dnis_block: z.boolean().optional(),
-   
+  global_ani_block: z.boolean().optional(),
+  global_dnis_block: z.boolean().optional(),
+  customer_ani_block: z.boolean().optional(),
+  customer_dnis_block: z.boolean().optional(),
 
-
-    ipEntries: z.array(
+  ipEntries: z
+    .array(
       z.object({
         name: z.string().min(1, { message: "Name is required" }),
         customer_ip: z
@@ -236,16 +234,15 @@ export const SipTrunkForm = z.object({
             "Sip map IP must be a valid IPv4 address."
           )
           .optional(),
-          cps_limit: z.coerce.number().optional(), // Change this line
-          session_limit: z.coerce.number().optional(), 
+        cps_limit: z.coerce.number().optional(), // Change this line
+        session_limit: z.coerce.number().optional(),
         status: z.boolean().optional(),
         tech_prefix: z.string().optional(),
         suffix: z.string().optional(),
       })
-    ).optional(),
+    )
+    .optional(),
 });
-
-
 
 export const BasicSipTrunkSchemaForEdit = z.object({
   trunk_name: z
@@ -254,41 +251,61 @@ export const BasicSipTrunkSchemaForEdit = z.object({
   customer: z.string().min(1, { message: "Customer is required" }),
   trunk_type: z.string().min(1, { message: "Trunk type is required" }),
   status: z.boolean().optional(),
-  
+
   cps_limit: z.string().optional(),
   session_limit: z.string().optional(),
   dnis_call_limit: z.string().optional(),
   ani_call_limit: z.string().optional(),
 
-  global_ani_block: z.boolean().optional(),  
+  global_ani_block: z.boolean().optional(),
   global_dnis_block: z.boolean().optional(),
   customer_ani_block: z.boolean().optional(),
   customer_dnis_block: z.boolean().optional(),
 });
 
 export const IpWhitelistSchemaForEdit = z.object({
-  ipEntries: z.array(
-    z.object({
-      name: z.string().min(1, { message: "Name is required" }),
-      customer_ip: z
-        .string()
-        .regex(
-          /^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}$/,
-          "Customer IP must be a valid IPv4 address."
-        )
-        .optional(),
-      sip_map_ip: z
-        .string()
-        .regex(
-          /^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}$/,
-          "Sip map IP must be a valid IPv4 address."
-        )
-        .optional(),
-      cps_limit: z.coerce.number().optional(),
-      session_limit: z.coerce.number().optional(), 
-      status: z.boolean().optional(),
-      tech_prefix: z.string().optional(),
-      suffix: z.string().optional(),
-    })
-  ).optional(),
+  ipEntries: z
+    .array(
+      z.object({
+        name: z.string().min(1, { message: "Name is required" }),
+        customer_ip: z
+          .string()
+          .regex(
+            /^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}$/,
+            "Customer IP must be a valid IPv4 address."
+          )
+          .optional(),
+        sip_map_ip: z
+          .string()
+          .regex(
+            /^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}$/,
+            "Sip map IP must be a valid IPv4 address."
+          )
+          .optional(),
+        cps_limit: z.coerce.number().optional(),
+        session_limit: z.coerce.number().optional(),
+        status: z.boolean().optional(),
+        tech_prefix: z.string().optional(),
+        suffix: z.string().optional(),
+      })
+    )
+    .optional(),
+});
+
+export const StirShakenFormSingle = z.object({
+  attestation: z.string().min(1, { message: "Attestation is required" }),
+  phone_number: z.string().min(1, { message: "DID is required" }),
+  notes: z.string().optional(),
+});
+export const StirShakenFormBulk = z.object({
+  attestation: z.string().min(1, { message: "Attestation is required" }),
+});
+
+export const LCR = z.object({
+  limit_cps: z.string().optional(),
+  limit_session: z.string().optional(),
+  limit_ani: z.string().optional(),
+  limit_dnis: z.string().optional(),
+  priority: z.string().optional(),
+  override_extend: z.string().optional(),
 });

@@ -442,9 +442,9 @@ export const TRUNK_TYPE_OPTIONS = [
  ]
 
  export const ATTESTATION_OPTIONS = [
-  {value:"inbound",label:"Attest A"},
-  {value:"outbound",label:"Attest B"},
-  {value:"both",label:"Attest C"},
+  {value:"A",label:"Attest A"},
+  {value:"B",label:"Attest B"},
+  {value:"C",label:"Attest C"},
 
  ]
  export const ATTESTATION_OPTIONS_DEFAULT = [

@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { BasicSipTrunkSchemaForEdit, ContactFormSchema, ContactFormSchemaEdit, IpWhitelistSchemaForEdit, loginFormSchema, NewGroupFormSchema, NewUrlFormSchema, SignUpFormSchema, SipTrunkForm } from "../Schema/auth";
-import { TRUNK_TYPE_OPTIONS } from "@/Constant";
+import { BasicSipTrunkSchemaForEdit, ContactFormSchema, ContactFormSchemaEdit, IpWhitelistSchemaForEdit, loginFormSchema, NewGroupFormSchema, NewUrlFormSchema, SignUpFormSchema, SipTrunkForm, StirShakenFormBulk, StirShakenFormSingle } from "../Schema/auth";
+import { ATTESTATION_OPTIONS, TRUNK_TYPE_OPTIONS } from "@/Constant";
 
 export function useLoginForm() {
   return useForm({
@@ -211,4 +211,46 @@ export function useIpWhitelistFormForEdit() {
       ipEntries: [],
     },
   });
+}
+
+
+
+export function useStirShakenSingle(){
+  return useForm({
+      resolver: zodResolver(StirShakenFormSingle),
+      defaultValues: {
+        attestation:"",
+        phone_number:"",
+        notes:"",
+      },
+    });
+}
+
+export function useStirShakenBulk(){
+  return useForm({
+      resolver: zodResolver(StirShakenFormBulk),
+      defaultValues: {
+        attestation:"",
+        mappedData:null,
+      },
+    });
+}
+
+
+export function useLCR(){
+  return useForm({
+      resolver: zodResolver(SipTrunkForm),
+      defaultValues: {
+
+        limit_cps:0,
+        limit_session:0,
+        limit_ani:0,
+
+        limit_dnis:0,
+        priority:50,
+        override_extend:0,
+
+
+      },
+    });
 }

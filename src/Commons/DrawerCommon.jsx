@@ -30,9 +30,7 @@ const CommonDrawer = ({
   return (
     <Drawer open={isOpen} onOpenChange={onOpenChange}>
       <DrawerTrigger asChild>
-        {trigger 
-        //  <Button variant="outline">Open Drawer</Button>
-         }
+        {trigger }
       </DrawerTrigger>
       <DrawerContent className={`h-[${contentHeight}] fixed `}>
         <div className={`${fullWidth ? 'w-full px-4' : 'max-w-4xl mx-auto'} w-full`}>

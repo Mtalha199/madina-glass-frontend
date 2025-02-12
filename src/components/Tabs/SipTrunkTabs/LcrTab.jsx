@@ -1,14 +1,28 @@
+import React, { useState, useEffect } from "react";
 import CommonDrawer from "@/Commons/DrawerCommon";
 import { InputCommon } from "@/Commons/FormCommons";
-import { useSipTrunk } from "@/components/Hooks/CustomHooks";
+import { useLCR } from "@/components/Hooks/CustomHooks";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Form } from "@/components/ui/form";
 import { Edit } from "lucide-react";
-import React, { useState } from "react";
 
 const LcrTab = () => {
-  const form = useSipTrunk();
+  const form = useLCR();
+  const defaultValues = {
+    limit_cps: 0,
+    limit_session: 0,
+    limit_ani: 0,
+    limit_dnis: 0,
+    priority: 50,
+    override_extend: 0,
+  };
+
+  const [checkedItems, setCheckedItems] = useState({});
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [selectedItemId, setSelectedItemId] = useState(null);
+  const [modifiedItems, setModifiedItems] = useState({});
+  const [itemValues, setItemValues] = useState({});
 
   const items = [
     { id: 1, label: "Primary Route" },
@@ -33,44 +47,134 @@ const LcrTab = () => {
     { id: 20, label: "Mountain Path" },
   ];
 
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [selectedItemId, setSelectedItemId] = useState(null);
+  useEffect(() => {
+    const initialValues = {};
+    items.forEach(item => {
+      initialValues[item.id] = { ...defaultValues };
+    });
+    setItemValues(initialValues);
+  }, []);
+
+  const checkIfModified = (values) => {
+    return Object.keys(defaultValues).some(
+      key => Number(values[key]) !== defaultValues[key]
+    );
+  };
+
+  const handleCheckboxChange = (itemId) => {
+    setCheckedItems(prev => ({
+      ...prev,
+      [itemId]: !prev[itemId]
+    }));
+  };
 
   const handleEdit = (item) => {
-    setSelectedItemId(item.id); // Set the selected item's ID
-    setIsDrawerOpen(true); // Open the drawer
+    setSelectedItemId(item.id);
+    setIsDrawerOpen(true);
+    form.reset(itemValues[item.id]);
   };
 
   const handleSave = () => {
-    console.log(`Save changes for item with ID: ${selectedItemId}`);
-    setIsDrawerOpen(false); // Close the drawer after saving
+    const formData = form.getValues();
+    const currentValues = {};
+    
+    // Convert form values to numbers for comparison
+    Object.keys(formData).forEach(key => {
+      currentValues[key] = Number(formData[key]);
+    });
+
+    setItemValues(prev => ({
+      ...prev,
+      [selectedItemId]: currentValues
+    }));
+
+    const isModified = checkIfModified(currentValues);
+
+    // Only set modified if values are different from defaults
+    if (isModified) {
+      setModifiedItems(prev => ({
+        ...prev,
+        [selectedItemId]: true
+      }));
+    } else {
+      // Remove the modified flag if values match defaults
+      setModifiedItems(prev => {
+        const newState = { ...prev };
+        delete newState[selectedItemId];
+        return newState;
+      });
+    }
+
+    setIsDrawerOpen(false);
+  };
+
+  const handleInputChange = (name, value) => {
+    form.setValue(name, value);
+    const currentValues = form.getValues();
+    
+    // Convert all values to numbers for comparison
+    const numericValues = {};
+    Object.keys(currentValues).forEach(key => {
+      numericValues[key] = Number(currentValues[key]);
+    });
+
+    const isModified = checkIfModified(numericValues);
+
+    if (isModified) {
+      setModifiedItems(prev => ({
+        ...prev,
+        [selectedItemId]: true
+      }));
+    } else {
+      // Remove the modified flag if values match defaults
+      setModifiedItems(prev => {
+        const newState = { ...prev };
+        delete newState[selectedItemId];
+        return newState;
+      });
+    }
   };
 
   const selectedItem = items.find((item) => item.id === selectedItemId);
-  async function onSubmit(data) {
-    console.log(data);
-  }
+
+  const inputFields = [
+    { name: "limit_cps", label: "Limit CPS", placeholder: "Enter Limit CPS" },
+    { name: "limit_session", label: "Limit Session", placeholder: "Enter Limit Session" },
+    { name: "limit_ani", label: "Limit ANI", placeholder: "Enter Limit ANI" },
+    { name: "limit_dnis", label: "Limit DNIS", placeholder: "Enter Limit DNIS" },
+    { name: "priority", label: "Priority", placeholder: "Enter Priority" },
+    { name: "override_extend", label: "Override Extend", placeholder: "Enter Override Extend" }
+  ];
+
   return (
     <div>
       <div className="grid grid-cols-4 gap-4">
         {items.map((item) => (
           <div key={item.id} className="flex flex-col space-y-2">
             <div className="flex items-center space-x-2">
-              <Checkbox id={`checkbox-${item.id}-1`} />
+              <Checkbox 
+                id={`checkbox-${item.id}-1`}
+                checked={checkedItems[item.id] || false}
+                onCheckedChange={() => handleCheckboxChange(item.id)}
+              />
               <label
                 htmlFor={`checkbox-${item.id}-1`}
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                className={`text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 
+                  ${modifiedItems[item.id] ? 'text-red-500' : ''}`}
               >
                 {item.label}
               </label>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleEdit(item)}
-                className="p-0 h-6 w-6"
-              >
-                <Edit className="h-4 w-4" />
-              </Button>
+              {checkedItems[item.id] && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleEdit(item)}
+                  className="p-0 h-6 w-6"
+                >
+                  <Edit className="h-4 w-4" />
+                </Button>
+              )}
             </div>
           </div>
         ))}
@@ -83,62 +187,23 @@ const LcrTab = () => {
         onOpenChange={setIsDrawerOpen}
         onSave={handleSave}
       >
-        <div>
-          {/* <p>Edit form or content for item with ID: {selectedItemId}</p> */}
-          {/* Add your form or other content here */}
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <InputCommon
-                LABEL={"Limit CPS"}
-                IS_REQUIRED={true}
-                NAME={"limit_cps"}
-                TYPE={"text"}
-                PLACEHOLDER={"Enter Limit CPS"}
-                CONTROL={form.control}
-              />
-              <InputCommon
-                LABEL={"Limit Session"}
-                IS_REQUIRED={true}
-                NAME={"limit_session"}
-                TYPE={"text"}
-                PLACEHOLDER={"Enter Limit Session"}
-                CONTROL={form.control}
-              />
-              <InputCommon
-                LABEL={"Limit ANI"}
-                IS_REQUIRED={true}
-                NAME={"limit_ani"}
-                TYPE={"text"}
-                PLACEHOLDER={"Enter Limit ANI"}
-                CONTROL={form.control}
-              />
-              <InputCommon
-                LABEL={"Limit DNIS"}
-                IS_REQUIRED={true}
-                NAME={"limit_dnis"}
-                TYPE={"text"}
-                PLACEHOLDER={"Enter Limit DNIS"}
-                CONTROL={form.control}
-              />
-              <InputCommon
-                LABEL={"Priority"}
-                IS_REQUIRED={true}
-                NAME={"priority"}
-                TYPE={"text"}
-                PLACEHOLDER={"Enter Priority"}
-                CONTROL={form.control}
-              />
-              <InputCommon
-                LABEL={"Override Extend"}
-                IS_REQUIRED={true}
-                NAME={"override_extend"}
-                TYPE={"text"}
-                PLACEHOLDER={"Enter Override Extend"}
-                CONTROL={form.control}
-              />
-            </form>
-          </Form>
-        </div>
+        <Form {...form}>
+          <form className="space-y-4">
+            {inputFields.map((field) => (
+              <div key={field.name}>
+                <InputCommon
+                  LABEL={field.label}
+                  IS_REQUIRED={true}
+                  NAME={field.name}
+                  TYPE="text"
+                  PLACEHOLDER={field.placeholder}
+                  CONTROL={form.control}
+                  onChange={(e) => handleInputChange(field.name, e.target.value)}
+                />
+              </div>
+            ))}
+          </form>
+        </Form>
       </CommonDrawer>
     </div>
   );
