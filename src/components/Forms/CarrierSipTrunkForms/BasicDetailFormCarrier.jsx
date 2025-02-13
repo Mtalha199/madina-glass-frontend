@@ -39,7 +39,7 @@ import {
 } from "@/Constant";
 import { APICALL } from "@/components/Api/ApiCall";
 import { useFormContext } from "react-hook-form";
-export const BasicDetailForm = ({ form, MODE, DATA, ID }) => {
+export const BasicDetailFormCarrier = ({ form, MODE, DATA ,ID }) => {
   const { setValue, watch } = useFormContext();
   const [edit, setEdit] = useState(false);
 
@@ -59,9 +59,9 @@ export const BasicDetailForm = ({ form, MODE, DATA, ID }) => {
       setValue("customer_ani_block", DATA?.customer_ani_block);
       setValue("customer_dnis_block", DATA?.customer_dnis_block);
     }
-  }, [DATA, setValue]);
+  }, [ DATA, setValue]);
   useEffect(() => {
-    if (ID !== undefined) {
+    if (ID!==undefined) {
       setValue("customer", String(ID));
     }
   }, [ID, setValue]);
@@ -105,8 +105,9 @@ export const BasicDetailForm = ({ form, MODE, DATA, ID }) => {
               FORM: form,
             })}
           </div>
-          {ID == undefined && (
-            <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
+            {
+              ID == undefined && 
+              <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
               {SelectAndView({
                 LABEL: "Carrier",
                 NAME: "customer",
@@ -123,7 +124,8 @@ export const BasicDetailForm = ({ form, MODE, DATA, ID }) => {
                 FORM: form,
               })}
             </div>
-          )}
+            }
+        
         </div>
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 space-y-4 ">
           <div className="hidden lg:block lg:col-span-1"></div>
@@ -260,10 +262,10 @@ export const BasicDetailForm = ({ form, MODE, DATA, ID }) => {
           <div className="col-span-1 md:col-span-4 lg:col-span-4 gap-4">
             {RadioGroupAndView({
               LABEL: "Verify Call Token",
-              NAME: "verify_call_token",
+              NAME: "trunk_type",
               ICON: <Badge />,
               OPTIONS: VERIFY_CALL_TOKEN,
-              VALUE: DATA?.verify_call_token,
+              VALUE: DATA?.trunk_type,
               MODE: MODE,
               EDIT: edit,
               FORM: form,

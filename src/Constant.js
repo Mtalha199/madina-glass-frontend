@@ -463,3 +463,10 @@ export const TRUNK_TYPE_OPTIONS = [
 
 
  ]
+ export const VERIFY_CALL_TOKEN = [
+  {value:"disabled",label:"Disabled"},
+  {value:"A",label:"Attest A"},
+  {value:"B",label:"Attest B"},
+  {value:"C",label:"Attest C"},
+
+ ]

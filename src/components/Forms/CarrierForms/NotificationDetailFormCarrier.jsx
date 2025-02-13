@@ -6,7 +6,7 @@ import { Mail } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 
-const NotificationDetailFormCarrier = ({ form, MODE, DATA }) => {
+const NotificationDetailForm = ({ form, MODE, DATA }) => {
   const [edit, setEdit] = useState(false);
 
   const { setValue, watch } = useFormContext();
@@ -83,95 +83,6 @@ const NotificationDetailFormCarrier = ({ form, MODE, DATA }) => {
 
         <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
           {renderField({
-            label: "Email-notices",
-            name: "notification_notice_email",
-            type: "email",
-            placeholder: "jane.smith@example.com",
-            icon: <Mail />,
-            value: DATA?.account?.general_notice_email,
-            isRequired: true,
-          })}
-        </div>
-        {MODE === "view" && edit && (
-          <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4 flex items-center">
-            <div className="flex items-center mt-8 border rounded-md p-2">
-              <Checkbox
-                checked={noticeChecked}
-                onCheckedChange={(checked) =>
-                  handleCheckboxChange("notification_notice_email", checked)
-                }
-              />
-
-              <label htmlFor="terms" className="mx-2 text-sm font-medium">
-                Use Primary Contact Email
-              </label>
-            </div>
-          </div>
-        )}
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-6 space-y-4 mb-4  ">
-        <div className="hidden lg:block lg:col-span-1"></div>
-        <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
-          {renderField({
-            label: "Email-Rates",
-            name: "notification_rate_email",
-            type: "email",
-            placeholder: "jane.smith@example.com",
-            icon: <Mail />,
-            value: DATA?.account?.rates_notification_email,
-            isRequired: true,
-          })}
-        </div>
-        {MODE === "view" && edit && (
-        <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4 flex items-center">
-          <div className="flex items-center mt-8 border rounded-md p-2">
-            
-            <Checkbox
-              checked={rateChecked}
-              onCheckedChange={(checked) =>
-                handleCheckboxChange("notification_rate_email", checked)
-              }
-            />
-            <label htmlFor="terms" className="mx-2 text-sm font-medium">
-              Use Primary Contact Email
-            </label>
-          </div>
-        </div>
-        )}
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-6 space-y-4 mb-4  ">
-        <div className="hidden lg:block lg:col-span-1"></div>
-        <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
-          {renderField({
-            label: "Email-Balance",
-            name: "notification_balance_email",
-            type: "email",
-            placeholder: "jane.smith@example.com",
-            icon: <Mail />,
-            value: DATA?.account?.balance_notification_email,
-            isRequired: true,
-          })}
-        </div>
-        {MODE === "view" && edit && (
-        <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4 flex items-center">
-          <div className="flex items-center mt-8 border rounded-md p-2">
-            <Checkbox
-              checked={balanceChecked}
-              onCheckedChange={(checked) =>
-                handleCheckboxChange("notification_balance_email", checked)
-              }
-            />
-            <label htmlFor="terms" className="mx-2 text-sm font-medium">
-              Use Primary Contact Email
-            </label>
-          </div>
-        </div>
-        )}
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-6 space-y-4 mb-4  ">
-        <div className="hidden lg:block lg:col-span-1"></div>
-        <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
-          {renderField({
             label: "Email-Trouble Tickets",
             name: "notification_trouble_ticket_email",
             type: "email",
@@ -181,23 +92,23 @@ const NotificationDetailFormCarrier = ({ form, MODE, DATA }) => {
             isRequired: true,
           })}
         </div>
-        {MODE === "view" && edit && (
-        <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4 flex items-center">
-          <div className="flex items-center mt-8 border rounded-md p-2">
-            <Checkbox
-              checked={troubleChecked}
-              onCheckedChange={(checked) =>
-                handleCheckboxChange(
-                  "notification_trouble_ticket_email",
-                  checked
-                )
-              }
-            />
-            <label htmlFor="terms" className="mx-2 text-sm font-medium">
-              Use Primary Contact Email
-            </label>
+        {(MODE == "Add" || edit) && (
+          <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4 flex items-center">
+            <div className="flex items-center mt-8 border rounded-md p-2">
+              <Checkbox
+                checked={noticeChecked}
+                onCheckedChange={(checked) =>
+                  handleCheckboxChange(
+                    "notification_trouble_ticket_email",
+                    checked
+                  )
+                }
+              />
+              <label htmlFor="terms" className="mx-2 text-sm font-medium">
+                Use Primary Contact Email
+              </label>
+            </div>
           </div>
-        </div>
         )}
       </div>
       <div className="col-span-2 flex justify-end mt-4 mb-4">
@@ -228,4 +139,4 @@ const NotificationDetailFormCarrier = ({ form, MODE, DATA }) => {
   );
 };
 
-export default NotificationDetailFormCarrier;
+export default NotificationDetailForm;

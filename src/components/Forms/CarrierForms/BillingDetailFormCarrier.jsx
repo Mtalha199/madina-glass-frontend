@@ -57,7 +57,7 @@ const BillingDetailFormCarrier = ({ form, MODE, DATA }) => {
     <div className="border-b">
       <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mt-4">
         <div className="col-span-1 md:col-span-5 lg:col-span-1 gap-4">
-          <h2 className="text-lg font-semibold mb-2">Billing Contact Detail</h2>
+          <h2 className="text-lg font-semibold mb-2">Account Contact Detail</h2>
           <p className="text-sm text-muted-foreground mb-4">
             Specify the billing detail you want to add.
           </p>
@@ -98,10 +98,6 @@ const BillingDetailFormCarrier = ({ form, MODE, DATA }) => {
             value: DATA?.account?.billing_contact_skype,
           })}
         </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-6 space-y-4">
-        <div className="hidden lg:block lg:col-span-1"></div>
         <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
           {renderField({
             label: "Phone Number",
@@ -110,16 +106,6 @@ const BillingDetailFormCarrier = ({ form, MODE, DATA }) => {
             placeholder: "+1 234 567 89",
             icon: <Phone />,
             value: DATA?.account?.billing_contact_phone,
-          })}
-        </div>
-        <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
-          {renderField({
-            label: "Mobile Number",
-            name: "billing_contact_mobile",
-            type: "tel",
-            placeholder: "+1 234 567 89",
-            icon: <Phone />,
-            value: DATA?.account?.billing_contact_mobile,
           })}
         </div>
       </div>

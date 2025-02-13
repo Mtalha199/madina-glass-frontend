@@ -22,9 +22,6 @@ const CompanyDetailFormCarrier = ({ form, MODE, DATA }) => {
   useEffect(() => {
     if ( DATA?.account) {
       setValue("company_name", DATA.account.company_name || "");
-      setValue("company_type", DATA.account.company_type || "");
-      setValue("company_frn", DATA.account.company_frn || "");
-      setValue("company_id", DATA.account.company_id || "");
       setValue("company_street_1", DATA.account.company_address1 || "");
       setValue("company_street_2", DATA.account.company_address2 || "");
       setValue("company_city", DATA.account.company_city || "");
@@ -85,40 +82,6 @@ const CompanyDetailFormCarrier = ({ form, MODE, DATA }) => {
               icon: <Building />,
               value: DATA?.account?.company_name,
               isRequired: true,
-            })}
-          </div>
-
-          <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
-            {renderField({
-              label: "Company Type",
-              name: "company_type",
-              type: "text",
-              placeholder: "e.g., LLC.",
-              icon: <Factory />,
-              value: DATA?.account?.company_type,
-            })}
-          </div>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 space-y-4 ">
-          <div className="hidden lg:block lg:col-span-1"></div>
-          <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
-            {renderField({
-              label: "FRN",
-              name: "company_frn",
-              type: "text",
-              placeholder: "e.g., 123456789 (FRN)",
-              icon: <Badge />,
-              value: DATA?.account?.company_frn,
-            })}
-          </div>
-          <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
-            {renderField({
-              label: "499-A-ID",
-              name: "company_id",
-              type: "text",
-              placeholder: "e.g., ABC-12345",
-              icon: <Mail />,
-              value: DATA?.account?.company_id,
             })}
           </div>
         </div>

@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { BasicSipTrunkSchema, ContactFormSchema, ContactFormSchemaEdit, IpWhitelistSchemaForEdit, loginFormSchema, NewGroupFormSchema, NewUrlFormSchema, SignUpFormSchema, SipTrunkForm, StirShakenFormBulk, StirShakenFormSingle } from "../Schema/auth";
+import { BasicSipTrunkSchema, ContactFormSchema, ContactFormSchemaCarrier, ContactFormSchemaEdit, IpWhitelistSchemaForEdit, loginFormSchema, NewGroupFormSchema, NewUrlFormSchema, SignUpFormSchema, SipTrunkForm, StirShakenFormBulk, StirShakenFormSingle } from "../Schema/auth";
 import { ATTESTATION_OPTIONS, TRUNK_TYPE_OPTIONS } from "@/Constant";
 
 export function useLoginForm() {
@@ -99,12 +99,9 @@ export function useContactDetail(){
 }
 export function useContactDetailCarrier(){
   return useForm({
-      resolver: zodResolver(ContactFormSchema),
+      resolver: zodResolver(ContactFormSchemaCarrier),
       defaultValues: {
         company_name: "",
-        company_type:"",
-        company_frn:"",
-        company_id:"",
         company_street_1 :"",
         company_street_2:"",
         company_city:"",
@@ -122,7 +119,6 @@ export function useContactDetailCarrier(){
         billing_contact_email:"",
         billing_contact_skype:"",
         billing_contact_phone:"",
-        billing_contact_mobile :"",
         billing_contact_street_1:"",
         billing_contact_street_2:"",
         billing_contact_city:"",
@@ -136,10 +132,6 @@ export function useContactDetailCarrier(){
         techinical_contact_phone:"",
         techinical_contact_mobile:"",
 
-
-        notification_notice_email:"",
-        notification_rate_email:"",
-        notification_balance_email:"",
         notification_trouble_ticket_email:"",
         
 

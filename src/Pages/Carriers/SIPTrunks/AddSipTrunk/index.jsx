@@ -1,5 +1,8 @@
 import FormSkeleton from "@/Commons/FormSkeloton";
 import { APICALL } from "@/components/Api/ApiCall";
+import { BasicDetailFormCarrier } from "@/components/Forms/CarrierSipTrunkForms/BasicDetailFormCarrier";
+import IpWhiteListingFormCarrier from "@/components/Forms/CarrierSipTrunkForms/IpWhiteListingFormCarrier";
+import RoutingCarrier from "@/components/Forms/CarrierSipTrunkForms/RoutingCarrier";
 import { BasicDetailForm } from "@/components/Forms/SipTrunkForms/BasicDetailForm";
 import IpWhiteListingForm from "@/components/Forms/SipTrunkForms/IpWhiteListingForn";
 import Routing from "@/components/Forms/SipTrunkForms/Routing";
@@ -133,7 +136,7 @@ export const AddSipTrunkCarrier = () => {
           <>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)}>
-                <BasicDetailForm
+                <BasicDetailFormCarrier
                   form={form}
                   MODE={DATA_VIEW_MODE.ADD}
                   ID={id}
@@ -151,25 +154,7 @@ export const AddSipTrunkCarrier = () => {
                   onSubmitIpWhiteListing
                 )}
               >
-                <IpWhiteListingForm form={form} MODE={DATA_VIEW_MODE.ADD} />
-                <div className="col-span-2 flex justify-end mt-4">
-                  <Button
-                    type="submit"
-                    disabled={trunkId === null}
-                    className=""
-                  >
-                    Save
-                  </Button>
-                </div>
-              </form>
-            </Form>
-            <Form {...stirAndShakenListing}>
-              <form
-                onSubmit={stirAndShakenListing.handleSubmit(
-                  onSubmitIpWhiteListing
-                )}
-              >
-                <StirAndShaken form={form} MODE={DATA_VIEW_MODE.ADD} />
+                <IpWhiteListingFormCarrier form={form} MODE={DATA_VIEW_MODE.ADD} />
                 <div className="col-span-2 flex justify-end mt-4">
                   <Button
                     type="submit"
@@ -185,7 +170,7 @@ export const AddSipTrunkCarrier = () => {
               <form
                 onSubmit={routingListing.handleSubmit(onSubmitIpWhiteListing)}
               >
-                <Routing form={form} MODE={DATA_VIEW_MODE.ADD} />
+                <RoutingCarrier form={form} MODE={DATA_VIEW_MODE.ADD} />
                 <div className="col-span-2 flex justify-end mt-4">
                   <Button
                     type="submit"

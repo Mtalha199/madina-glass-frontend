@@ -107,7 +107,7 @@ export const AddCarrier = () => {
               <PrimaryContactDetailFormCarrier form={form} />
               <BillingDetailFormCarrier form={form} />
               <TechnicalDetailFormCarrier form={form} />
-              <NotificationDetailFormCarrier form={form} />
+              <NotificationDetailFormCarrier form={form} MODE={"Add"} />
             </>
           )}
 
