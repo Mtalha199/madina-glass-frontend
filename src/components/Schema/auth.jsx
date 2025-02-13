@@ -72,20 +72,6 @@ export const ContactFormSchema = z.object({
   company_zip_code: z.string().optional(),
   company_country: z.string().optional(),
 
-  user_name: z
-    .string()
-    .min(4, { message: "User name must be at least 4 characters" }),
-  password: z
-    .string()
-    .min(6, { message: "Password must be at least 6 characters." }),
-  confirm_password: z
-    .string()
-    .min(6, { message: "Please confirm your password." })
-    .refine((data) => data.password === data.confirm_password, {
-      message: "Passwords do not match.",
-      path: ["confirm_password"],
-    }),
-
   primary_contact_name: z.string().optional(),
   primary_contact_email: z
     .string()

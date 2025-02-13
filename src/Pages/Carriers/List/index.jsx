@@ -43,7 +43,7 @@ export default function CarriersList() {
         const status = row.getValue("is_active");
 
         const handleNavigation = () => {
-          navigate(`/customer/${id}`, {
+          navigate(`/carriers/${id}`, {
             state: { name: fullName, is_active: status },
           });
         };

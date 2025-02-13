@@ -1,4 +1,4 @@
-import FormSkeleton from "@/Commons/FormSkeloton";
+import SkeletonCardLayout from "@/Commons/SkelotonCard";
 import { APICALL } from "@/components/Api/ApiCall";
 import BillingDetailFormCarrier from "@/components/Forms/CarrierForms/BillingDetailFormCarrier";
 import CompanyDetailFormCarrier from "@/components/Forms/CarrierForms/CompanyDetailFormCarrier";
@@ -8,29 +8,31 @@ import TechnicalDetailFormCarrier from "@/components/Forms/CarrierForms/Technica
 import BillingDetailForm from "@/components/Forms/CustomerForms/BillingDetailForm";
 import CompanyDetailForm from "@/components/Forms/CustomerForms/CompanyDetailForm";
 import NotificationDetailForm from "@/components/Forms/CustomerForms/NotificationDetailForm";
-import PortalCredientials from "@/components/Forms/CustomerForms/PortalCredientials";
 import PrimaryContactDetailForm from "@/components/Forms/CustomerForms/PrimaryContactDetailForm";
 import TechnicalDetailForm from "@/components/Forms/CustomerForms/TechnicalDetailForm";
-import {  useContactDetailCarrier } from "@/components/Hooks/CustomHooks";
+import {useContactDetailEdit } from "@/components/Hooks/CustomHooks";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { API_END_POINT, API_TYPE, SCREEN_PATH } from "@/Constant";
-import { ArrowLeft } from "lucide-react";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { custom } from "zod";
-
-export const AddCarrier = () => {
-  const navigate = useNavigate();
-  const form = useContactDetailCarrier();
-
-  const [loading, setLoading] = useState(false);
+import {
+  API_END_POINT,
+  API_TYPE,
+  SCREEN_PATH,
+} from "@/Constant";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+export const ProfileCarrier = () => {
+  const { id } = useParams();
+    const navigate = useNavigate();
+  
+  const [loading, setloading] = useState(false);
+  const [count, setCount] = useState(0);
+  const [data, setData] = useState([]);
+  const form = useContactDetailEdit();
+  const [mode, setMode] = useState("view");
+  const [customers, setCustomers] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   async function onSubmit(data) {
     const payload = {
-      user: {
-        username: data.user_name,
-        password: data.password,
-      },
       customer: {
         company_name: data.company_name,
         company_type: data.company_type,
@@ -74,50 +76,60 @@ export const AddCarrier = () => {
       },
     };
     const response = await APICALL(
-      API_TYPE.POST,
-      API_END_POINT.ADD_CUSTOMER,
-      setLoading,
+      API_TYPE.PATCH,
+      `${API_END_POINT.ADD_CUSTOMER}/${id}`,
+      setloading,
       payload,
       null,
       null,
-      "Customer Added Successfully"
+      "Customer updated successfully"
     );
+    debugger
     if (response !== undefined) {
-      navigate(SCREEN_PATH.CUSTOMER_LIST);
+      // navigate(SCREEN_PATH.CUSTOMER_LIST);
+      getData();
     }
   }
+  useEffect(() => {
+    getData();
+  }, []);
+  const getData = async () => {
+    await APICALL(
+      API_TYPE.GET,
+      `${API_END_POINT.CUSTOMER_LIST}/${id}`,
+      setloading,
+      null,
+      setData,
+      setCount
+    );
+  };
   return (
-    <div className="p-6">
-      <Button
-        variant="ghost"
-        onClick={() => navigate(SCREEN_PATH.CARRIERS_LIST)}
-        className="mb-4"
-      >
-        <ArrowLeft />
-        Carriers List 
-      </Button>
-      <h1 className="text-2xl font-bold mb-4">Add Carrier</h1>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-          {loading ? (
-            <FormSkeleton />
-          ) : (
-            <>
-              <CompanyDetailFormCarrier form={form} MODE={"Add"} />
-              <PrimaryContactDetailFormCarrier form={form} />
-              <BillingDetailFormCarrier form={form} />
-              <TechnicalDetailFormCarrier form={form} />
-              <NotificationDetailFormCarrier form={form} />
-            </>
-          )}
-
-          <div className="col-span-2 flex justify-end mt-4">
-            <Button type="submit" className="">
-              Save
-            </Button>
-          </div>
-        </form>
-      </Form>
-    </div>
+    <>
+      {loading ? (
+        <SkeletonCardLayout ROWS={10} COLUMNS={3} />
+      ) : (
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            {loading ? (
+              <FormSkeleton />
+            ) : (
+              <>
+                <CompanyDetailFormCarrier form={form} MODE={mode} DATA={data} />
+                <PrimaryContactDetailFormCarrier form={form} MODE={mode} DATA={data} />
+                <BillingDetailFormCarrier form={form} MODE={mode} DATA={data} />
+                <TechnicalDetailFormCarrier form={form} MODE={mode} DATA={data} />
+                <NotificationDetailFormCarrier form={form} MODE={mode} DATA={data} />
+              </>
+            )}
+            
+            <div className="col-span-2 flex justify-end mt-4">
+              <Button type="submit" className="">
+                Save
+              </Button>
+            </div>
+          </form>
+        </Form>
+      )}
+    </>
   );
 };

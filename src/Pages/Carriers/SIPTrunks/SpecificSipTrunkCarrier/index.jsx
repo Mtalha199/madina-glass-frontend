@@ -26,7 +26,7 @@ import { useEffect, useState } from "react";
 import FormSkeleton from "@/Commons/FormSkeloton";
 import { Form } from "@/components/ui/form";
 import IpWhiteListingForm from "@/components/Forms/SipTrunkForms/IpWhiteListingForn";
-export default function SpecificSipTrunk() {
+export default function SpecificSipTrunkCarrier() {
   const navigate = useNavigate();
   const { id } = useParams();
 

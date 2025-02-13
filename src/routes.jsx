@@ -14,8 +14,11 @@ import SipTrunkList from "./Pages/Customers/SIPTrunks";
 import { AddSipTrunk } from "./Pages/Customers/SIPTrunks/AddSipTrunk";
 import SpecificSipTrunk from "./Pages/Customers/SIPTrunks/SpecificSipTrunk";
 import CarriersList from "./Pages/Carriers/List";
-import SpecificCarrier from "./Pages/Carriers/List/SpecificCarrier/specificCustomer";
 import { AddCarrier } from "./Pages/Carriers/List/AddCarrier";
+import SpecificCarrier from "./Pages/Carriers/List/SpecificCarrier/specificCarrier";
+import SipTrunkListCarrier from "./Pages/Carriers/SIPTrunks";
+import { AddSipTrunkCarrier } from "./Pages/Carriers/SIPTrunks/AddSipTrunk";
+import SpecificSipTrunkCarrier from "./Pages/Carriers/SIPTrunks/SpecificSipTrunkCarrier";
 
 const routes = [
   {
@@ -49,6 +52,9 @@ const routes = [
       { path: SCREEN_PATH.CARRIERS_LIST_UNIQUE, element: <SpecificCarrier /> },
       { path: SCREEN_PATH.ADD_NEW_CARRIER, element: <AddCarrier /> },
 
+      { path: SCREEN_PATH.SIP_TRUNK_LIST_CARRIER, element: <SipTrunkListCarrier /> },
+      { path: SCREEN_PATH.ADD_NEW_SIP_TRUNK_CARRIER, element: <AddSipTrunkCarrier /> },
+      { path: SCREEN_PATH.SIP_TRUNK_LIST_UNIQUE_CARRIER, element: <SpecificSipTrunkCarrier /> },
 
     ],
   },

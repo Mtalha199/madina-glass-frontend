@@ -24,7 +24,7 @@ import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-export const AddSipTrunk = () => {
+export const AddSipTrunkCarrier = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
 
@@ -104,11 +104,11 @@ export const AddSipTrunk = () => {
         {id == undefined ? (
           <Button
             variant="ghost"
-            onClick={() => navigate(SCREEN_PATH.SIP_TRUNK_LIST)}
+            onClick={() => navigate(SCREEN_PATH.SIP_TRUNK_LIST_CARRIER)}
             className="mb-4"
           >
             <ArrowLeft />
-            Sip Trunk List
+            Carrier Sip Trunk List
           </Button>
         ) : (
           <Button

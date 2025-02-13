@@ -97,7 +97,56 @@ export function useContactDetail(){
       },
     });
 }
+export function useContactDetailCarrier(){
+  return useForm({
+      resolver: zodResolver(ContactFormSchema),
+      defaultValues: {
+        company_name: "",
+        company_type:"",
+        company_frn:"",
+        company_id:"",
+        company_street_1 :"",
+        company_street_2:"",
+        company_city:"",
+        company_state:"",
+        company_zip_code:"",
+        company_country:"",
 
+        primary_contact_name:"",
+        primary_contact_email:"",
+        primary_contact_skype:"",
+        primary_contact_phone:"",
+        primary_contact_mobile:"",
+
+        billing_contact_name:"",
+        billing_contact_email:"",
+        billing_contact_skype:"",
+        billing_contact_phone:"",
+        billing_contact_mobile :"",
+        billing_contact_street_1:"",
+        billing_contact_street_2:"",
+        billing_contact_city:"",
+        billing_contact_state:"",
+        billing_contact_zip_code:"",
+        billing_contact_country:"",
+       
+        techinical_contact_name:"",
+        techinical_contact_email:"",
+        techinical_contact_skype:"",
+        techinical_contact_phone:"",
+        techinical_contact_mobile:"",
+
+
+        notification_notice_email:"",
+        notification_rate_email:"",
+        notification_balance_email:"",
+        notification_trouble_ticket_email:"",
+        
+
+
+      },
+    });
+}
 
 
 export function useContactDetailEdit(){

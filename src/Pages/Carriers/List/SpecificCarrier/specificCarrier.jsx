@@ -7,7 +7,7 @@ import { ArrowLeft } from "lucide-react";
 import { API_END_POINT, API_TYPE, SCREEN_PATH } from "@/Constant";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import TabsCommon from "@/Commons/TabsCommon";
-import { CUSTOMER_LIST_TABS } from "@/components/Tabs/TabConfig";
+import { CARRIER_LIST_TABS, CUSTOMER_LIST_TABS } from "@/components/Tabs/TabConfig";
 import { useEffect, useState } from "react";
 import { APICALL } from "@/components/Api/ApiCall";
 import AccountHeaderSkeleton from "@/Commons/AccountHeaderSkeleton";
@@ -35,11 +35,11 @@ export default function SpecificCarrier() {
     <div className="p-6">
       <Button
         variant="ghost"
-        onClick={() => navigate(SCREEN_PATH.CUSTOMER_LIST)}
+        onClick={() => navigate(SCREEN_PATH.CARRIERS_LIST)}
         className="mb-4"
       >
         <ArrowLeft />
-        Customers List
+        Carrier List
       </Button>
 
       {loading ? (
@@ -72,7 +72,7 @@ export default function SpecificCarrier() {
         </div>
       )}
       <TabsCommon
-        TABS={CUSTOMER_LIST_TABS}
+        TABS={CARRIER_LIST_TABS}
         DEFAULT_TAB={
           state?.activeTab ? state?.activeTab : CUSTOMER_LIST_TABS[0].value
         }

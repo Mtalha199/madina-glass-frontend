@@ -44,6 +44,10 @@ export const SCREEN_PATH = {
   CARRIERS_LIST: "/carriers-list",
   CARRIERS_LIST_UNIQUE: "/carriers/:id",
   ADD_NEW_CARRIER:"/carriers/register",
+
+  SIP_TRUNK_LIST_CARRIER:"/carrier/siptrunk",
+  ADD_NEW_SIP_TRUNK_CARRIER:"/carrier/siptrunk/register",
+  SIP_TRUNK_LIST_UNIQUE_CARRIER: "/carrier/siptrunk/:id",
 };
 // ----------------------------------------NAVIGATION----------------------------------
 import {
@@ -126,7 +130,7 @@ export const NAVIGATION = {
         },
         {
           title: "SIP trunks",
-          url: "#",
+          url: SCREEN_PATH.SIP_TRUNK_LIST_CARRIER,
         },
         {
           title: "Payments",
