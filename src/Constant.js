@@ -37,6 +37,8 @@ export const SCREEN_PATH = {
   CUSTOMER_LIST_UNIQUE: "/customer/:id",
   ADD_NEW_CUSTOMER:"/customer/register",
 
+  PAYMENT_LIST_CUSTOMER:"/customer/payment",
+
   SIP_TRUNK_LIST:"/siptrunk",
   ADD_NEW_SIP_TRUNK:"/siptrunk/register",
   SIP_TRUNK_LIST_UNIQUE: "/siptrunk/:id",
@@ -48,6 +50,9 @@ export const SCREEN_PATH = {
   SIP_TRUNK_LIST_CARRIER:"/carrier/siptrunk",
   ADD_NEW_SIP_TRUNK_CARRIER:"/carrier/siptrunk/register",
   SIP_TRUNK_LIST_UNIQUE_CARRIER: "/carrier/siptrunk/:id",
+
+
+
 };
 // ----------------------------------------NAVIGATION----------------------------------
 import {
@@ -111,7 +116,7 @@ export const NAVIGATION = {
         },
         {
           title: "Payments",
-          url: "/customer-payments",
+          url: SCREEN_PATH.PAYMENT_LIST_CUSTOMER,
         },
         {
           title: "Rate decks",
