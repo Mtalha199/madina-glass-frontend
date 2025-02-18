@@ -53,10 +53,6 @@ const CustomerPaymentTableCommon = () => {
         ];
     return (
         <>
-        {/* <div className="flex justify-end items-center mb-4">
-          
-            <Button>Add Balance</Button>
-        </div> */}
         {loading ? (
           <SkeletonTable ROWS={10} COLUMNS={3} />
         ) : (

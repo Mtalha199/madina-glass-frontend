@@ -9,10 +9,9 @@ export const API_END_POINT = {
   CUSTOMER_LIST: "admin/customers",
   ADD_CUSTOMER: "admin/register",
   SIP_TRUNK_LIST: "admin/siptrunk",
-  ADD_NEW_SIP_TRUNK:"/admin/siptrunk",
-  ADD_IP_WHITE_LISTING:"/admin/ip-auth",
+  ADD_NEW_SIP_TRUNK: "/admin/siptrunk",
+  ADD_IP_WHITE_LISTING: "/admin/ip-auth",
   SIP_TRUNK_LIST_CUSTOMER: "admin/siptrunk-customer",
-
 };
 
 export const API_TYPE = {
@@ -35,24 +34,26 @@ export const SCREEN_PATH = {
 
   CUSTOMER_LIST: "/customer-list",
   CUSTOMER_LIST_UNIQUE: "/customer/:id",
-  ADD_NEW_CUSTOMER:"/customer/register",
+  ADD_NEW_CUSTOMER: "/customer/register",
 
-  PAYMENT_LIST_CUSTOMER:"/customer/payment",
+  PAYMENT_LIST_CUSTOMER: "/customer/payment",
 
-  SIP_TRUNK_LIST:"/siptrunk",
-  ADD_NEW_SIP_TRUNK:"/siptrunk/register",
+  RATE_DECK_LIST_CUSTOMER: "/customer/rate-deck",
+  ADD_NEW_RATE_DECK_GENERATE: "/customer/rate-deck/generate",
+  RATE_DECK_GENERATE_VIEW: "/customer/rate-deck/:id",
+
+
+  SIP_TRUNK_LIST: "/siptrunk",
+  ADD_NEW_SIP_TRUNK: "/siptrunk/register",
   SIP_TRUNK_LIST_UNIQUE: "/siptrunk/:id",
 
   CARRIERS_LIST: "/carriers-list",
   CARRIERS_LIST_UNIQUE: "/carriers/:id",
-  ADD_NEW_CARRIER:"/carriers/register",
+  ADD_NEW_CARRIER: "/carriers/register",
 
-  SIP_TRUNK_LIST_CARRIER:"/carrier/siptrunk",
-  ADD_NEW_SIP_TRUNK_CARRIER:"/carrier/siptrunk/register",
+  SIP_TRUNK_LIST_CARRIER: "/carrier/siptrunk",
+  ADD_NEW_SIP_TRUNK_CARRIER: "/carrier/siptrunk/register",
   SIP_TRUNK_LIST_UNIQUE_CARRIER: "/carrier/siptrunk/:id",
-
-
-
 };
 // ----------------------------------------NAVIGATION----------------------------------
 import {
@@ -120,7 +121,7 @@ export const NAVIGATION = {
         },
         {
           title: "Rate decks",
-          url: "/customer-rate-decks",
+          url: SCREEN_PATH.RATE_DECK_LIST_CUSTOMER,
         },
       ],
     },
@@ -431,47 +432,62 @@ export const TECH_DETAIL = (DATA) => [
   },
 ];
 
-export const DATA_VIEW_MODE ={
-  VIEW:"view",
-  EDIT:"edit",
-  ADD:"add",
-}
-
-
+export const DATA_VIEW_MODE = {
+  VIEW: "view",
+  EDIT: "edit",
+  ADD: "add",
+};
 
 export const RADIOGROUP_YES_NO = [
- {value:true,label:"Yes"},
- {value:false,label:"No"}
-]
+  { value: true, label: "Yes" },
+  { value: false, label: "No" },
+];
 export const TRUNK_TYPE_OPTIONS = [
-  {value:"inbound",label:"Inbound"},
-  {value:"outbound",label:"Outbound"},
-  {value:"both",label:"Both"}
- ]
- export const TRUNK_TYPE_STATUS_OPTIONS = [
-  {value:true,label:"Enable"},
-  {value:false,label:"Disable"},
- ]
+  { value: "inbound", label: "Inbound" },
+  { value: "outbound", label: "Outbound" },
+  { value: "both", label: "Both" },
+];
+export const TRUNK_TYPE_STATUS_OPTIONS = [
+  { value: true, label: "Enable" },
+  { value: false, label: "Disable" },
+];
 
- export const ATTESTATION_OPTIONS = [
-  {value:"A",label:"Attest A"},
-  {value:"B",label:"Attest B"},
-  {value:"C",label:"Attest C"},
+export const ATTESTATION_OPTIONS = [
+  { value: "A", label: "Attest A" },
+  { value: "B", label: "Attest B" },
+  { value: "C", label: "Attest C" },
+];
+export const ATTESTATION_OPTIONS_DEFAULT = [
+  { value: "inbound1", label: "Do Not Sign" },
+  { value: "inbound2", label: "Attest A" },
+  { value: "outbound", label: "Attest B" },
+  { value: "both", label: "Attest C" },
+  { value: "inbound3", label: "Block" },
+];
+export const VERIFY_CALL_TOKEN = [
+  { value: "disabled", label: "Disabled" },
+  { value: "A", label: "Attest A" },
+  { value: "B", label: "Attest B" },
+  { value: "C", label: "Attest C" },
+];
 
- ]
- export const ATTESTATION_OPTIONS_DEFAULT = [
-  {value:"inbound1",label:"Do Not Sign"},
-  {value:"inbound2",label:"Attest A"},
-  {value:"outbound",label:"Attest B"},
-  {value:"both",label:"Attest C"},
-  {value:"inbound3",label:"Block"},
+export const POPULATE_INTERMINATE_AS = [
+  { value: "disabled", label: "Copy of intrastate" },
+  { value: "A", label: "Copy of Interstate" },
+  { value: "B", label: "Higher of Inter/Intra" },
+  { value: "C", label: "Lower of Inter/Intra" },
+  { value: "C", label: "True LCR of Carrier Indeterminate" },
+];
 
-
- ]
- export const VERIFY_CALL_TOKEN = [
-  {value:"disabled",label:"Disabled"},
-  {value:"A",label:"Attest A"},
-  {value:"B",label:"Attest B"},
-  {value:"C",label:"Attest C"},
-
- ]
+export const ROUNDING_PRECISION = [
+  { value: "disabled", label: "6" },
+  { value: "A", label: "5" },
+  { value: "B", label: "3" },
+  { value: "C", label: "2" },
+  { value: "C", label: "1" },
+];
+export const ROUNDING_METHOD = [
+  { value: "a", label: "Round up" },
+  { value: "A", label: "True Math" },
+  { value: "B", label: "Round down" },
+];

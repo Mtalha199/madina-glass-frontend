@@ -20,6 +20,9 @@ import SipTrunkListCarrier from "./Pages/Carriers/SIPTrunks";
 import { AddSipTrunkCarrier } from "./Pages/Carriers/SIPTrunks/AddSipTrunk";
 import SpecificSipTrunkCarrier from "./Pages/Carriers/SIPTrunks/SpecificSipTrunkCarrier";
 import CustomerPayment from "./Pages/Customers/Payments";
+import RateDeckCustomer from "./Pages/Customers/Rate decks";
+import GenerateRateDecks from "./Pages/Customers/Rate decks/AddRateDecks/GenerateRateDeck";
+import SpecificRateDeck from "./Pages/Customers/Rate decks/SpecificRateDeck";
 
 const routes = [
   {
@@ -46,8 +49,12 @@ const routes = [
       { path: SCREEN_PATH.CUSTOMER_LIST_UNIQUE, element: <SpecificCustomer /> },
       { path: SCREEN_PATH.ADD_NEW_CUSTOMER, element: <AddCustomer /> },
 
-
       { path: SCREEN_PATH.PAYMENT_LIST_CUSTOMER, element: <CustomerPayment /> },
+
+      { path: SCREEN_PATH.RATE_DECK_LIST_CUSTOMER, element: <RateDeckCustomer /> },
+      { path: SCREEN_PATH.ADD_NEW_RATE_DECK_GENERATE, element: <GenerateRateDecks /> },
+      { path: SCREEN_PATH.RATE_DECK_GENERATE_VIEW, element: <SpecificRateDeck /> },
+
 
       { path: SCREEN_PATH.SIP_TRUNK_LIST, element: <SipTrunkList /> },
       { path: SCREEN_PATH.ADD_NEW_SIP_TRUNK, element: <AddSipTrunk /> },
