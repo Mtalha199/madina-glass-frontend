@@ -23,6 +23,7 @@ import CustomerPayment from "./Pages/Customers/Payments";
 import RateDeckCustomer from "./Pages/Customers/Rate decks";
 import GenerateRateDecks from "./Pages/Customers/Rate decks/AddRateDecks/GenerateRateDeck";
 import SpecificRateDeck from "./Pages/Customers/Rate decks/SpecificRateDeck";
+import Settings from "./Pages/Settings";
 
 const routes = [
   {
@@ -67,6 +68,8 @@ const routes = [
       { path: SCREEN_PATH.SIP_TRUNK_LIST_CARRIER, element: <SipTrunkListCarrier /> },
       { path: SCREEN_PATH.ADD_NEW_SIP_TRUNK_CARRIER, element: <AddSipTrunkCarrier /> },
       { path: SCREEN_PATH.SIP_TRUNK_LIST_UNIQUE_CARRIER, element: <SpecificSipTrunkCarrier /> },
+
+      { path: SCREEN_PATH.SETTINGS, element: <Settings /> },
 
     ],
   },

@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { BasicSipTrunkSchema, ContactFormSchema, ContactFormSchemaCarrier, ContactFormSchemaEdit, IpWhitelistSchemaForEdit, loginFormSchema, NewGroupFormSchema, NewUrlFormSchema, SignUpFormSchema, SipTrunkForm, StirShakenFormBulk, StirShakenFormSingle } from "../Schema/auth";
+import { AddGroup, BasicSipTrunkSchema, ContactFormSchema, ContactFormSchemaCarrier, ContactFormSchemaEdit, IpWhitelistSchemaForEdit, loginFormSchema, NewGroupFormSchema, NewUrlFormSchema, SignUpFormSchema, SipTrunkForm, StirShakenFormBulk, StirShakenFormSingle } from "../Schema/auth";
 import { ATTESTATION_OPTIONS, TRUNK_TYPE_OPTIONS } from "@/Constant";
 
 export function useLoginForm() {
@@ -292,6 +292,16 @@ export function useLCR(){
         override_extend:0,
 
 
+      },
+    });
+}
+
+
+export function useAddGroup(){
+  return useForm({
+      resolver: zodResolver(AddGroup),
+      defaultValues: {
+        group_name:"",
       },
     });
 }

@@ -39,7 +39,7 @@ import {
 } from "@/Constant";
 import { APICALL } from "@/components/Api/ApiCall";
 import { useFormContext } from "react-hook-form";
-export const BasicDetailFormCarrier = ({ form, MODE, DATA ,ID }) => {
+export const BasicDetailFormCarrier = ({ form, MODE, DATA, ID }) => {
   const { setValue, watch } = useFormContext();
   const [edit, setEdit] = useState(false);
 
@@ -59,9 +59,9 @@ export const BasicDetailFormCarrier = ({ form, MODE, DATA ,ID }) => {
       setValue("customer_ani_block", DATA?.customer_ani_block);
       setValue("customer_dnis_block", DATA?.customer_dnis_block);
     }
-  }, [ DATA, setValue]);
+  }, [DATA, setValue]);
   useEffect(() => {
-    if (ID!==undefined) {
+    if (ID !== undefined) {
       setValue("customer", String(ID));
     }
   }, [ID, setValue]);
@@ -105,9 +105,8 @@ export const BasicDetailFormCarrier = ({ form, MODE, DATA ,ID }) => {
               FORM: form,
             })}
           </div>
-            {
-              ID == undefined && 
-              <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
+          {ID == undefined && (
+            <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
               {SelectAndView({
                 LABEL: "Carrier",
                 NAME: "customer",
@@ -124,8 +123,24 @@ export const BasicDetailFormCarrier = ({ form, MODE, DATA ,ID }) => {
                 FORM: form,
               })}
             </div>
-            }
-        
+          )}
+          <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
+            {SelectAndView({
+              LABEL: "Group",
+              NAME: "group",
+              PLACEHOLDER: "Select group",
+              ICON: <Server />,
+              OPTIONS: customerData?.map((item) => ({
+                value: String(item?.id),
+                label: item?.company_name,
+              })),
+              VALUE: DATA?.company_name,
+              IS_REQUIRED: true,
+              MODE: MODE,
+              EDIT: edit,
+              FORM: form,
+            })}
+          </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 space-y-4 ">
           <div className="hidden lg:block lg:col-span-1"></div>

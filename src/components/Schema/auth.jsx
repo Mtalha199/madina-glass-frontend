@@ -340,3 +340,7 @@ export const LCR = z.object({
   priority: z.string().optional(),
   override_extend: z.string().optional(),
 });
+
+export const AddGroup = z.object({
+  group_name: z.string().min(1, { message: "Group name is required" }),
+});

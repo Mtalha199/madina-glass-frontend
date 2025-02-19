@@ -54,6 +54,9 @@ export const SCREEN_PATH = {
   SIP_TRUNK_LIST_CARRIER: "/carrier/siptrunk",
   ADD_NEW_SIP_TRUNK_CARRIER: "/carrier/siptrunk/register",
   SIP_TRUNK_LIST_UNIQUE_CARRIER: "/carrier/siptrunk/:id",
+
+  SETTINGS: "/settings",
+
 };
 // ----------------------------------------NAVIGATION----------------------------------
 import {
@@ -279,7 +282,7 @@ export const NAVIGATION = {
     },
     {
       title: "Settings",
-      url: SCREEN_PATH.DNC_SCRUBBER,
+      url: SCREEN_PATH.SETTINGS,
       icon: Settings2,
       items: [],
     },

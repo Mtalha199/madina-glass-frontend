@@ -8,6 +8,12 @@ import { ProfileCarrier } from "./CarrierTabs/ProfileCarrier";
 import { SettingCarrier } from "./CarrierTabs/SettingCarrier";
 import { PaymentsCarrier } from "./CarrierTabs/PaymentCarrier";
 import SipTrunksCarrier from "./CarrierTabs/SipTrunksCarrier";
+import UserSetting from "./SettingTabs/User";
+import Groups from "./SettingTabs/Groups";
+import Role from "./SettingTabs/Role";
+import Notifications from "./SettingTabs/Notifications";
+import GlobalBlackList from "./SettingTabs/GlobalBlackList";
+import SystemSettings from "./SettingTabs/SystemSettings";
 
 export const CUSTOMER_LIST_TABS = [
   { value: "profile", label: "Profile", component: <ProfileCustomer /> },
@@ -33,4 +39,25 @@ export const CARRIER_LIST_TABS = [
 export const ROUTING_TABS = [
   { value: "lcr", label: "LCR", component: <LcrTab /> },
   { value: "percentage", label: "Percentage", component: <Percentage /> },
+];
+
+export const SETTING_TABS = [
+  { value: "profile", label: "User", component: <UserSetting /> },
+  { value: "setting", label: "Groups", component: <Groups /> },
+  { value: "payments", label: "Role", component: <Role /> },
+  {
+    value: "notifications",
+    label: "Notifications",
+    component: <Notifications />,
+  },
+  {
+    value: "global-black-list",
+    label: "Global Black list",
+    component: <GlobalBlackList />,
+  },
+  {
+    value: "system-settings",
+    label: "System Settings",
+    component: <SystemSettings />,
+  },
 ];
