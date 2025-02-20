@@ -84,7 +84,6 @@ export const ProfileCarrier = () => {
       null,
       "Customer updated successfully"
     );
-    debugger
     if (response !== undefined) {
       // navigate(SCREEN_PATH.CUSTOMER_LIST);
       getData();

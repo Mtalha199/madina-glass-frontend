@@ -2,6 +2,7 @@ import { CustomerViewCommon } from "@/Commons/CustomerViewCommon";
 import { InputCommon } from "@/Commons/FormCommons";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { DATA_VIEW_MODE } from "@/Constant";
 import { Mail } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
@@ -92,7 +93,7 @@ const NotificationDetailForm = ({ form, MODE, DATA }) => {
             isRequired: true,
           })}
         </div>
-        {MODE === "view" && edit && (
+        {(MODE == DATA_VIEW_MODE.ADD || edit) && (
           <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4 flex items-center">
             <div className="flex items-center mt-8 border rounded-md p-2">
               <Checkbox
@@ -122,21 +123,20 @@ const NotificationDetailForm = ({ form, MODE, DATA }) => {
             isRequired: true,
           })}
         </div>
-        {MODE === "view" && edit && (
-        <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4 flex items-center">
-          <div className="flex items-center mt-8 border rounded-md p-2">
-            
-            <Checkbox
-              checked={rateChecked}
-              onCheckedChange={(checked) =>
-                handleCheckboxChange("notification_rate_email", checked)
-              }
-            />
-            <label htmlFor="terms" className="mx-2 text-sm font-medium">
-              Use Primary Contact Email
-            </label>
+        {(MODE == DATA_VIEW_MODE.ADD || edit) && (
+          <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4 flex items-center">
+            <div className="flex items-center mt-8 border rounded-md p-2">
+              <Checkbox
+                checked={rateChecked}
+                onCheckedChange={(checked) =>
+                  handleCheckboxChange("notification_rate_email", checked)
+                }
+              />
+              <label htmlFor="terms" className="mx-2 text-sm font-medium">
+                Use Primary Contact Email
+              </label>
+            </div>
           </div>
-        </div>
         )}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-5 gap-6 space-y-4 mb-4  ">
@@ -152,20 +152,20 @@ const NotificationDetailForm = ({ form, MODE, DATA }) => {
             isRequired: true,
           })}
         </div>
-        {MODE === "view" && edit && (
-        <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4 flex items-center">
-          <div className="flex items-center mt-8 border rounded-md p-2">
-            <Checkbox
-              checked={balanceChecked}
-              onCheckedChange={(checked) =>
-                handleCheckboxChange("notification_balance_email", checked)
-              }
-            />
-            <label htmlFor="terms" className="mx-2 text-sm font-medium">
-              Use Primary Contact Email
-            </label>
+        {(MODE == DATA_VIEW_MODE.ADD || edit) && (
+          <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4 flex items-center">
+            <div className="flex items-center mt-8 border rounded-md p-2">
+              <Checkbox
+                checked={balanceChecked}
+                onCheckedChange={(checked) =>
+                  handleCheckboxChange("notification_balance_email", checked)
+                }
+              />
+              <label htmlFor="terms" className="mx-2 text-sm font-medium">
+                Use Primary Contact Email
+              </label>
+            </div>
           </div>
-        </div>
         )}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-5 gap-6 space-y-4 mb-4  ">
@@ -181,23 +181,23 @@ const NotificationDetailForm = ({ form, MODE, DATA }) => {
             isRequired: true,
           })}
         </div>
-        {MODE === "view" && edit && (
-        <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4 flex items-center">
-          <div className="flex items-center mt-8 border rounded-md p-2">
-            <Checkbox
-              checked={troubleChecked}
-              onCheckedChange={(checked) =>
-                handleCheckboxChange(
-                  "notification_trouble_ticket_email",
-                  checked
-                )
-              }
-            />
-            <label htmlFor="terms" className="mx-2 text-sm font-medium">
-              Use Primary Contact Email
-            </label>
+        {(MODE == DATA_VIEW_MODE.ADD || edit) && (
+          <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4 flex items-center">
+            <div className="flex items-center mt-8 border rounded-md p-2">
+              <Checkbox
+                checked={troubleChecked}
+                onCheckedChange={(checked) =>
+                  handleCheckboxChange(
+                    "notification_trouble_ticket_email",
+                    checked
+                  )
+                }
+              />
+              <label htmlFor="terms" className="mx-2 text-sm font-medium">
+                Use Primary Contact Email
+              </label>
+            </div>
           </div>
-        </div>
         )}
       </div>
       <div className="col-span-2 flex justify-end mt-4 mb-4">

@@ -19,12 +19,21 @@ const BillingDetailForm = ({ form, MODE, DATA }) => {
       setValue("billing_contact_skype", DATA.account.billing_contact_skype || "");
       setValue("billing_contact_phone", DATA.account.billing_contact_phone || "");
       setValue("billing_contact_mobile", DATA.account.billing_contact_mobile || "");
-      setValue("billing_contact_street_1", DATA.account.billing_contact_street_1 || "");
-      setValue("billing_contact_street_2", DATA.account.billing_contact_street_2 || "");
-      setValue("billing_contact_city", DATA.account.billing_contact_city || "");
-      setValue("billing_contact_state", DATA.account.billing_contact_state || "");
-      setValue("billing_contact_zip_code", DATA.account.billing_contact_zip_code || "");
-      setValue("billing_contact_country", DATA.account.billing_contact_country || "");
+      setValue("billing_contact_street_1", DATA.account.billing_address1 || "");
+      setValue("billing_contact_street_2", DATA.account.billing_address2 || "");
+      setValue("billing_contact_city", DATA.account.billing_city || "");
+      setValue("billing_contact_state", DATA.account.billing_state || "");
+      setValue("billing_contact_zip_code", DATA.account.billing_zipcode || "");
+      setValue("billing_contact_country", DATA.account.billing_country || "");
+
+      setValue("primary_contact_email", DATA.account.primary_contact_email || "");
+      setValue("techinical_contact_email", DATA.account.tech_contact_email || "");
+      setValue("notification_notice_email", DATA.account.notification_notice_email || "");
+      setValue("notification_rate_email", DATA.account.notification_rate_email || "");
+      setValue("notification_balance_email", DATA.account.notification_balance_email || "");
+      setValue("trouble_ticket_email", DATA.account.trouble_ticket_email || "");
+      setValue("company_name", DATA.account.company_name || "");
+
     }
   }, [ DATA, setValue]);
 
@@ -133,7 +142,7 @@ const BillingDetailForm = ({ form, MODE, DATA }) => {
             type: "text",
             placeholder: "e.g., 123 Main St, Apt 101",
             icon: <Home />,
-            value: DATA?.account?.billing_contact_street_1,
+            value: DATA?.account?.billing_address1,
           })}
         </div>
         <div className="col-span-1 md:col-span-1 lg:hidden"></div>
@@ -144,7 +153,7 @@ const BillingDetailForm = ({ form, MODE, DATA }) => {
             type: "text",
             placeholder: "e.g., Landmark or Suite Number",
             icon: <Landmark />,
-            value: DATA?.account?.billing_contact_street_2,
+            value: DATA?.account?.billing_address2,
           })}
         </div>
       </div>
@@ -158,7 +167,7 @@ const BillingDetailForm = ({ form, MODE, DATA }) => {
             type: "text",
             placeholder: "e.g., San Francisco",
             icon: <MapPin />,
-            value: DATA?.account?.billing_contact_city,
+            value: DATA?.account?.billing_city,
           })}
         </div>
         <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
@@ -168,7 +177,7 @@ const BillingDetailForm = ({ form, MODE, DATA }) => {
             type: "text",
             placeholder: "e.g., California",
             icon: <MapPin />,
-            value: DATA?.account?.billing_contact_state,
+            value: DATA?.account?.billing_state,
           })}
         </div>
         <div className="col-span-1 md:col-span-1 lg:hidden"></div>
@@ -179,7 +188,7 @@ const BillingDetailForm = ({ form, MODE, DATA }) => {
             type: "text",
             placeholder: "e.g., 94103",
             icon: <MapPin />,
-            value: DATA?.account?.billing_contact_zip_code,
+            value: DATA?.account?.billing_zipcode,
           })}
         </div>
         <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
@@ -189,7 +198,7 @@ const BillingDetailForm = ({ form, MODE, DATA }) => {
             type: "text",
             placeholder: "e.g., United States",
             icon: <Globe />,
-            value: DATA?.account?.billing_contact_country,
+            value: DATA?.account?.billing_country,
           })}
         </div>
       </div>

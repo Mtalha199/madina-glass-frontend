@@ -6,13 +6,20 @@ export const AUTHENTICATION_VALUE = {
 /* --------------------------------- API_END_POINT --------------------------------- */
 export const API_END_POINT = {
   AUTH_LOGIN: "auth/login",
-  CUSTOMER_LIST: "admin/customers",
-  ADD_CUSTOMER: "admin/register",
+  CUSTOMER_LIST: "users",
+  ADD_CUSTOMER: "users",
   SIP_TRUNK_LIST: "admin/siptrunk",
   ADD_NEW_SIP_TRUNK: "/admin/siptrunk",
   ADD_IP_WHITE_LISTING: "/admin/ip-auth",
   SIP_TRUNK_LIST_CUSTOMER: "admin/siptrunk-customer",
 };
+
+/* --------------------------------- TOAST_MESSAGES --------------------------------- */
+export const TOAST_MESSAGES = {
+  CUSTOMER_ADDED: "Customer added successfully",
+  CUSTOMER_UPDATED: "Customer updated successfully",
+}
+
 
 export const API_TYPE = {
   GET: "get",

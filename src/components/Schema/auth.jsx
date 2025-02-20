@@ -72,6 +72,12 @@ export const ContactFormSchema = z.object({
   company_zip_code: z.string().optional(),
   company_country: z.string().optional(),
 
+  user_name:z.string().min(2, { message: "User name is required" }),
+  password:z
+  .string()
+  .min(8, { message: "Password must be at least 8 characters." }),
+  confirm_password: z.string().min(6, { message: "Please confirm your password." }),
+
   primary_contact_name: z.string().optional(),
   primary_contact_email: z
     .string()
@@ -120,7 +126,11 @@ export const ContactFormSchema = z.object({
     .string()
     .email({ message: "Please enter a valid email address." })
     .optional(),
+}).refine((data) => data.password === data.confirm_password, {
+  message: "Passwords do not match.",
+  path: ["confirm_password"],
 });
+
 export const ContactFormSchemaCarrier = z.object({
   company_name: z.string().min(2, { message: "Company name is required" }),
   company_street_1: z.string().optional(),
@@ -165,7 +175,7 @@ export const ContactFormSchemaCarrier = z.object({
     .string()
     .email({ message: "Please enter a valid email address." })
     .optional(),
-});
+})
 
 export const ContactFormSchemaEdit = z.object({
   company_name: z.string().min(2, { message: "Company name is required" }),

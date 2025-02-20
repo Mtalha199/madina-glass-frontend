@@ -9,11 +9,10 @@ import TechnicalDetailForm from "@/components/Forms/CustomerForms/TechnicalDetai
 import { useContactDetail } from "@/components/Hooks/CustomHooks";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { API_END_POINT, API_TYPE, SCREEN_PATH } from "@/Constant";
+import { API_END_POINT, API_TYPE, DATA_VIEW_MODE, SCREEN_PATH, TOAST_MESSAGES } from "@/Constant";
 import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { custom } from "zod";
 
 export const AddCustomer = () => {
   const navigate = useNavigate();
@@ -26,7 +25,7 @@ export const AddCustomer = () => {
         username: data.user_name,
         password: data.password,
       },
-      customer: {
+      profile: {
         company_name: data.company_name,
         company_type: data.company_type,
         company_frn: data.company_frn,
@@ -75,7 +74,7 @@ export const AddCustomer = () => {
       payload,
       null,
       null,
-      "Customer Added Successfully"
+      TOAST_MESSAGES.CUSTOMER_ADDED
     );
     if (response !== undefined) {
       navigate(SCREEN_PATH.CUSTOMER_LIST);
@@ -98,12 +97,12 @@ export const AddCustomer = () => {
             <FormSkeleton />
           ) : (
             <>
-              <CompanyDetailForm form={form} MODE={"Add"} />
-              <PortalCredientials form={form} />
-              <PrimaryContactDetailForm form={form} />
-              <BillingDetailForm form={form} />
-              <TechnicalDetailForm form={form} />
-              <NotificationDetailForm form={form} />
+              <CompanyDetailForm form={form} MODE={DATA_VIEW_MODE.ADD} />
+              <PortalCredientials form={form} MODE={DATA_VIEW_MODE.ADD}  />
+              <PrimaryContactDetailForm form={form} MODE={DATA_VIEW_MODE.ADD} />
+              <BillingDetailForm form={form} MODE={DATA_VIEW_MODE.ADD} />
+              <TechnicalDetailForm form={form} MODE={DATA_VIEW_MODE.ADD} />
+              <NotificationDetailForm form={form} MODE={DATA_VIEW_MODE.ADD} />
             </>
           )}
 

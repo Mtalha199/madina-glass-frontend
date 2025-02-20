@@ -61,7 +61,7 @@ const TechnicalDetailForm = ({ form ,MODE,DATA}) => {
         <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
         {renderField({
         label: "Name",
-        name: "technical_contact_name",
+        name: "techinical_contact_name",
         type: "text",
         placeholder: "e.g., Jane Smith",
         icon: <User />,

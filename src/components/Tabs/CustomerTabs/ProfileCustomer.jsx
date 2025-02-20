@@ -11,6 +11,7 @@ import { Form } from "@/components/ui/form";
 import {
   API_END_POINT,
   API_TYPE,
+  DATA_VIEW_MODE,
   SCREEN_PATH,
 } from "@/Constant";
 import { useEffect, useState } from "react";
@@ -28,7 +29,6 @@ export const ProfileCustomer = () => {
   const [searchTerm, setSearchTerm] = useState("");
   async function onSubmit(data) {
     const payload = {
-      customer: {
         company_name: data.company_name,
         company_type: data.company_type,
         company_frn: data.company_frn,
@@ -68,7 +68,7 @@ export const ProfileCustomer = () => {
         rates_notification_email: data.notification_rate_email,
         balance_notification_email: data.notification_balance_email,
         general_notice_email: data.notification_notice_email,
-      },
+    
     };
     const response = await APICALL(
       API_TYPE.PATCH,
@@ -79,7 +79,6 @@ export const ProfileCustomer = () => {
       null,
       "Customer updated successfully"
     );
-    debugger
     if (response !== undefined) {
       // navigate(SCREEN_PATH.CUSTOMER_LIST);
       getData();
@@ -109,19 +108,19 @@ export const ProfileCustomer = () => {
               <FormSkeleton />
             ) : (
               <>
-                <CompanyDetailForm form={form} MODE={mode} DATA={data} />
-                <PrimaryContactDetailForm form={form} MODE={mode} DATA={data} />
-                <BillingDetailForm form={form} MODE={mode} DATA={data} />
-                <TechnicalDetailForm form={form} MODE={mode} DATA={data} />
-                <NotificationDetailForm form={form} MODE={mode} DATA={data} />
+                <CompanyDetailForm form={form} MODE={DATA_VIEW_MODE.VIEW} DATA={data} />
+                <PrimaryContactDetailForm form={form} MODE={DATA_VIEW_MODE.VIEW} DATA={data} />
+                <BillingDetailForm form={form} MODE={DATA_VIEW_MODE.VIEW} DATA={data} />
+                <TechnicalDetailForm form={form} MODE={DATA_VIEW_MODE.VIEW} DATA={data} />
+                <NotificationDetailForm form={form} MODE={DATA_VIEW_MODE.VIEW} DATA={data} />
               </>
             )}
             
-            <div className="col-span-2 flex justify-end mt-4">
+            {/* <div className="col-span-2 flex justify-end mt-4">
               <Button type="submit" className="">
                 Save
               </Button>
-            </div>
+            </div> */}
           </form>
         </Form>
       )}

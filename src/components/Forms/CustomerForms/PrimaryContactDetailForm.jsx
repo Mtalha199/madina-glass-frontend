@@ -18,6 +18,13 @@ const PrimaryContactDetailForm = ({ form, MODE,DATA }) => {
       setValue("primary_contact_phone", DATA.account.primary_contact_phone || "");
       setValue("primary_contact_skype", DATA.account.primary_contact_skype || "");
       setValue("primary_contact_name", DATA.account.primary_contact_name || "");
+      setValue("billing_contact_email", DATA.account.billing_contact_email || "");
+      setValue("techinical_contact_email", DATA.account.techinical_contact_email || "");
+      setValue("notification_notice_email", DATA.account.notification_notice_email || "");
+      setValue("notification_rate_email", DATA.account.notification_rate_email || "");
+      setValue("notification_balance_email", DATA.account.notification_balance_email || "");
+      setValue("trouble_ticket_email", DATA.account.trouble_ticket_email || "");
+      setValue("company_name", DATA.account.company_name || "");
 
     }
   }, [ DATA, setValue]);

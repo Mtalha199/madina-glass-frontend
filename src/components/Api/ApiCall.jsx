@@ -28,7 +28,7 @@ export const APICALL = async (
         } catch (error) {
           toast({
             variant: "destructive",
-            title: error?.response?.data?.detail || "Something went wrong",
+            title:  error?.response?.data.error || "Something went wrong",
           });
         } finally {
           setloading(false);
@@ -51,7 +51,7 @@ export const APICALL = async (
         } catch (error) {
           toast({
             variant: "destructive",
-            title: error?.response?.data?.detail || "Something went wrong",
+            title:  error?.response?.data.error || "Something went wrong",
           });
         }finally {
           setloading(false);
@@ -66,11 +66,11 @@ export const APICALL = async (
           }
           const response = await axios.get(API_URL, { params: DATA });
           setData(response?.data?.data);
-          setCount(response?.data?.count);
+          setCount(response?.data?.total);
         } catch (error) {
           toast({
             variant: "destructive",
-            title: error?.response?.data?.detail || "Something went wrong",
+            title: error?.response?.data.error || "Something went wrong",
           });
         } finally {
           setloading(false);
@@ -82,7 +82,7 @@ export const APICALL = async (
         if (setloadingExist) {
           setloading(true);
         }
-        const response = await axios.delete(API_URL, { data: DATA }); // Use { data: DATA } for DELETE with body
+        const response = await axios.delete(API_URL, { data: DATA });
         if (toastMessage) {
           toast({
             description: toastMessage,
@@ -92,7 +92,7 @@ export const APICALL = async (
         } catch (error) {
           toast({
             variant: "destructive",
-            title: error?.response?.data?.detail || "Something went wrong",
+            title: error?.response?.data.error|| "Something went wrong",
           });
         } finally {
           setloading(false);

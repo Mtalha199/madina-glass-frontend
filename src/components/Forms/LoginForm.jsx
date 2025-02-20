@@ -33,13 +33,15 @@ export default function LoginForm() {
           password: values.password,
         }
       );
-      const TOKEN = response?.data?.access_token;
-      localStorage.setItem(AUTHENTICATION_VALUE.AUTH_TOKEN, TOKEN);
-      navigate("/dashboard");
+      const TOKEN = response?.data?.data?.access_token;
+      if (TOKEN) {
+        localStorage.setItem(AUTHENTICATION_VALUE.AUTH_TOKEN, TOKEN);
+        navigate(SCREEN_PATH.DASHBOARD);
+      }
     } catch (error) {
       toast({
         variant: "destructive",
-        title: error?.response?.data?.detail || "Something went wrong",
+        title: error?.response?.data.error || "Something went wrong",
         description: "There was a problem with your request.",
       });
     } finally {
