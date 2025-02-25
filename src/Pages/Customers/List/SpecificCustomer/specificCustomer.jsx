@@ -60,12 +60,12 @@ export default function SpecificCustomer() {
               </h2>
               <Badge
                 variant={
-                  data?.user?.[0]?.is_active === true
+                  data?.is_active === true
                     ? "success"
                     : "destructive"
                 }
               >
-                {data?.user?.[0]?.is_active === true ? "Active" : "Suspended"}
+                {data?.is_active === true ? "Active" : "Suspended"}
               </Badge>
             </div>
           </div>

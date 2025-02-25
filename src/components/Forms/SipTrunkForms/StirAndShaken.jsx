@@ -40,9 +40,10 @@ import {
   Plus,
   Search,
 } from "lucide-react";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { RadioGroupAndView } from "../CustomerForms/InputFieldAndView";
 
-const StirAndShaken = ({ form, MODE }) => {
+const StirAndShaken = ({ form, MODE, DATA }) => {
   const [open, setOpen] = useState(false);
   const [openSingle, setOpenSingle] = useState(false);
   const [count, setCount] = useState(10);
@@ -50,6 +51,7 @@ const StirAndShaken = ({ form, MODE }) => {
   const [StirShaken, setStirShaken] = useState([]);
   const formStarShaken = useStirShakenSingle();
   const formStarShakenBulk = useStirShakenBulk();
+  const [edit, setEdit] = useState(false);
 
   async function onSubmit(data) {
     console.log(data);
@@ -103,10 +105,24 @@ const StirAndShaken = ({ form, MODE }) => {
   };
   const searchedData = useMemo(() => {
     if (!searchQuery) return [];
-    return StirShaken.filter((record) => 
+    return StirShaken.filter((record) =>
       record.phoneNumber.toString().includes(searchQuery)
     );
   }, [StirShaken, searchQuery]);
+  useEffect(() => {
+    // If DATA contains stirShakenData, initialize with that
+    if (DATA?.stirShakenData && Array.isArray(DATA.stirShakenData)) {
+      setStirShaken(DATA.stirShakenData);
+    }
+    
+    // Always ensure form has current data
+    form.setValue("stirShakenData", StirShaken);
+  }, [DATA, form]);
+  
+  // Update form value whenever StirShaken changes
+  useEffect(() => {
+    form.setValue("stirShakenData", StirShaken);
+  }, [StirShaken, form]);
   return (
     <>
       <div className="border-t mt-4 pt-4">
@@ -118,11 +134,16 @@ const StirAndShaken = ({ form, MODE }) => {
             </p>
           </div>
           <div className="col-span-4 md:col-span-4 lg:col-span-4 gap-4">
-            <RadioGroupCommon
-              LABEL={"Default Action"}
-              NAME={"attestation"}
-              OPTIONS={ATTESTATION_OPTIONS_DEFAULT}
-            />
+            {RadioGroupAndView({
+              LABEL: "Default Action",
+              NAME: "default_action",
+              ICON: <Badge />,
+              OPTIONS: ATTESTATION_OPTIONS_DEFAULT,
+              VALUE: DATA?.default_action,
+              MODE: MODE,
+              EDIT: edit,
+              FORM: form,
+            })}
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
@@ -338,6 +359,10 @@ const StirAndShaken = ({ form, MODE }) => {
           </div>
         )}
       </div>
+      <input 
+        type="hidden" 
+        {...form.register("stirShakenData")}
+      />
     </>
   );
 };

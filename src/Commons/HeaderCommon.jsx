@@ -1,11 +1,25 @@
 import React, { useState } from "react";
 import { Search, SlidersHorizontal } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { DataTable } from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
 
-const HeaderCommon = ({ ITEMS,COLUMNS,DATA,COUNT }) => {
+const HeaderCommon = ({
+  COLUMNS,
+  DATA,
+  COUNT,
+  PAGE,
+  SET_PAGE,
+  LIMIT,
+  SET_LIMIT,
+  HANDLE_SORT,
+}) => {
   const [visibleColumns, setVisibleColumns] = useState(
     COLUMNS?.map((col) => col?.accessorKey)
   );
@@ -18,16 +32,16 @@ const HeaderCommon = ({ ITEMS,COLUMNS,DATA,COUNT }) => {
   };
   return (
     <>
-    <div className="flex items-center justify-between w-full mt-7 mb-5">
-      <div className="relative">
-        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-        <Input
-          type="search"
-          placeholder="Type a command or search"
-          className="w-full rounded-lg bg-background pl-8 md:w-[400px] lg:w-[400px]"
-        />
-      </div>
-      <DropdownMenu>
+      <div className="flex items-center justify-between w-full mt-7 mb-5">
+        <div className="relative">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="search"
+            placeholder="Type a command or search"
+            className="w-full rounded-lg bg-background pl-8 md:w-[400px] lg:w-[400px]"
+          />
+        </div>
+        <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline">Columns</Button>
           </DropdownMenuTrigger>
@@ -43,13 +57,20 @@ const HeaderCommon = ({ ITEMS,COLUMNS,DATA,COUNT }) => {
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
-    </div>
-     <DataTable
-     data={DATA}
-     columns={COLUMNS?.filter((col) => visibleColumns.includes(col?.accessorKey))}
-     COUNT={COUNT}
-   />
-   </>
+      </div>
+      <DataTable
+        data={DATA}
+        columns={COLUMNS?.filter((col) =>
+          visibleColumns.includes(col?.accessorKey)
+        )}
+        COUNT={COUNT}
+        PAGE={PAGE}
+        SET_PAGE={SET_PAGE}
+        LIMIT={LIMIT}
+        SET_LIMIT={SET_LIMIT}
+        HANDLE_SORT={HANDLE_SORT}
+      />
+    </>
   );
 };
 

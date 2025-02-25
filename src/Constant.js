@@ -8,16 +8,32 @@ export const API_END_POINT = {
   AUTH_LOGIN: "auth/login",
   CUSTOMER_LIST: "users",
   ADD_CUSTOMER: "users",
-  SIP_TRUNK_LIST: "admin/siptrunk",
-  ADD_NEW_SIP_TRUNK: "/admin/siptrunk",
-  ADD_IP_WHITE_LISTING: "/admin/ip-auth",
+  SIP_TRUNK_LIST: "siptrunk",
+  ADD_NEW_SIP_TRUNK: "siptrunk",
+  ADD_IP_WHITE_LISTING: "/siptrunk/ip-auth",
+  ADD_STIR_SHAKEN: "siptrunk/stir-shaken",
+  ADD_PRICING_INFO: "siptrunk/pricing-info",
+
+
   SIP_TRUNK_LIST_CUSTOMER: "admin/siptrunk-customer",
+
+  ALL_GROUP_CARRIER:"groups/names",
+  GROUP_LIST: "groups",
+
 };
 
 /* --------------------------------- TOAST_MESSAGES --------------------------------- */
 export const TOAST_MESSAGES = {
   CUSTOMER_ADDED: "Customer added successfully",
   CUSTOMER_UPDATED: "Customer updated successfully",
+  GROUP_ADDED: "Group added successfully",
+  GROUP_UPDATED: "Group updated successfully",
+  SIP_TRUNK_ADDED: "SIP Trunk added successfully",
+  SIP_TRUNK_UPDATED: "SIP Trunk updated successfully",
+  IP_WHITE_LISTING_ADDED: "IP white listing added successfully",
+  STIR_SHAKEN_ADDED: "Stir/shaken added successfully",
+  PRICING_INFO_ADDED: "Pricing info added successfully",
+
 }
 
 
@@ -468,17 +484,22 @@ export const ATTESTATION_OPTIONS = [
   { value: "C", label: "Attest C" },
 ];
 export const ATTESTATION_OPTIONS_DEFAULT = [
-  { value: "inbound1", label: "Do Not Sign" },
-  { value: "inbound2", label: "Attest A" },
-  { value: "outbound", label: "Attest B" },
-  { value: "both", label: "Attest C" },
-  { value: "inbound3", label: "Block" },
+  { value: "dontsign", label: "Do Not Sign" },
+  { value: "A", label: "Attest A" },
+  { value: "B", label: "Attest B" },
+  { value: "C", label: "Attest C" },
+  { value: "block", label: "Block" },
 ];
 export const VERIFY_CALL_TOKEN = [
   { value: "disabled", label: "Disabled" },
   { value: "A", label: "Attest A" },
   { value: "B", label: "Attest B" },
   { value: "C", label: "Attest C" },
+];
+export const BLOCK_MATCHING_SRC_DST = [
+  { value: "3", label: "3" },
+  { value: "6", label: "6" },
+  { value: "full", label: "Full" },
 ];
 
 export const POPULATE_INTERMINATE_AS = [
@@ -500,4 +521,38 @@ export const ROUNDING_METHOD = [
   { value: "a", label: "Round up" },
   { value: "A", label: "True Math" },
   { value: "B", label: "Round down" },
+];
+
+
+
+export const BILLING_TYPE_OPTIONS = [
+  { value: "dialed_number", label: "Dialed Number" },
+  { value: "lrn", label: "LRN" },
+];
+export const BILLING_INCREMENT_OPTIONS = [
+  { value: 1, label: "1" },
+  { value: 2, label: "2" },
+  { value: 3, label: "3" },
+  { value: 4, label: "4" },
+  { value: 5, label: "5" },
+  { value: 6, label: "6" },
+  { value: 12, label: "12" },
+  { value: 18, label: "18" },
+  { value: 24, label: "24" },
+  { value: 30, label: "30" },
+  { value: 60, label: "60" },
+
+];
+export const DIGIT_USED = [
+  { value: 2, label: "2" },
+  { value: 3, label: "3" },
+  { value: 4, label: "4" },
+  { value: 5, label: "5" },
+  { value: 6, label: "6" },
+];
+
+export const PRICING_ROUNDING_METHOD = [
+  { value: "up", label: "Up" },
+  { value: "down", label: "Down" },
+  { value: "true_mathematical", label: "True Mathematical" },
 ];

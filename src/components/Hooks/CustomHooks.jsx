@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AddGroup, BasicSipTrunkSchema, ContactFormSchema, ContactFormSchemaCarrier, ContactFormSchemaEdit, IpWhitelistSchemaForEdit, loginFormSchema, NewGroupFormSchema, NewUrlFormSchema, SignUpFormSchema, SipTrunkForm, StirShakenFormBulk, StirShakenFormSingle } from "../Schema/auth";
-import { ATTESTATION_OPTIONS, TRUNK_TYPE_OPTIONS } from "@/Constant";
+import { AddGroup, BasicSipTrunkSchema, ContactFormSchema, ContactFormSchemaCarrier, ContactFormSchemaEdit, IpWhitelistSchema, IpWhitelistSchemaForEdit, loginFormSchema, NewGroupFormSchema, NewUrlFormSchema, PricingInfochema, SignUpFormSchema, SipTrunkForm, StirShakenFormBulk, StirShakenFormSingle, StirShakenSchema } from "../Schema/auth";
+import { ATTESTATION_OPTIONS, ATTESTATION_OPTIONS_DEFAULT, TRUNK_TYPE_OPTIONS, VERIFY_CALL_TOKEN } from "@/Constant";
 
 export function useLoginForm() {
   return useForm({
@@ -230,31 +230,65 @@ export function useBasicSipTrunkForm() {
     resolver: zodResolver(BasicSipTrunkSchema),
     defaultValues: {
       trunk_name: "",
-      trunk_type: "",
-      customer: "",
+      customer_id: "",
+      group_id:"",
+      trunk_type:TRUNK_TYPE_OPTIONS[2].value,
+      status: true,
+      somos:false,
+      cps_limit: 0,
+      session_limit: 0,
+      dnis_call_limit: 0,
+      ani_call_limit: 0,
       global_ani_block: false,
       global_dnis_block: false,
       customer_ani_block: false,
       customer_dnis_block: false,
-      cps_limit: "0",
-      session_limit: "0",
-      dnis_call_limit: "0",
-      ani_call_limit: "0",
-      status: true,
+      verify_call_token:VERIFY_CALL_TOKEN[0].value,
+      block_matching_src_dst:"",
     },
   });
 }
 
 export function useIpWhitelistForm() {
   return useForm({
-    resolver: zodResolver(IpWhitelistSchemaForEdit),
+    resolver: zodResolver(IpWhitelistSchema),
     defaultValues: {
       ipEntries: [],
     },
   });
 }
+export function useStirShakenForm() {
+  return useForm({
+    resolver: zodResolver(StirShakenSchema),
+    defaultValues: {
+      default_action:ATTESTATION_OPTIONS_DEFAULT[0].value,
+      stirShakenData: []
+    },
+  });
+}
 
-
+export function usePricingInfo() {
+  return useForm({
+    resolver: zodResolver(PricingInfochema),
+    defaultValues: {
+      billing_type: "",
+      billing_increment: "",
+      initial: "",
+      subsequent: "",
+      price_cap: false,
+      price_protection: false,
+      override_carrier_price_protection: false,
+      digits_used: "",
+      rounding_method: "",
+      outbound_media_ip_block: false,
+      inbound_media_ip_block: false,
+      allow555: false,
+      use_global_404_blacklist: false,
+      call_extend: false,
+      override_call_extending: false,
+    },
+  });
+}
 
 export function useStirShakenSingle(){
   return useForm({

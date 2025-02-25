@@ -5,11 +5,10 @@ import { APICALL } from "@/components/Api/ApiCall";
 import SkeletonTable from "./SkeletonTable";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
+import TableContainer from "./TableContainer";
+import DataTable from "@/components/ui/data-table";
 
 const SipTrunkCommonTable = ({ id }) => {
-  const [loading, setloading] = useState(false);
-  const [count, setCount] = useState(0);
-  const [data, setData] = useState([]);
 
   const columns = [
     { header: "ID", accessorKey: "id" },
@@ -96,24 +95,82 @@ const SipTrunkCommonTable = ({ id }) => {
     },
     { header: "CPS Limit", accessorKey: "cps_limit" },
   ];
+  const [loading, setloading] = useState(false);
+  const [data, setData] = useState([]);
 
+  const [count, setCount] = useState(0);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [orderBy, setOrderBy] = useState(null);
+  const [order, setOrder] = useState(null);
+  const [visibleColumns, setVisibleColumns] = useState(
+    columns.map((col) => col.accessorKey)
+  );
+  const [search, setSearch] = useState(null);
   useEffect(() => {
-    getData();
-  }, [id]);
+    const debounceTimer = setTimeout(() => {
+      getData();
+    }, 300);
 
+    return () => clearTimeout(debounceTimer);
+  }, [page, limit, orderBy, order, search]);
   const getData = async () => {
     const endpoint = id
-      ? `${API_END_POINT.SIP_TRUNK_LIST_CUSTOMER}/${id}`
-      : `${API_END_POINT.SIP_TRUNK_LIST}`;
-    await APICALL(API_TYPE.GET, endpoint, setloading, null, setData, setCount);
+    ? `${API_END_POINT.SIP_TRUNK_LIST_CUSTOMER}/${id}`
+    : `${API_END_POINT.SIP_TRUNK_LIST}`;
+    await APICALL(
+      API_TYPE.GET,
+      endpoint,
+      setloading,
+      { page, limit, orderBy, order, search },
+      setData,
+      setCount
+    );
+  };
+  const handleSort = (column) => {
+    if (orderBy === column) {
+      setOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+    } else {
+      setOrderBy(column);
+      setOrder("asc");
+    }
   };
 
+  const handleSearch = (query) => {
+    if (query === "") query = null;
+    setSearch(query);
+    setPage(1);
+  };
+  const handleVisibleColumnsChange = (newVisibleColumns) => {
+    setVisibleColumns(newVisibleColumns);
+  };
   return (
     <div>
       {loading ? (
         <SkeletonTable ROWS={10} COLUMNS={3} />
       ) : (
-        <HeaderCommon DATA={data} COLUMNS={columns} COUNT={count} />
+        // <HeaderCommon DATA={data} COLUMNS={columns} COUNT={count} />
+        <>
+        <TableContainer
+            SEARCH={search}
+            COLUMNS={columns}
+            onSearch={handleSearch}
+            VISIBILE_COLUMN_CHANGE={handleVisibleColumnsChange}
+            INITIAL_VISIBLE_COLUMNS={visibleColumns}
+          />
+          <DataTable
+            data={data}
+            columns={columns?.filter((col) =>
+              visibleColumns.includes(col?.accessorKey)
+            )}
+            COUNT={count}
+            PAGE={page}
+            SET_PAGE={setPage}
+            LIMIT={limit}
+            SET_LIMIT={setLimit}
+            HANDLE_SORT={handleSort}
+          />
+          </>
       )}
     </div>
   );

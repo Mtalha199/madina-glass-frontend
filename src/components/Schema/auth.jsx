@@ -284,26 +284,106 @@ export const SipTrunkForm = z.object({
     )
     .optional(),
 });
-
+// -----------------------SIP_TRUNK_SCEHEMA---------------------
 export const BasicSipTrunkSchema = z.object({
   trunk_name: z
     .string()
     .min(2, { message: "Trunk name must be at least 2 characters" }),
-  customer: z.string().min(1, { message: "Customer is required" }),
+  customer_id: z.coerce.number().min(1, { message: "Customer is required" }),
+  group_id: z.coerce.number().min(1, { message: "Group is required" }),
   trunk_type: z.string().min(1, { message: "Trunk type is required" }),
   status: z.boolean().optional(),
+  somos: z.boolean().optional(),
 
-  cps_limit: z.string().optional(),
-  session_limit: z.string().optional(),
-  dnis_call_limit: z.string().optional(),
-  ani_call_limit: z.string().optional(),
-
+  cps_limit: z.preprocess(
+    val => val === "" ? undefined : Number(val),
+    z.number({ required_error: "CPS limit is required" })
+  ),
+  session_limit: z.preprocess(
+    val => val === "" ? undefined : Number(val),
+    z.number({ required_error: "Session limit is required" })
+  ),
+  dnis_call_limit: z.preprocess(
+    val => val === "" ? undefined : Number(val),
+    z.number({ required_error: "DNIS call limit is required" })
+  ),
+  ani_call_limit: z.preprocess(
+    val => val === "" ? undefined : Number(val),
+    z.number({ required_error: "ANI call limit is required" })
+  ),
   global_ani_block: z.boolean().optional(),
   global_dnis_block: z.boolean().optional(),
   customer_ani_block: z.boolean().optional(),
   customer_dnis_block: z.boolean().optional(),
+  verify_call_token: z.string().optional(),
+  block_matching_src_dst:z.string().min(1, { message: "Block matching scr/dst is required" }),
 });
-
+export const IpWhitelistSchema = z.object({
+  ipEntries: z
+    .array(
+      z.object({
+        name: z.string().min(1, { message: "Name is required" }),
+        customer_ip: z
+          .string()
+          .regex(
+            /^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}$/,
+            "Customer IP must be a valid IPv4 address."
+          )
+          .optional(),
+        sip_map_ip: z
+          .string()
+          .regex(
+            /^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}$/,
+            "Sip map IP must be a valid IPv4 address."
+          )
+          .optional(),
+        cps_limit: z.coerce.number().optional(),
+        session_limit: z.coerce.number().optional(),
+        status: z.boolean().optional(),
+        tech_prefix: z.string().optional(),
+        suffix: z.string().optional(),
+      }).refine(
+        data => {
+          if (!data.customer_ip || !data.sip_map_ip) {
+            return true;
+          }
+          return data.customer_ip !== data.sip_map_ip;
+        },
+        {
+          message: "Customer IP and SIP Map IP cannot be the same",
+          path: ["sip_map_ip"]
+        }
+      )
+    )
+    .optional(),
+});
+export const StirShakenSchema = z.object({
+  default_action: z.string().min(1, { message: "Default Action is required" }),
+  stirShakenData: z.array(
+    z.object({
+      phoneNumber: z.string().optional(),
+      attestationType: z.string().optional(),
+      notes: z.string().optional()
+    })
+  ).optional().default([])
+});
+export const PricingInfochema = z.object({
+  billing_type: z.string().min(1, "Billing Type is required"),
+  billing_increment: z.coerce.number().min(1, "Billing Increment is required"),
+  initial: z.string().min(1, "Initial value is required"),
+  subsequent: z.string().min(1, "Subsequent value is required"),
+  price_cap: z.boolean().optional(),
+  price_protection: z.boolean().optional(),
+  override_carrier_price_protection: z.boolean().optional(),
+  digits_used: z.coerce.number().min(1, "Digits Used is required"),
+  rounding_method: z.string().min(1, "Rounding Method is required"),
+  outbound_media_ip_block: z.boolean().optional(),
+  inbound_media_ip_block: z.boolean().optional(),
+  allow555: z.boolean().optional(),
+  use_global_404_blacklist: z.boolean().optional(),
+  call_extend: z.boolean().optional(),
+  override_call_extending: z.boolean().optional(),
+});
 export const IpWhitelistSchemaForEdit = z.object({
   ipEntries: z
     .array(
@@ -333,6 +413,7 @@ export const IpWhitelistSchemaForEdit = z.object({
     .optional(),
 });
 
+
 export const StirShakenFormSingle = z.object({
   attestation: z.string().min(1, { message: "Attestation is required" }),
   phone_number: z.string().min(1, { message: "DID is required" }),
@@ -350,6 +431,8 @@ export const LCR = z.object({
   priority: z.string().optional(),
   override_extend: z.string().optional(),
 });
+
+
 
 export const AddGroup = z.object({
   group_name: z.string().min(1, { message: "Group name is required" }),

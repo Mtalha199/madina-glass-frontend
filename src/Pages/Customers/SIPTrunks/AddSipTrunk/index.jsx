@@ -2,6 +2,7 @@ import FormSkeleton from "@/Commons/FormSkeloton";
 import { APICALL } from "@/components/Api/ApiCall";
 import { BasicDetailForm } from "@/components/Forms/SipTrunkForms/BasicDetailForm";
 import IpWhiteListingForm from "@/components/Forms/SipTrunkForms/IpWhiteListingForn";
+import PricingInfoForm from "@/components/Forms/SipTrunkForms/PricingInfoForm";
 import Routing from "@/components/Forms/SipTrunkForms/Routing";
 import StirAndShaken from "@/components/Forms/SipTrunkForms/StirAndShaken";
 import {
@@ -9,7 +10,9 @@ import {
   // useBasicSipTrunkFormForEdit,
   useContactDetailEdit,
   useIpWhitelistForm,
+  usePricingInfo,
   useSipTrunk,
+  useStirShakenForm,
 } from "@/components/Hooks/CustomHooks";
 import { CUSTOMER_LIST_TABS } from "@/components/Tabs/TabConfig";
 import { Button } from "@/components/ui/button";
@@ -19,6 +22,7 @@ import {
   API_TYPE,
   DATA_VIEW_MODE,
   SCREEN_PATH,
+  TOAST_MESSAGES,
 } from "@/Constant";
 import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
@@ -32,10 +36,12 @@ export const AddSipTrunk = () => {
   const [trunkId, setTrunkId] = useState(null);
   const form = useBasicSipTrunkForm();
   const formIpWhiteListing = useIpWhitelistForm();
-  const stirAndShakenListing = useIpWhitelistForm();
+  const formStirShaken = useStirShakenForm();
   const routingListing = useIpWhitelistForm();
+  const formPricingInfo = usePricingInfo();
 
   const [loading, setLoading] = useState(false);
+
   async function onSubmit(data) {
     const payload = {
       trunk_name: data?.trunk_name,
@@ -49,7 +55,11 @@ export const AddSipTrunk = () => {
       customer_ani_block: data?.customer_ani_block,
       customer_dnis_block: data?.customer_dnis_block,
       status: data?.status,
-      customer_id: data?.customer,
+      somos: data?.somos,
+      customer_id: data?.customer_id,
+      verify_call_token: data?.verify_call_token,
+      block_matching_src_dst: data?.block_matching_src_dst,
+      group_id: data?.group_id,
     };
 
     const response = await APICALL(
@@ -59,10 +69,12 @@ export const AddSipTrunk = () => {
       payload,
       null,
       null,
-      "Sip Trunk Added Successfully"
+      TOAST_MESSAGES.SIP_TRUNK_ADDED
     );
+    debugger;
     if (response !== undefined) {
-      setTrunkId(response?.data?.sip_trunk_id);
+      setTrunkId(response?.data?.data?.id);
+      debugger;
     }
   }
   async function onSubmitIpWhiteListing(data) {
@@ -95,9 +107,61 @@ export const AddSipTrunk = () => {
       payload1,
       null,
       null,
-      "IP white listing Added Succussfully"
+      TOAST_MESSAGES.IP_WHITE_LISTING_ADDED
     );
   }
+  async function onSubmitStirShaken(data) {
+  const AllNumbers = data.stirShakenData.map(item => ({
+    number:item.phoneNumber,
+    attest: item.attestationType,
+    notes: item.notes
+  }));
+const stirShakenPayload={
+  number:AllNumbers,
+  default_stir_shaken:data.default_action,
+  trunk_id:trunkId
+}
+    await APICALL(
+      API_TYPE.POST,
+      API_END_POINT.ADD_STIR_SHAKEN,
+      setLoading,
+      stirShakenPayload,
+      null,
+      null,
+      TOAST_MESSAGES.STIR_SHAKEN_ADDED
+    );
+  }
+  async function onSubmitPricingInfo(data) {
+    console.log(data);
+    
+  const pricingInfoPayload={
+    billing_type: data.billing_type,
+    billing_increment: data.billing_increment,
+    initial: data.initial,
+    subsequent: data.subsequent,
+    price_cap: data.price_cap,
+    price_protection: data.price_protection,
+    override_carrier_price_protection: data.override_carrier_price_protection,
+    digits_used: data.digits_used,
+    rounding_method: data.rounding_method,
+    outbound_media_ip_block: data.outbound_media_ip_block,
+    inbound_media_ip_block: data.inbound_media_ip_block,
+    allow555: data.allow555,
+    use_global_404_blacklist: data.use_global_404_blacklist,
+    call_extend: data.call_extend,
+    override_call_extending: data.override_call_extending,
+    trunk_id:trunkId
+  }
+      await APICALL(
+        API_TYPE.POST,
+        API_END_POINT.ADD_PRICING_INFO,
+        setLoading,
+        pricingInfoPayload,
+        null,
+        null,
+        TOAST_MESSAGES.PRICING_INFO_ADDED
+      );
+    }
   return (
     <>
       <div className="p-6">
@@ -151,7 +215,10 @@ export const AddSipTrunk = () => {
                   onSubmitIpWhiteListing
                 )}
               >
-                <IpWhiteListingForm form={form} MODE={DATA_VIEW_MODE.ADD} />
+                <IpWhiteListingForm
+                  form={formIpWhiteListing}
+                  MODE={DATA_VIEW_MODE.ADD}
+                />
                 <div className="col-span-2 flex justify-end mt-4">
                   <Button
                     type="submit"
@@ -163,13 +230,13 @@ export const AddSipTrunk = () => {
                 </div>
               </form>
             </Form>
-            <Form {...stirAndShakenListing}>
+            <Form {...formStirShaken}>
               <form
-                onSubmit={stirAndShakenListing.handleSubmit(
-                  onSubmitIpWhiteListing
+                onSubmit={formStirShaken.handleSubmit(
+                  onSubmitStirShaken
                 )}
               >
-                <StirAndShaken form={form} MODE={DATA_VIEW_MODE.ADD} />
+                <StirAndShaken form={formStirShaken} MODE={DATA_VIEW_MODE.ADD} />
                 <div className="col-span-2 flex justify-end mt-4">
                   <Button
                     type="submit"
@@ -186,6 +253,24 @@ export const AddSipTrunk = () => {
                 onSubmit={routingListing.handleSubmit(onSubmitIpWhiteListing)}
               >
                 <Routing form={form} MODE={DATA_VIEW_MODE.ADD} />
+                <div className="col-span-2 flex justify-end mt-4">
+                  <Button
+                    type="submit"
+                    disabled={trunkId === null}
+                    className=""
+                  >
+                    Save
+                  </Button>
+                </div>
+              </form>
+            </Form>
+            <Form {...formPricingInfo}>
+              <form
+                onSubmit={formPricingInfo.handleSubmit(
+                  onSubmitPricingInfo
+                )}
+              >
+                <PricingInfoForm form={formPricingInfo} MODE={DATA_VIEW_MODE.ADD} />
                 <div className="col-span-2 flex justify-end mt-4">
                   <Button
                     type="submit"

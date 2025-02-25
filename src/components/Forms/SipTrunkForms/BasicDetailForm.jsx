@@ -33,6 +33,7 @@ import {
 import {
   API_END_POINT,
   API_TYPE,
+  BLOCK_MATCHING_SRC_DST,
   TRUNK_TYPE_OPTIONS,
   TRUNK_TYPE_STATUS_OPTIONS,
   VERIFY_CALL_TOKEN,
@@ -66,6 +67,8 @@ export const BasicDetailForm = ({ form, MODE, DATA, ID }) => {
     }
   }, [ID, setValue]);
   const [customerData, setCustomerData] = useState([]);
+  const [groupCarrierData, setGroupCarrierData] = useState([]);
+
   const [loading, setloading] = useState(false);
   const [count, setCount] = useState(0);
   useEffect(() => {
@@ -78,6 +81,14 @@ export const BasicDetailForm = ({ form, MODE, DATA, ID }) => {
       setloading,
       null,
       setCustomerData,
+      setCount
+    );
+    await APICALL(
+      API_TYPE.GET,
+      API_END_POINT.ALL_GROUP_CARRIER,
+      setloading,
+      null,
+      setGroupCarrierData,
       setCount
     );
   };
@@ -108,15 +119,15 @@ export const BasicDetailForm = ({ form, MODE, DATA, ID }) => {
           {ID == undefined && (
             <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
               {SelectAndView({
-                LABEL: "Carrier",
-                NAME: "customer",
+                LABEL: "Customer",
+                NAME: "customer_id",
                 PLACEHOLDER: "Select Customer",
                 ICON: <Server />,
                 OPTIONS: customerData?.map((item) => ({
                   value: String(item?.id),
                   label: item?.company_name,
                 })),
-                VALUE: DATA?.company_name,
+                VALUE: DATA?.customer_id,
                 IS_REQUIRED: true,
                 MODE: MODE,
                 EDIT: edit,
@@ -124,6 +135,23 @@ export const BasicDetailForm = ({ form, MODE, DATA, ID }) => {
               })}
             </div>
           )}
+          <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
+            {SelectAndView({
+              LABEL: "Group",
+              NAME: "group_id",
+              PLACEHOLDER: "Select Group",
+              ICON: <Server />,
+              OPTIONS: groupCarrierData?.map((item) => ({
+                value: String(item?.id),
+                label: item?.name,
+              })),
+              VALUE: DATA?.group_id,
+              IS_REQUIRED: true,
+              MODE: MODE,
+              EDIT: edit,
+              FORM: form,
+            })}
+          </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 space-y-4 ">
           <div className="hidden lg:block lg:col-span-1"></div>
@@ -141,10 +169,21 @@ export const BasicDetailForm = ({ form, MODE, DATA, ID }) => {
           </div>
           <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
             {SwitchAndView({
-              LABEL: "STATUS",
+              LABEL: "Status",
               NAME: "status",
               ICON: <Badge />,
               VALUE: DATA?.status,
+              MODE: MODE,
+              EDIT: edit,
+              FORM: form,
+            })}
+          </div>
+          <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
+            {SwitchAndView({
+              LABEL: "Somos",
+              NAME: "somos",
+              ICON: <Badge />,
+              VALUE: DATA?.somos,
               MODE: MODE,
               EDIT: edit,
               FORM: form,
@@ -257,13 +296,25 @@ export const BasicDetailForm = ({ form, MODE, DATA, ID }) => {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 space-y-4 ">
           <div className="hidden lg:block lg:col-span-1"></div>
-          <div className="col-span-1 md:col-span-4 lg:col-span-4 gap-4">
+          <div className="col-span-1 md:col-span-2 lg:col-span-2 gap-4">
             {RadioGroupAndView({
               LABEL: "Verify Call Token",
               NAME: "verify_call_token",
               ICON: <Badge />,
               OPTIONS: VERIFY_CALL_TOKEN,
               VALUE: DATA?.verify_call_token,
+              MODE: MODE,
+              EDIT: edit,
+              FORM: form,
+            })}
+          </div>
+          <div className="col-span-1 md:col-span-2 lg:col-span-2 gap-4">
+            {RadioGroupAndView({
+              LABEL: "Block Matching SRC/DST",
+              NAME: "block_matching_src_dst",
+              ICON: <Badge />,
+              OPTIONS: BLOCK_MATCHING_SRC_DST,
+              VALUE: DATA?.block_matching_src_dst,
               MODE: MODE,
               EDIT: edit,
               FORM: form,

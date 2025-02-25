@@ -117,7 +117,7 @@ export const RadioGroupCommon = ({
                 className={`
                   ${
                     DIRECTION === "row"
-                      ? "flex flex-row space-x-4"
+                      ? "flex flex-row space-x-0"
                       : "space-y-2"
                   }
                   ${CLASSNAME}
@@ -126,7 +126,7 @@ export const RadioGroupCommon = ({
                 {OPTIONS.map((option) => (
                   <div
                     key={option.value}
-                    className="flex items-center space-x-2"
+                    className="flex items-center space-x-1"
                   >
                     <RadioGroupItem
                       value={option.value}
@@ -167,7 +167,7 @@ export const CheckboxCommon = ({
           <div className="flex items-center space-x-2">
             {START_ICON && <span className="text-gray-500">{START_ICON}</span>}
             <FormControl>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 mt-4">
                 <Checkbox
                   checked={field.value}
                   onCheckedChange={field.onChange}
