@@ -9,49 +9,50 @@ import { API_END_POINT, API_TYPE, SCREEN_PATH } from "@/Constant";
 import SkeletonTable from "@/Commons/SkeletonTable";
 import TableContainer from "@/Commons/TableContainer";
 import DataTable from "@/components/ui/data-table";
-const columns = [
-  {
-    header: "Name",
-    accessorKey: "fullName",
-    cell: ({ row }) => {
-      const fullName = row.getValue("company_name");
-      const id = row.getValue("id");
-      const status = row.getValue("is_active");
 
-      const handleNavigation = () => {
-        navigate(`/customer/${id}`, {
-          state: { name: fullName, is_active: status },
-        });
-      };
-
-      return (
-        <span
-          className="text-primary hover:underline cursor-pointer"
-          onClick={handleNavigation}
-        >
-          {fullName}
-        </span>
-      );
-    },
-  },
-  {
-    header: "Status",
-    accessorKey: "is_active",
-    cell: ({ row }) => {
-      const status = row.getValue("is_active");
-      return (
-        <Badge variant={status === true ? "success" : "destructive"}>
-          {status === true ? "Active" : "Suspended"}
-        </Badge>
-      );
-    },
-  },
-  { header: "User Name", accessorKey: "username" },
-  { header: "Sip Trunks", accessorKey: "sip_trunks" },
-
-  { header: "Balance", accessorKey: "balance" },
-];
 export default function CustomersList() {
+  const columns = [
+    {
+      header: "Name",
+      accessorKey: "fullName",
+      cell: ({ row }) => {
+        const fullName = row.getValue("company_name");
+        const id = row.getValue("id");
+        const status = row.getValue("is_active");
+  
+        const handleNavigation = () => {
+          navigate(`/customer/${id}`, {
+            state: { name: fullName, is_active: status },
+          });
+        };
+  
+        return (
+          <span
+            className="text-primary hover:underline cursor-pointer"
+            onClick={handleNavigation}
+          >
+            {fullName}
+          </span>
+        );
+      },
+    },
+    {
+      header: "Status",
+      accessorKey: "is_active",
+      cell: ({ row }) => {
+        const status = row.getValue("is_active");
+        return (
+          <Badge variant={status === true ? "success" : "destructive"}>
+            {status === true ? "Active" : "Suspended"}
+          </Badge>
+        );
+      },
+    },
+    { header: "User Name", accessorKey: "username" },
+    { header: "Sip Trunks", accessorKey: "sip_trunks" },
+  
+    { header: "Balance", accessorKey: "balance" },
+  ];
   const navigate = useNavigate();
 
   const [loading, setloading] = useState(false);

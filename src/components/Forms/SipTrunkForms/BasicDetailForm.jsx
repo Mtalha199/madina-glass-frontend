@@ -50,15 +50,18 @@ export const BasicDetailForm = ({ form, MODE, DATA, ID }) => {
       setValue("customer", String(DATA.customer_id));
       setValue("trunk_type", DATA?.trunk_type);
       setValue("status", DATA?.status);
-      setValue("status", DATA?.status);
-      setValue("cps_limit", String(DATA?.cps_limit));
-      setValue("session_limit", String(DATA?.session_limit));
-      setValue("dnis_call_limit", String(DATA?.dnis_call_limit));
-      setValue("ani_call_limit", String(DATA?.ani_call_limit));
+      setValue("cps_limit", DATA?.cps_limit);
+      setValue("session_limit", DATA?.session_limit);
+      setValue("dnis_call_limit", DATA?.dnis_call_limit);
+      setValue("ani_call_limit", DATA?.ani_call_limit);
       setValue("global_ani_block", DATA?.global_ani_block);
       setValue("global_dnis_block", DATA?.global_dnis_block);
       setValue("customer_ani_block", DATA?.customer_ani_block);
       setValue("customer_dnis_block", DATA?.customer_dnis_block);
+      setValue("somos", DATA?.somos);
+      setValue("block_matching_src_dst", DATA?.block_matching_src_dst);
+
+
     }
   }, [DATA, setValue]);
   useEffect(() => {
@@ -77,7 +80,7 @@ export const BasicDetailForm = ({ form, MODE, DATA, ID }) => {
   const getData = async () => {
     await APICALL(
       API_TYPE.GET,
-      API_END_POINT.CUSTOMER_LIST,
+      API_END_POINT.ALL_CUSTOMER,
       setloading,
       null,
       setCustomerData,
@@ -127,7 +130,7 @@ export const BasicDetailForm = ({ form, MODE, DATA, ID }) => {
                   value: String(item?.id),
                   label: item?.company_name,
                 })),
-                VALUE: DATA?.customer_id,
+                VALUE: DATA?.user?.name,
                 IS_REQUIRED: true,
                 MODE: MODE,
                 EDIT: edit,

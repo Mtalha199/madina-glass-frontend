@@ -8,12 +8,14 @@ export const API_END_POINT = {
   AUTH_LOGIN: "auth/login",
   CUSTOMER_LIST: "users",
   ADD_CUSTOMER: "users",
+  ALL_CUSTOMER: "users/names",
+
   SIP_TRUNK_LIST: "siptrunk",
   ADD_NEW_SIP_TRUNK: "siptrunk",
   ADD_IP_WHITE_LISTING: "/siptrunk/ip-auth",
   ADD_STIR_SHAKEN: "siptrunk/stir-shaken",
   ADD_PRICING_INFO: "siptrunk/pricing-info",
-
+  VIEW_SIP_TRUNK: "siptrunk/siptrunk-customer",
 
   SIP_TRUNK_LIST_CUSTOMER: "admin/siptrunk-customer",
 

@@ -91,7 +91,7 @@ const Groups = () => {
       API_TYPE.GET,
       API_END_POINT.GROUP_LIST,
       setloading,
-      null,
+      { page, limit, orderBy, order, search },
       setData,
       setCount
     );

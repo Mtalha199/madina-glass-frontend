@@ -44,20 +44,20 @@ export default function SpecificSipTrunk() {
   const getData = async () => {
     await APICALL(
       API_TYPE.GET,
-      `${API_END_POINT.SIP_TRUNK_LIST}/${id}`,
+      `${API_END_POINT.VIEW_SIP_TRUNK}/${id}`,
       setloading,
       null,
       setData,
       setCount
     );
-    await APICALL(
-      API_TYPE.GET,
-      `${API_END_POINT.ADD_IP_WHITE_LISTING}/${id}`,
-      setloading,
-      null,
-      setIPWhiteListing,
-      setCount
-    );
+    // await APICALL(
+    //   API_TYPE.GET,
+    //   `${API_END_POINT.ADD_IP_WHITE_LISTING}/${id}`,
+    //   setloading,
+    //   null,
+    //   setIPWhiteListing,
+    //   setCount
+    // );
   };
   async function onSubmit(data) {
     console.log(data, "data");
