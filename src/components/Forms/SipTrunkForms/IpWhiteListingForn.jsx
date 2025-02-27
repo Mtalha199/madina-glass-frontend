@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useFieldArray } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { API_TYPE, TRUNK_TYPE_STATUS_OPTIONS } from "@/Constant";
+import { TRUNK_TYPE_STATUS_OPTIONS } from "@/Constant";
 import { Plus, X, Edit, Trash, Save, ArrowLeft } from "lucide-react";
 import { InputCommon, SwitchCommon } from "@/Commons/FormCommons";
 import {
@@ -12,10 +12,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import axios from "axios"; // Assuming you're using axios for API calls
-import { APICALL } from "@/components/Api/ApiCall";
+import DeleteConfirmationDialog from "@/Commons/DeleteConfirmationCommon";
 
-const IpWhiteListingForm = ({ form, MODE, DATA ,onsubmit}) => {
+const IpWhiteListingForm = ({
+  form,
+  MODE,
+  DATA,
+  ON_SUBMIT,
+  ON_SUBMIT_SINGLE,
+  ON_DELETE_SINGLE,
+}) => {
   const [editIndex, setEditIndex] = useState(-1);
   const [newEntries, setNewEntries] = useState([]);
 
@@ -51,31 +57,12 @@ const IpWhiteListingForm = ({ form, MODE, DATA ,onsubmit}) => {
   const handleCancel = () => {
     setEditIndex(-1);
   };
-  const [loading, setloading] = useState(false);
-  const [count, setCount] = useState(0);
-  const [data, setData] = useState([]);
   const handleSave = async () => {
-      onsubmit(newEntries)
+    ON_SUBMIT(newEntries);
   };
-
-  const deleteEntryFromBackend = async (id) => {
-    const API_URL = `/items/${id}`;
-    const toastMessage = "Item deleted successfully!";
-    const response = await APICALL(
-      API_TYPE.DELETE,
-      API_URL,
-      setloading,
-      null,
-      setData,
-      setCount,
-      toastMessage
-    );
-    if(response!== undefined)
-    {
-      return true;
-    }
+  const handleSaveOneRow = async (index) => {
+    ON_SUBMIT_SINGLE(index);
   };
-
   const handleDelete = async (index) => {
     const field = fields[index];
     if (newEntries.includes(index)) {
@@ -85,10 +72,7 @@ const IpWhiteListingForm = ({ form, MODE, DATA ,onsubmit}) => {
       );
       return;
     }
-    const isDeleted = await deleteEntryFromBackend(field.id);
-    if (isDeleted) {
-      remove(index);
-    }
+    ON_DELETE_SINGLE(index);
   };
 
   const renderEditableRow = (index) => (
@@ -173,7 +157,7 @@ const IpWhiteListingForm = ({ form, MODE, DATA ,onsubmit}) => {
               type="button"
               variant="outline"
               size="sm"
-              onClick={() => handleSave(index)}
+              onClick={() => handleSaveOneRow(index)}
             >
               <Save className="h-4 w-4" />
             </Button>
@@ -219,76 +203,78 @@ const IpWhiteListingForm = ({ form, MODE, DATA ,onsubmit}) => {
         {fields.length > 0 && (
           <div className="overflow-x-auto grid grid-cols-1 md:grid-cols-5 gap-4 space-y-4 ">
             <div className="hidden lg:block lg:col-span-1"></div>
-            <div className="col-span-1 md:col-span-4 lg:col-span-4 gap-4 border rounded-md" >
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[150px]">Name</TableHead>
-                  <TableHead className="w-[150px]">Customer IP</TableHead>
-                  <TableHead className="w-[150px]">SIP Map IP</TableHead>
-                  <TableHead className="w-[120px]">CPS Limit</TableHead>
-                  <TableHead className="w-[120px]">Session Limit</TableHead>
-                  <TableHead className="w-[150px]">Tech Prefix</TableHead>
-                  <TableHead className="w-[150px]">Suffix</TableHead>
-                  <TableHead className="w-[100px]">Status</TableHead>
-                  <TableHead className="w-[100px]">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {fields.map((field, index) =>
-                  // If in add mode, or the row is marked as a new entry, or it's being edited, render editable row
-                  MODE === "add" ||
-                  newEntries.includes(index) ||
-                  editIndex === index ? (
-                    renderEditableRow(index)
-                  ) : (
-                    // Otherwise, render view mode row
-                    <TableRow key={field.id}>
-                      <TableCell className="w-[150px]">{field.name}</TableCell>
-                      <TableCell className="w-[150px]">
-                        {field.customer_ip}
-                      </TableCell>
-                      <TableCell className="w-[150px]">
-                        {field.sip_map_ip}
-                      </TableCell>
-                      <TableCell className="w-[120px]">
-                        {field.cps_limit}
-                      </TableCell>
-                      <TableCell className="w-[120px]">
-                        {field.session_limit}
-                      </TableCell>
-                      <TableCell className="w-[150px]">
-                        {field.tech_prefix}
-                      </TableCell>
-                      <TableCell className="w-[150px]">
-                        {field.suffix}
-                      </TableCell>
-                      <TableCell className="w-[100px]">
-                        {field.status ? "Active" : "Inactive"}
-                      </TableCell>
-                      <TableCell className="w-[100px]">
-                        <div className="flex space-x-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => onEdit(index)}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleDelete(index)}
-                          >
-                            <Trash className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  )
-                )}
-              </TableBody>
-            </Table>
+            <div className="col-span-1 md:col-span-4 lg:col-span-4 gap-4 border rounded-md">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[150px]">Name</TableHead>
+                    <TableHead className="w-[150px]">Customer IP</TableHead>
+                    <TableHead className="w-[150px]">SIP Map IP</TableHead>
+                    <TableHead className="w-[120px]">CPS Limit</TableHead>
+                    <TableHead className="w-[120px]">Session Limit</TableHead>
+                    <TableHead className="w-[150px]">Tech Prefix</TableHead>
+                    <TableHead className="w-[150px]">Suffix</TableHead>
+                    <TableHead className="w-[100px]">Status</TableHead>
+                    <TableHead className="w-[100px]">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {fields.map((field, index) =>
+                    // If in add mode, or the row is marked as a new entry, or it's being edited, render editable row
+                    MODE === "add" ||
+                    newEntries.includes(index) ||
+                    editIndex === index ? (
+                      renderEditableRow(index)
+                    ) : (
+                      // Otherwise, render view mode row
+                      <TableRow key={field.id}>
+                        <TableCell className="w-[150px]">
+                          {field.name}
+                        </TableCell>
+                        <TableCell className="w-[150px]">
+                          {field.customer_ip}
+                        </TableCell>
+                        <TableCell className="w-[150px]">
+                          {field.sip_map_ip}
+                        </TableCell>
+                        <TableCell className="w-[120px]">
+                          {field.cps_limit}
+                        </TableCell>
+                        <TableCell className="w-[120px]">
+                          {field.session_limit}
+                        </TableCell>
+                        <TableCell className="w-[150px]">
+                          {field.tech_prefix}
+                        </TableCell>
+                        <TableCell className="w-[150px]">
+                          {field.suffix}
+                        </TableCell>
+                        <TableCell className="w-[100px]">
+                          {field.status ? "Active" : "Inactive"}
+                        </TableCell>
+                        <TableCell className="w-[100px]">
+                          <div className="flex space-x-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => onEdit(index)}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <DeleteConfirmationDialog
+                              onConfirm={() => handleDelete(index)}
+                            >
+                              <Button variant="destructive">
+                                <Trash />
+                              </Button>
+                            </DeleteConfirmationDialog>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )
+                  )}
+                </TableBody>
+              </Table>
             </div>
           </div>
         )}
@@ -301,8 +287,7 @@ const IpWhiteListingForm = ({ form, MODE, DATA ,onsubmit}) => {
               size="sm"
               onClick={handleSave}
             >
-              <Save className="mr-2 h-4 w-4" />
-              Save New Entries
+              Save
             </Button>
           </div>
         )}

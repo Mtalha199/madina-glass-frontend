@@ -272,7 +272,6 @@ export function usePricingInfo() {
     resolver: zodResolver(PricingInfochema),
     defaultValues: {
       billing_type: "",
-      billing_increment: "",
       initial: "",
       subsequent: "",
       price_cap: false,

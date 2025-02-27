@@ -9,17 +9,12 @@ import {
   API_TYPE,
   DATA_VIEW_MODE,
   SCREEN_PATH,
+  TOAST_MESSAGES,
 } from "@/Constant";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import TabsCommon from "@/Commons/TabsCommon";
-import { CUSTOMER_LIST_TABS } from "@/components/Tabs/TabConfig";
 import { BasicDetailForm } from "@/components/Forms/SipTrunkForms/BasicDetailForm";
 import {
   useBasicSipTrunkForm,
   useIpWhitelistForm,
-  // useBasicSipTrunkFormForEdit,
-  // useIpWhitelistFormForEdit,
-  useSipTrunk,
 } from "@/components/Hooks/CustomHooks";
 import { APICALL } from "@/components/Api/ApiCall";
 import { useEffect, useState } from "react";
@@ -29,15 +24,13 @@ import IpWhiteListingForm from "@/components/Forms/SipTrunkForms/IpWhiteListingF
 export default function SpecificSipTrunk() {
   const navigate = useNavigate();
   const { id } = useParams();
-
   const [loading, setloading] = useState(false);
   const [count, setCount] = useState(0);
   const [data, setData] = useState([]);
-  const [ipWhiteListing, setIPWhiteListing] = useState([]);
+  const [ipWhiteListingData, setIPWhiteListingData] = useState([]);
   const [newEntries, setNewEntries] = useState();
-  // const form = useSipTrunk();
-  const basicForm = useBasicSipTrunkForm();
-  const ipWhitelistForm = useIpWhitelistForm();
+  const form = useBasicSipTrunkForm();
+  const formIpWhiteListing = useIpWhitelistForm();
   useEffect(() => {
     getData();
   }, []);
@@ -50,18 +43,16 @@ export default function SpecificSipTrunk() {
       setData,
       setCount
     );
-    // await APICALL(
-    //   API_TYPE.GET,
-    //   `${API_END_POINT.ADD_IP_WHITE_LISTING}/${id}`,
-    //   setloading,
-    //   null,
-    //   setIPWhiteListing,
-    //   setCount
-    // );
+    await APICALL(
+      API_TYPE.GET,
+      `${API_END_POINT.VIEW_IP_WHITE_LISTING}/${id}`,
+      setloading,
+      null,
+      setIPWhiteListingData,
+      setCount
+    );
   };
   async function onSubmit(data) {
-    console.log(data, "data");
-
     const payload = {
       id: id,
       trunk_name: data?.trunk_name,
@@ -75,78 +66,34 @@ export default function SpecificSipTrunk() {
       customer_ani_block: data?.customer_ani_block,
       customer_dnis_block: data?.customer_dnis_block,
       status: data?.status,
-      customer_id: data?.customer,
+      somos: data?.somos,
+      customer_id: data?.customer_id,
+      verify_call_token: data?.verify_call_token,
+      block_matching_src_dst: data?.block_matching_src_dst,
+      group_id: data?.group_id,
     };
 
     const response = await APICALL(
-      API_TYPE.PATCH,
-      API_END_POINT.ADD_NEW_SIP_TRUNK,
+      API_TYPE.PUT,
+      `${API_END_POINT.ADD_NEW_SIP_TRUNK}/${id}`,
       setloading,
       payload,
       null,
       null,
-      data?.ipEntries.length === 0 ? "Sip trunk updated successfully" : null
+      TOAST_MESSAGES.SIP_TRUNK_UPDATED,
     );
     if (response !== undefined) {
-      if (data?.ipEntries.length == 0) {
-        navigate(SCREEN_PATH.SIP_TRUNK_LIST);
-      } else {
-        const payloadIPWhiteListing = data.ipEntries.map(
-          ({
-            name,
-            customer_ip,
-            sip_map_ip,
-            cps_limit,
-            session_limit,
-            status,
-            tech_prefix = "",
-            suffix = "",
-          }) => ({
-            id: id,
-            name: name,
-            trunk_id: response?.data?.sip_trunk_id,
-            customer_ip,
-            sip_map_ip,
-            cps_limit: cps_limit ?? 0,
-            session_limit: session_limit ?? 0,
-            status,
-            tech_prefix,
-            suffix,
-          })
-        );
-        const apiResponse = await APICALL(
-          API_TYPE.PATCH,
-          API_END_POINT.ADD_IP_WHITE_LISTING,
-          setloading,
-          payloadIPWhiteListing,
-          null,
-          null,
-          "Sip trunk updated successfully"
-        );
-        if (apiResponse !== undefined) {
-          navigate(SCREEN_PATH.SIP_TRUNK_LIST);
-        }
-      }
-    }
+      getData();}
   }
-  const onBasicSubmit = (basicData) => {
-    // Validate and handle basic form submission
-    basicForm.trigger().then((isValid) => {
-      if (isValid) {
-        // Proceed with basic form validation or initial submission
-        console.log("Basic Form Data:", basicData);
-      }
-    });
-  };
 
   const onIpWhitelistSubmit = async (ipData) => {
     try {
-      const isValid = await ipWhitelistForm.trigger();
+      const isValid = await formIpWhiteListing.trigger();
       if (isValid) {
         const filteredEntries = ipData?.ipEntries.filter((entry, index) =>
           newEntries.includes(index)
         );
-                const payload1 = filteredEntries?.map(
+                const ipWhiteListingPayload = filteredEntries?.map(
                   ({
                     name,
                     customer_ip,
@@ -158,7 +105,7 @@ export default function SpecificSipTrunk() {
                     suffix = "",
                   }) => ({
                     name: name,
-                    trunk_id: id,
+                    trunk_id: Number(id),
                     customer_ip,
                     sip_map_ip,
                     cps_limit: cps_limit ?? 0,
@@ -172,25 +119,57 @@ export default function SpecificSipTrunk() {
                   API_TYPE.POST,
                   API_END_POINT.ADD_IP_WHITE_LISTING,
                   setloading,
-                  payload1,
+                  ipWhiteListingPayload,
                   null,
                   null,
-                  "IP White listing updated successfully"
+                  TOAST_MESSAGES.IP_WHITE_LISTING_ADDED
                 );
                 if (apiResponse !== undefined) {
-                  // navigate(SCREEN_PATH.SIP_TRUNK_LIST);
                   getData();
                 }
       }
     } catch (error) {
-      console.error("Error in onIpWhitelistSubmit:", error);
-      // Handle error (e.g., show an error message to the user)
+      console.log(error);
+      
     }
   
   };
   const handleNewEntries = (data) => {
     setNewEntries(data);
   };
+  const handleSaveOneRow = async (index) => {
+    const currentFormValues = formIpWhiteListing.getValues();
+    const updatedFieldValues = currentFormValues.ipEntries[index];
+    const { id, ...payloadData } = updatedFieldValues;
+        const response = await APICALL(
+          API_TYPE.PUT,
+          `${API_END_POINT.ADD_IP_WHITE_LISTING}/${updatedFieldValues.id}`,
+          setloading,
+          payloadData,
+          null,
+          null,
+          TOAST_MESSAGES.IP_WHITE_LISTING_UPDATED,
+        );
+        if (response !== undefined) {
+          getData();}
+
+};
+const handleDeleteRow = async (index) => {
+  const currentFormValues = formIpWhiteListing.getValues();
+  const updatedFieldValues = currentFormValues.ipEntries[index];
+      const response = await APICALL(
+        API_TYPE.DELETE,
+        `${API_END_POINT.ADD_IP_WHITE_LISTING}/${updatedFieldValues.id}`,
+        setloading,
+        null,
+        null,
+        null,
+        TOAST_MESSAGES.IP_WHITE_LISTING_DELETED,
+      );
+      if (response !== undefined) {
+        getData();}
+
+};
   return (
     <div className="p-6">
       <Button
@@ -201,30 +180,33 @@ export default function SpecificSipTrunk() {
         <ArrowLeft />
         Sip Trunk List
       </Button>
-      <Form {...basicForm}>
-        <form onSubmit={basicForm.handleSubmit(onBasicSubmit)}>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
           {loading ? (
             <FormSkeleton />
           ) : (
             <BasicDetailForm
-              form={basicForm}
+              form={form}
               MODE={DATA_VIEW_MODE.VIEW}
-              DATA={data[0]}
+              DATA={data}
             />
           )}
         </form>
       </Form>
 
-      <Form {...ipWhitelistForm}>
-        <form onSubmit={ipWhitelistForm.handleSubmit(onIpWhitelistSubmit)}>
+      <Form {...formIpWhiteListing}>
+        <form onSubmit={formIpWhiteListing.handleSubmit(onIpWhitelistSubmit)}>
           {loading ? (
             <FormSkeleton />
           ) : (
             <IpWhiteListingForm
-              form={ipWhitelistForm}
+              form={formIpWhiteListing}
               MODE={DATA_VIEW_MODE.VIEW}
-              DATA={ipWhiteListing}
-              onsubmit={handleNewEntries}
+              DATA={ipWhiteListingData}
+              ON_SUBMIT={handleNewEntries}
+              ON_SUBMIT_SINGLE={handleSaveOneRow}
+              ON_DELETE_SINGLE={handleDeleteRow}
+
             />
           )}
         </form>

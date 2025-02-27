@@ -274,7 +274,7 @@ const stirShakenPayload={
                 <div className="col-span-2 flex justify-end mt-4">
                   <Button
                     type="submit"
-                    disabled={trunkId === null}
+                    // disabled={trunkId === null}
                     className=""
                   >
                     Save

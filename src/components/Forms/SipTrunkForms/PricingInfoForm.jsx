@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { CheckboxFieldAndView, InputFieldAndView, SelectAndView } from '../CustomerForms/InputFieldAndView';
 import { BILLING_INCREMENT_OPTIONS, BILLING_TYPE_OPTIONS, DIGIT_USED, PRICING_ROUNDING_METHOD } from '@/Constant';
 import { Server } from 'lucide-react';
+import { Label } from '@/components/ui/label';
 
 function PricingInfoForm({MODE,DATA,form}) {
       const [edit, setEdit] = useState(false);
@@ -29,44 +30,34 @@ function PricingInfoForm({MODE,DATA,form}) {
                 FORM: form,
               })}
           </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 space-y-4 ">
+          <div className="hidden lg:block lg:col-span-1"></div>
           <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
-            {SelectAndView({
-              LABEL: "Billing Increment",
-              NAME: "billing_increment",
-              PLACEHOLDER: "Select billing increment",
+          <Label>Billing Increment</Label>
+
+          {SelectAndView({
+              LABEL: "Initial",
+              NAME: "initial",
+              PLACEHOLDER: "Select initial",
               ICON: <Server />,
               OPTIONS: BILLING_INCREMENT_OPTIONS,
-              VALUE: DATA?.billing_increment,
+              VALUE: DATA?.initial,
               IS_REQUIRED: true,
               MODE: MODE,
               EDIT: edit,
               FORM: form,
             })}
           </div>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 space-y-4 ">
-          <div className="hidden lg:block lg:col-span-1"></div>
-          <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
-          {InputFieldAndView({
-              LABEL: "Initial",
-              NAME: "initial",
-              TYPE: "text",
-              PLACEHOLDER: "e.g., San Francisco",
-              ICON: <Server />,
-              VALUE: DATA?.initial,
-              MODE: MODE,
-              EDIT: edit,
-              FORM: form,
-            })}
-          </div>
-          <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
-          {InputFieldAndView({
-              LABEL: "subsequent",
+          <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4 pt-5">
+          {SelectAndView({
+              LABEL: "Subsequent",
               NAME: "subsequent",
-              TYPE: "text",
-              PLACEHOLDER: "e.g., San Francisco",
+              PLACEHOLDER: "Select subsequent",
               ICON: <Server />,
+              OPTIONS: BILLING_INCREMENT_OPTIONS,
               VALUE: DATA?.subsequent,
+              IS_REQUIRED: true,
               MODE: MODE,
               EDIT: edit,
               FORM: form,

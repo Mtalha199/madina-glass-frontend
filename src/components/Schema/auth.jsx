@@ -370,8 +370,8 @@ export const StirShakenSchema = z.object({
 export const PricingInfochema = z.object({
   billing_type: z.string().min(1, "Billing Type is required"),
   billing_increment: z.coerce.number().min(1, "Billing Increment is required"),
-  initial: z.string().min(1, "Initial value is required"),
-  subsequent: z.string().min(1, "Subsequent value is required"),
+  initial: z.coerce.number().min(1, "Initial is required"),
+  subsequent: z.coerce.number().min(1, "Subsequent is required"),
   price_cap: z.boolean().optional(),
   price_protection: z.boolean().optional(),
   override_carrier_price_protection: z.boolean().optional(),

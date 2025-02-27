@@ -12,7 +12,9 @@ export const API_END_POINT = {
 
   SIP_TRUNK_LIST: "siptrunk",
   ADD_NEW_SIP_TRUNK: "siptrunk",
-  ADD_IP_WHITE_LISTING: "/siptrunk/ip-auth",
+  ADD_IP_WHITE_LISTING: "siptrunk/ip-auth",
+  VIEW_IP_WHITE_LISTING: "siptrunk/ip-auths",
+
   ADD_STIR_SHAKEN: "siptrunk/stir-shaken",
   ADD_PRICING_INFO: "siptrunk/pricing-info",
   VIEW_SIP_TRUNK: "siptrunk/siptrunk-customer",
@@ -33,6 +35,8 @@ export const TOAST_MESSAGES = {
   SIP_TRUNK_ADDED: "SIP Trunk added successfully",
   SIP_TRUNK_UPDATED: "SIP Trunk updated successfully",
   IP_WHITE_LISTING_ADDED: "IP white listing added successfully",
+  IP_WHITE_LISTING_UPDATED: "IP white listing updated successfully",
+  IP_WHITE_LISTING_DELETED: "IP white listing deleted successfully",
   STIR_SHAKEN_ADDED: "Stir/shaken added successfully",
   PRICING_INFO_ADDED: "Pricing info added successfully",
 
@@ -43,6 +47,7 @@ export const API_TYPE = {
   GET: "get",
   POST: "post",
   PATCH: "patch",
+  PUT: "put",
   DELETE: "delete",
 };
 /* --------------------------------- IMAGES --------------------------------- */

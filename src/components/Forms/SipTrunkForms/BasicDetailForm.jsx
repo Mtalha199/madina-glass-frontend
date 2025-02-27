@@ -47,7 +47,8 @@ export const BasicDetailForm = ({ form, MODE, DATA, ID }) => {
   useEffect(() => {
     if (DATA) {
       setValue("trunk_name", DATA?.trunk_name || "");
-      setValue("customer", String(DATA.customer_id));
+      setValue("customer_id", DATA.customer_id);
+      setValue("group_id", DATA.group_id);
       setValue("trunk_type", DATA?.trunk_type);
       setValue("status", DATA?.status);
       setValue("cps_limit", DATA?.cps_limit);
@@ -58,6 +59,7 @@ export const BasicDetailForm = ({ form, MODE, DATA, ID }) => {
       setValue("global_dnis_block", DATA?.global_dnis_block);
       setValue("customer_ani_block", DATA?.customer_ani_block);
       setValue("customer_dnis_block", DATA?.customer_dnis_block);
+      setValue("verify_call_token", DATA?.verify_call_token);
       setValue("somos", DATA?.somos);
       setValue("block_matching_src_dst", DATA?.block_matching_src_dst);
 
@@ -130,7 +132,7 @@ export const BasicDetailForm = ({ form, MODE, DATA, ID }) => {
                   value: String(item?.id),
                   label: item?.company_name,
                 })),
-                VALUE: DATA?.user?.name,
+                VALUE: DATA?.user?.accounts?.company_name,
                 IS_REQUIRED: true,
                 MODE: MODE,
                 EDIT: edit,
@@ -148,7 +150,7 @@ export const BasicDetailForm = ({ form, MODE, DATA, ID }) => {
                 value: String(item?.id),
                 label: item?.name,
               })),
-              VALUE: DATA?.group_id,
+              VALUE: DATA?.group?.name,
               IS_REQUIRED: true,
               MODE: MODE,
               EDIT: edit,
