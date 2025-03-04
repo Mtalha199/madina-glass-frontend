@@ -8,7 +8,7 @@ import { Link } from "react-router-dom";
 import TableContainer from "./TableContainer";
 import DataTable from "@/components/ui/data-table";
 
-const SipTrunkCommonTable = ({ id }) => {
+const SipTrunkCommonTable = ({ id,CARRIER=false }) => {
 
   const columns = [
     { header: "ID", accessorKey: "id" },
@@ -117,7 +117,7 @@ const SipTrunkCommonTable = ({ id }) => {
   const getData = async () => {
     const endpoint = id
     ? `${API_END_POINT.SIP_TRUNK_LIST_CUSTOMER}/${id}`
-    : `${API_END_POINT.SIP_TRUNK_LIST}`;
+    : CARRIER ? `${API_END_POINT.SIP_TRUNK_LIST }?carrier=1`:  `${API_END_POINT.SIP_TRUNK_LIST}?carrier=0`;
     await APICALL(
       API_TYPE.GET,
       endpoint,
@@ -149,7 +149,6 @@ const SipTrunkCommonTable = ({ id }) => {
       {loading ? (
         <SkeletonTable ROWS={10} COLUMNS={3} />
       ) : (
-        // <HeaderCommon DATA={data} COLUMNS={columns} COUNT={count} />
         <>
         <TableContainer
             SEARCH={search}

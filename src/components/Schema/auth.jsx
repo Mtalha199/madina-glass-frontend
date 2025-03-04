@@ -140,6 +140,12 @@ export const ContactFormSchemaCarrier = z.object({
   company_zip_code: z.string().optional(),
   company_country: z.string().optional(),
 
+  user_name:z.string().min(2, { message: "User name is required" }),
+  password:z
+  .string()
+  .min(8, { message: "Password must be at least 8 characters." }),
+  confirm_password: z.string().min(6, { message: "Please confirm your password." }),
+
   primary_contact_name: z.string().optional(),
   primary_contact_email: z
     .string()
@@ -175,7 +181,10 @@ export const ContactFormSchemaCarrier = z.object({
     .string()
     .email({ message: "Please enter a valid email address." })
     .optional(),
-})
+}).refine((data) => data.password === data.confirm_password, {
+  message: "Passwords do not match.",
+  path: ["confirm_password"],
+});
 
 export const ContactFormSchemaEdit = z.object({
   company_name: z.string().min(2, { message: "Company name is required" }),
@@ -238,6 +247,51 @@ export const ContactFormSchemaEdit = z.object({
     .email({ message: "Please enter a valid email address." })
     .optional(),
 });
+export const ContactFormSchemaCarrierEdit = z.object({
+  company_name: z.string().min(2, { message: "Company name is required" }),
+  company_street_1: z.string().optional(),
+  company_street_2: z.string().optional(),
+  company_city: z.string().optional(),
+  company_state: z.string().optional(),
+  company_zip_code: z.string().optional(),
+  company_country: z.string().optional(),
+
+  primary_contact_name: z.string().optional(),
+  primary_contact_email: z
+    .string()
+    .email({ message: "Please enter a valid email address." }),
+  primary_contact_skype: z.string().optional(),
+  primary_contact_phone: z.string().optional(),
+  primary_contact_mobile: z.string().optional(),
+
+  billing_contact_name: z.string().optional(),
+  billing_contact_email: z
+    .string()
+    .email({ message: "Please enter a valid email address." })
+    .optional(),
+  billing_contact_skype: z.string().optional(),
+  billing_contact_phone: z.string().optional(),
+  billing_contact_street_1: z.string().optional(),
+  billing_contact_street_2: z.string().optional(),
+  billing_contact_city: z.string().optional(),
+  billing_contact_state: z.string().optional(),
+  billing_contact_zip_code: z.string().optional(),
+  billing_contact_country: z.string().optional(),
+
+  techinical_contact_name: z.string().optional(),
+  techinical_contact_email: z
+    .string()
+    .email({ message: "Please enter a valid email address." })
+    .optional(),
+  techinical_contact_skype: z.string().optional(),
+  techinical_contact_phone: z.string().optional(),
+  techinical_contact_mobile: z.string().optional(),
+
+  notification_trouble_ticket_email: z
+    .string()
+    .email({ message: "Please enter a valid email address." })
+    .optional(),
+});
 export const SipTrunkForm = z.object({
   trunk_name: z
     .string()
@@ -284,12 +338,14 @@ export const SipTrunkForm = z.object({
     )
     .optional(),
 });
+
 // -----------------------SIP_TRUNK_SCEHEMA---------------------
+
 export const BasicSipTrunkSchema = z.object({
   trunk_name: z
     .string()
     .min(2, { message: "Trunk name must be at least 2 characters" }),
-  customer_id: z.coerce.number().min(1, { message: "Customer is required" }),
+  customer_id: z.coerce.number().min(1, { message: "Required" }),
   group_id: z.coerce.number().min(1, { message: "Group is required" }),
   trunk_type: z.string().min(1, { message: "Trunk type is required" }),
   status: z.boolean().optional(),
@@ -369,7 +425,6 @@ export const StirShakenSchema = z.object({
 });
 export const PricingInfochema = z.object({
   billing_type: z.string().min(1, "Billing Type is required"),
-  billing_increment: z.coerce.number().min(1, "Billing Increment is required"),
   initial: z.coerce.number().min(1, "Initial is required"),
   subsequent: z.coerce.number().min(1, "Subsequent is required"),
   price_cap: z.boolean().optional(),

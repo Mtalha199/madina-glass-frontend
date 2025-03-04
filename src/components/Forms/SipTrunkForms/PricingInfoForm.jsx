@@ -1,12 +1,34 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { CheckboxFieldAndView, InputFieldAndView, SelectAndView } from '../CustomerForms/InputFieldAndView';
 import { BILLING_INCREMENT_OPTIONS, BILLING_TYPE_OPTIONS, DIGIT_USED, PRICING_ROUNDING_METHOD } from '@/Constant';
 import { Server } from 'lucide-react';
 import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { useFormContext } from 'react-hook-form';
 
 function PricingInfoForm({MODE,DATA,form}) {
       const [edit, setEdit] = useState(false);
-    
+  const { setValue, watch } = useFormContext();
+
+
+      useEffect(() => {
+        if (DATA) {
+          setValue("billing_type", DATA?.billing_type);
+          setValue("initial", DATA?.initial);
+          setValue("subsequent", DATA?.subsequent);
+          setValue("price_cap", DATA?.price_cap);
+          setValue("price_protection", DATA?.price_protection);
+          setValue("override_carrier_price_protection", DATA?.override_carrier_price_protection);
+          setValue("digits_used", DATA?.digits_used);
+          setValue("rounding_method", DATA?.rounding_method);
+          setValue("outbound_media_ip_block", DATA?.outbound_media_ip_block);
+          setValue("inbound_media_ip_block", DATA?.inbound_media_ip_block);
+          setValue("allow555", DATA?.allow555);
+          setValue("use_global_404_blacklist", DATA?.use_global_404_blacklist);
+          setValue("call_extend", DATA?.call_extend);
+          setValue("override_call_extending", DATA?.override_call_extending);
+        }
+      }, [DATA, setValue]);
     return (
         <div className="">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 border-t mt-4 pt-4 ">
@@ -34,7 +56,7 @@ function PricingInfoForm({MODE,DATA,form}) {
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 space-y-4 ">
           <div className="hidden lg:block lg:col-span-1"></div>
           <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
-          <Label>Billing Increment</Label>
+          {/* <Label>Billing Increment</Label> */}
 
           {SelectAndView({
               LABEL: "Initial",
@@ -49,7 +71,7 @@ function PricingInfoForm({MODE,DATA,form}) {
               FORM: form,
             })}
           </div>
-          <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4 pt-5">
+          <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
           {SelectAndView({
               LABEL: "Subsequent",
               NAME: "subsequent",
@@ -195,7 +217,7 @@ function PricingInfoForm({MODE,DATA,form}) {
             })}
           </div>
         </div>
-        {/* <div className="col-span-2 flex justify-end mt-4 mb-4">
+        <div className="col-span-2 flex justify-end mt-4 mb-4">
           <div className="space-x-2">
             {MODE === "view" && (
               <>
@@ -218,7 +240,7 @@ function PricingInfoForm({MODE,DATA,form}) {
               </>
             )}
           </div>
-        </div> */}
+        </div>
       </div>
     );
 }

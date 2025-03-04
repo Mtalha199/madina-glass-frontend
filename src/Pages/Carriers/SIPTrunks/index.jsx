@@ -15,7 +15,7 @@ export default function SipTrunkListCarrier() {
           <Button>Add New Sip Trunk</Button>
         </Link>
       </div>
-      <SipTrunkCommonTable />
+      <SipTrunkCommonTable CARRIER={true} />
     </div>
   );
 }

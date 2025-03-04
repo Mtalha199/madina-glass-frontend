@@ -9,21 +9,26 @@ export const API_END_POINT = {
   CUSTOMER_LIST: "users",
   ADD_CUSTOMER: "users",
   ALL_CUSTOMER: "users/names",
+  ALL_CARRIER: "carriers/names",
+
 
   SIP_TRUNK_LIST: "siptrunk",
   ADD_NEW_SIP_TRUNK: "siptrunk",
   ADD_IP_WHITE_LISTING: "siptrunk/ip-auth",
-  VIEW_IP_WHITE_LISTING: "siptrunk/ip-auths",
+  VIEW_IP_WHITE_LISTING: "siptrunk/ip-auth",
 
   ADD_STIR_SHAKEN: "siptrunk/stir-shaken",
   ADD_PRICING_INFO: "siptrunk/pricing-info",
-  VIEW_SIP_TRUNK: "siptrunk/siptrunk-customer",
-
+  ADD_ROUTING:"siptrunk/routing",
+  VIEW_SIP_TRUNK: "siptrunk",
   SIP_TRUNK_LIST_CUSTOMER: "admin/siptrunk-customer",
-
   ALL_GROUP_CARRIER:"groups/names",
   GROUP_LIST: "groups",
+  ALL_CARRIER_FOR_ROUTING:"groups/users",
 
+
+  // -----------------------------CARRIERS--------------------------
+  CARRIERS:"/carriers"
 };
 
 /* --------------------------------- TOAST_MESSAGES --------------------------------- */
@@ -38,7 +43,11 @@ export const TOAST_MESSAGES = {
   IP_WHITE_LISTING_UPDATED: "IP white listing updated successfully",
   IP_WHITE_LISTING_DELETED: "IP white listing deleted successfully",
   STIR_SHAKEN_ADDED: "Stir/shaken added successfully",
+  ROUTING_ADDED:"Rounting added succesfully",
   PRICING_INFO_ADDED: "Pricing info added successfully",
+  PRICING_INFO_UPDATED: "Pricing info updated successfully",
+  CARRIER_ADDED:"Carrier added succesfully",
+  CARRIER_UPDATED:"Carrier updated succesfully"
 
 }
 
@@ -562,4 +571,12 @@ export const PRICING_ROUNDING_METHOD = [
   { value: "up", label: "Up" },
   { value: "down", label: "Down" },
   { value: "true_mathematical", label: "True Mathematical" },
+];
+
+export const BUILD_OFF_PLACE_CARRIER = [
+  { value: "1st", label: "1st" },
+  { value: "2nd", label: "2nd" },
+  { value: "3rd", label: "3rd" },
+  { value: "4th", label: "4th" },
+  { value: "5th", label: "5th" },
 ];

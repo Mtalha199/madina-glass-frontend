@@ -10,13 +10,15 @@ import CompanyDetailForm from "@/components/Forms/CustomerForms/CompanyDetailFor
 import NotificationDetailForm from "@/components/Forms/CustomerForms/NotificationDetailForm";
 import PrimaryContactDetailForm from "@/components/Forms/CustomerForms/PrimaryContactDetailForm";
 import TechnicalDetailForm from "@/components/Forms/CustomerForms/TechnicalDetailForm";
-import {useContactDetailEdit } from "@/components/Hooks/CustomHooks";
+import {useContactDetailCarrier, useContactDetailCarrierEdit, useContactDetailEdit } from "@/components/Hooks/CustomHooks";
+import { ContactFormSchemaEdit } from "@/components/Schema/auth";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import {
   API_END_POINT,
   API_TYPE,
   SCREEN_PATH,
+  TOAST_MESSAGES,
 } from "@/Constant";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -27,17 +29,11 @@ export const ProfileCarrier = () => {
   const [loading, setloading] = useState(false);
   const [count, setCount] = useState(0);
   const [data, setData] = useState([]);
-  const form = useContactDetailEdit();
+  const form = useContactDetailCarrierEdit();
   const [mode, setMode] = useState("view");
-  const [customers, setCustomers] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
   async function onSubmit(data) {
     const payload = {
-      customer: {
         company_name: data.company_name,
-        company_type: data.company_type,
-        company_frn: data.company_frn,
-        company_id: data.company_id,
         company_address1:data.company_street_1,
         company_address2: data.company_street_2,
         company_city: data.company_city,
@@ -55,7 +51,6 @@ export const ProfileCarrier = () => {
         billing_contact_email: data.billing_contact_email,
         billing_contact_phone: data.billing_contact_phone,
         billing_contact_skype: data.billing_contact_skype,
-        billing_contact_mobile: data.billing_contact_mobile,
         billing_address1:data.billing_contact_street_1,
         billing_address2: data.billing_contact_street_2,
         billing_city: data.billing_contact_city,
@@ -70,22 +65,17 @@ export const ProfileCarrier = () => {
         tech_contact_mobile: data.techinical_contact_mobile,
 
         trouble_ticket_email: data.notification_trouble_ticket_email,
-        rates_notification_email: data.notification_rate_email,
-        balance_notification_email: data.notification_balance_email,
-        general_notice_email: data.notification_notice_email,
-      },
     };
     const response = await APICALL(
-      API_TYPE.PATCH,
-      `${API_END_POINT.ADD_CUSTOMER}/${id}`,
+      API_TYPE.PUT,
+      `${API_END_POINT.CARRIERS}/${id}`,
       setloading,
       payload,
       null,
       null,
-      "Customer updated successfully"
+      TOAST_MESSAGES.CARRIER_UPDATED
     );
     if (response !== undefined) {
-      // navigate(SCREEN_PATH.CUSTOMER_LIST);
       getData();
     }
   }
@@ -120,12 +110,6 @@ export const ProfileCarrier = () => {
                 <NotificationDetailFormCarrier form={form} MODE={mode} DATA={data} />
               </>
             )}
-            
-            <div className="col-span-2 flex justify-end mt-4">
-              <Button type="submit" className="">
-                Save
-              </Button>
-            </div>
           </form>
         </Form>
       )}

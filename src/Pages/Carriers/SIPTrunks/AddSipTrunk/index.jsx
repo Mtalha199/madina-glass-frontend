@@ -22,6 +22,7 @@ import {
   API_TYPE,
   DATA_VIEW_MODE,
   SCREEN_PATH,
+  TOAST_MESSAGES,
 } from "@/Constant";
 import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
@@ -40,6 +41,7 @@ export const AddSipTrunkCarrier = () => {
 
   const [loading, setLoading] = useState(false);
   async function onSubmit(data) {
+    debugger
     const payload = {
       trunk_name: data?.trunk_name,
       trunk_type: data?.trunk_type,
@@ -52,7 +54,11 @@ export const AddSipTrunkCarrier = () => {
       customer_ani_block: data?.customer_ani_block,
       customer_dnis_block: data?.customer_dnis_block,
       status: data?.status,
-      customer_id: data?.customer,
+      somos: data?.somos,
+      customer_id: data?.customer_id,
+      verify_call_token: data?.verify_call_token,
+      block_matching_src_dst: data?.block_matching_src_dst,
+      group_id: data?.group_id,
     };
 
     const response = await APICALL(
@@ -62,10 +68,10 @@ export const AddSipTrunkCarrier = () => {
       payload,
       null,
       null,
-      "Sip Trunk Added Successfully"
+      TOAST_MESSAGES.SIP_TRUNK_ADDED
     );
     if (response !== undefined) {
-      setTrunkId(response?.data?.sip_trunk_id);
+      setTrunkId(response?.data?.data?.id);
     }
   }
   async function onSubmitIpWhiteListing(data) {

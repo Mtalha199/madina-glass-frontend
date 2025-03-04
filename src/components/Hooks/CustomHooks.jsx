@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AddGroup, BasicSipTrunkSchema, ContactFormSchema, ContactFormSchemaCarrier, ContactFormSchemaEdit, IpWhitelistSchema, IpWhitelistSchemaForEdit, loginFormSchema, NewGroupFormSchema, NewUrlFormSchema, PricingInfochema, SignUpFormSchema, SipTrunkForm, StirShakenFormBulk, StirShakenFormSingle, StirShakenSchema } from "../Schema/auth";
+import { AddGroup, BasicSipTrunkSchema, ContactFormSchema, ContactFormSchemaCarrier, ContactFormSchemaCarrierEdit, ContactFormSchemaEdit, IpWhitelistSchema, IpWhitelistSchemaForEdit, loginFormSchema, NewGroupFormSchema, NewUrlFormSchema, PricingInfochema, SignUpFormSchema, SipTrunkForm, StirShakenFormBulk, StirShakenFormSingle, StirShakenSchema } from "../Schema/auth";
 import { ATTESTATION_OPTIONS, ATTESTATION_OPTIONS_DEFAULT, TRUNK_TYPE_OPTIONS, VERIFY_CALL_TOKEN } from "@/Constant";
 
 export function useLoginForm() {
@@ -196,7 +196,48 @@ export function useContactDetailEdit(){
       },
     });
 }
+export function useContactDetailCarrierEdit(){
+  return useForm({
+      resolver: zodResolver(ContactFormSchemaCarrierEdit),
+      defaultValues: {
+        company_name: "",
+        company_street_1 :"",
+        company_street_2:"",
+        company_city:"",
+        company_state:"",
+        company_zip_code:"",
+        company_country:"",  
+        
+        primary_contact_name:"",
+        primary_contact_email:"",
+        primary_contact_skype:"",
+        primary_contact_phone:"",
+        primary_contact_mobile:"",
 
+        billing_contact_name:"",
+        billing_contact_email:"",
+        billing_contact_skype:"",
+        billing_contact_phone:"",
+        billing_contact_street_1:"",
+        billing_contact_street_2:"",
+        billing_contact_city:"",
+        billing_contact_state:"",
+        billing_contact_zip_code:"",
+        billing_contact_country:"",
+       
+        techinical_contact_name:"",
+        techinical_contact_email:"",
+        techinical_contact_skype:"",
+        techinical_contact_phone:"",
+        techinical_contact_mobile:"",
+
+        notification_trouble_ticket_email:"",
+        
+
+
+      },
+    });
+}
 
 
 export function useSipTrunk(){

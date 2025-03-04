@@ -33,6 +33,7 @@ import {
 import {
   API_END_POINT,
   API_TYPE,
+  BLOCK_MATCHING_SRC_DST,
   TRUNK_TYPE_OPTIONS,
   TRUNK_TYPE_STATUS_OPTIONS,
   VERIFY_CALL_TOKEN,
@@ -46,18 +47,21 @@ export const BasicDetailFormCarrier = ({ form, MODE, DATA, ID }) => {
   useEffect(() => {
     if (DATA) {
       setValue("trunk_name", DATA?.trunk_name || "");
-      setValue("customer", String(DATA.customer_id));
+      setValue("customer_id", DATA.customer_id);
+      setValue("group_id", DATA.group_id);
       setValue("trunk_type", DATA?.trunk_type);
       setValue("status", DATA?.status);
-      setValue("status", DATA?.status);
-      setValue("cps_limit", String(DATA?.cps_limit));
-      setValue("session_limit", String(DATA?.session_limit));
-      setValue("dnis_call_limit", String(DATA?.dnis_call_limit));
-      setValue("ani_call_limit", String(DATA?.ani_call_limit));
+      setValue("cps_limit", DATA?.cps_limit);
+      setValue("session_limit", DATA?.session_limit);
+      setValue("dnis_call_limit", DATA?.dnis_call_limit);
+      setValue("ani_call_limit", DATA?.ani_call_limit);
       setValue("global_ani_block", DATA?.global_ani_block);
       setValue("global_dnis_block", DATA?.global_dnis_block);
       setValue("customer_ani_block", DATA?.customer_ani_block);
       setValue("customer_dnis_block", DATA?.customer_dnis_block);
+      setValue("verify_call_token", DATA?.verify_call_token);
+      setValue("somos", DATA?.somos);
+      setValue("block_matching_src_dst", DATA?.block_matching_src_dst);
     }
   }, [DATA, setValue]);
   useEffect(() => {
@@ -65,7 +69,9 @@ export const BasicDetailFormCarrier = ({ form, MODE, DATA, ID }) => {
       setValue("customer", String(ID));
     }
   }, [ID, setValue]);
-  const [customerData, setCustomerData] = useState([]);
+  const [carrierData, setCarrierData] = useState([]);
+  const [groupCarrierData, setGroupCarrierData] = useState([]);
+
   const [loading, setloading] = useState(false);
   const [count, setCount] = useState(0);
   useEffect(() => {
@@ -74,10 +80,18 @@ export const BasicDetailFormCarrier = ({ form, MODE, DATA, ID }) => {
   const getData = async () => {
     await APICALL(
       API_TYPE.GET,
-      API_END_POINT.CUSTOMER_LIST,
+      API_END_POINT.ALL_CARRIER,
       setloading,
       null,
-      setCustomerData,
+      setCarrierData,
+      setCount
+    );
+    await APICALL(
+      API_TYPE.GET,
+      `${API_END_POINT.ALL_GROUP_CARRIER}`,
+      setloading,
+      null,
+      setGroupCarrierData,
       setCount
     );
   };
@@ -109,10 +123,10 @@ export const BasicDetailFormCarrier = ({ form, MODE, DATA, ID }) => {
             <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
               {SelectAndView({
                 LABEL: "Carrier",
-                NAME: "customer",
+                NAME: "customer_id",
                 PLACEHOLDER: "Select Customer",
                 ICON: <Server />,
-                OPTIONS: customerData?.map((item) => ({
+                OPTIONS: carrierData?.map((item) => ({
                   value: String(item?.id),
                   label: item?.company_name,
                 })),
@@ -127,12 +141,12 @@ export const BasicDetailFormCarrier = ({ form, MODE, DATA, ID }) => {
           <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
             {SelectAndView({
               LABEL: "Group",
-              NAME: "group",
+              NAME: "group_id",
               PLACEHOLDER: "Select group",
               ICON: <Server />,
-              OPTIONS: customerData?.map((item) => ({
+              OPTIONS: groupCarrierData?.map((item) => ({
                 value: String(item?.id),
-                label: item?.company_name,
+                label: item?.name,
               })),
               VALUE: DATA?.company_name,
               IS_REQUIRED: true,
@@ -162,6 +176,17 @@ export const BasicDetailFormCarrier = ({ form, MODE, DATA, ID }) => {
               NAME: "status",
               ICON: <Badge />,
               VALUE: DATA?.status,
+              MODE: MODE,
+              EDIT: edit,
+              FORM: form,
+            })}
+          </div>
+          <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
+            {SwitchAndView({
+              LABEL: "Somos",
+              NAME: "somos",
+              ICON: <Badge />,
+              VALUE: DATA?.somos,
               MODE: MODE,
               EDIT: edit,
               FORM: form,
@@ -274,13 +299,25 @@ export const BasicDetailFormCarrier = ({ form, MODE, DATA, ID }) => {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 space-y-4 ">
           <div className="hidden lg:block lg:col-span-1"></div>
-          <div className="col-span-1 md:col-span-4 lg:col-span-4 gap-4">
+          <div className="col-span-1 md:col-span-2 lg:col-span-2 gap-4">
             {RadioGroupAndView({
               LABEL: "Verify Call Token",
-              NAME: "trunk_type",
+              NAME: "verify_call_token",
               ICON: <Badge />,
               OPTIONS: VERIFY_CALL_TOKEN,
-              VALUE: DATA?.trunk_type,
+              VALUE: DATA?.verify_call_token,
+              MODE: MODE,
+              EDIT: edit,
+              FORM: form,
+            })}
+          </div>
+          <div className="col-span-1 md:col-span-2 lg:col-span-2 gap-4">
+            {RadioGroupAndView({
+              LABEL: "Block Matching SRC/DST",
+              NAME: "block_matching_src_dst",
+              ICON: <Badge />,
+              OPTIONS: BLOCK_MATCHING_SRC_DST,
+              VALUE: DATA?.block_matching_src_dst,
               MODE: MODE,
               EDIT: edit,
               FORM: form,

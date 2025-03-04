@@ -42,8 +42,8 @@ export const APICALL = async (
         }
         break;
 
-      case API_TYPE.DELETE:
-        response = await axios.delete(API_URL, { data: DATA });
+        case API_TYPE.DELETE: 
+        response = await axios.delete(API_URL, { data: DATA && DATA !== null ? { data: DATA } : undefined });
         break;
 
       default:

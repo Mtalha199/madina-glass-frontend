@@ -1,6 +1,7 @@
 import FormSkeleton from '@/Commons/FormSkeloton';
 import CompanyDetailForm from '@/components/Forms/CustomerForms/CompanyDetailForm';
 import DetailForm from '@/components/Forms/RateDeckForms/DetailForm';
+import OtherDetail from '@/components/Forms/RateDeckForms/OtherDetail';
 import { useContactDetail } from '@/components/Hooks/CustomHooks';
 import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
@@ -35,6 +36,7 @@ console.log(data)
             ) : (
               <>
                 <DetailForm form={form} MODE={"Add"} />
+                <OtherDetail form={form} MODE={"Add"} />
               </>
             )}
   

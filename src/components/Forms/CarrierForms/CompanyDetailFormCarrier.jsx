@@ -28,6 +28,11 @@ const CompanyDetailFormCarrier = ({ form, MODE, DATA }) => {
       setValue("company_state", DATA.account.company_state || "");
       setValue("company_zip_code", DATA.account.company_zipcode || "");
       setValue("company_country", DATA.account.company_country || "");
+      setValue("primary_contact_email", DATA.account.primary_contact_email || "");
+      setValue("billing_contact_email", DATA.account.billing_contact_email || "");
+      setValue("techinical_contact_email", DATA.account.techinical_contact_email || "");
+      setValue("trouble_ticket_email", DATA.account.trouble_ticket_email || "");
+
     }
   }, [DATA, setValue]);
 
@@ -139,7 +144,7 @@ const CompanyDetailFormCarrier = ({ form, MODE, DATA }) => {
               type: "text",
               placeholder: "e.g., 94103",
               icon: <MapPin />,
-              value: DATA?.account?.company_zip_code,
+              value: DATA?.account?.company_zipcode,
             })}
           </div>
           <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">

@@ -24,7 +24,7 @@ export default function SpecificCarrier() {
   const getData = async () => {
     await APICALL(
       API_TYPE.GET,
-      `${API_END_POINT.CUSTOMER_LIST}/${id}`,
+      `${API_END_POINT.CARRIERS}/${id}`,
       setloading,
       null,
       setData,
@@ -60,12 +60,12 @@ export default function SpecificCarrier() {
               </h2>
               <Badge
                 variant={
-                  data?.user?.[0]?.is_active === true
+                  data?.is_active === true
                     ? "success"
                     : "destructive"
                 }
               >
-                {data?.user?.[0]?.is_active === true ? "Active" : "Suspended"}
+                {data?.is_active === true ? "Active" : "Suspended"}
               </Badge>
             </div>
           </div>

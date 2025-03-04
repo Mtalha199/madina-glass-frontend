@@ -31,7 +31,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
-import { ATTESTATION_OPTIONS, ATTESTATION_OPTIONS_DEFAULT } from "@/Constant";
+import {
+  API_END_POINT,
+  API_TYPE,
+  ATTESTATION_OPTIONS,
+  ATTESTATION_OPTIONS_DEFAULT,
+  TOAST_MESSAGES,
+} from "@/Constant";
 import {
   ChevronLeft,
   ChevronRight,
@@ -42,26 +48,49 @@ import {
 } from "lucide-react";
 import React, { useEffect, useMemo, useState } from "react";
 import { RadioGroupAndView } from "../CustomerForms/InputFieldAndView";
+import { APICALL } from "@/components/Api/ApiCall";
 
-const StirAndShaken = ({ form, MODE, DATA }) => {
+const StirAndShaken = ({ form, MODE,  TRUNK_ID = null }) => {
   const [open, setOpen] = useState(false);
   const [openSingle, setOpenSingle] = useState(false);
-  const [count, setCount] = useState(10);
-  const [data, setData] = useState([]);
   const [StirShaken, setStirShaken] = useState([]);
+  const [StirShakenData, setStirShakenData] = useState([]);
+
   const formStarShaken = useStirShakenSingle();
   const formStarShakenBulk = useStirShakenBulk();
   const [edit, setEdit] = useState(false);
-
+  const [loading, setLoading] = useState(false);
+  const [countStirShaken, setCountStirShaken] = useState(0);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
   async function onSubmit(data) {
-    console.log(data);
     const newRecord = {
       phoneNumber: data.phone_number,
       attestationType: data.attestation,
       notes: data.notes,
     };
-
-    setStirShaken((prevRecords) => [...prevRecords, newRecord]);
+    const updatedStirShaken = [newRecord];
+    const AllNumbers = updatedStirShaken.map((item) => ({
+      number: item.phoneNumber,
+      attest: item.attestationType,
+      notes: item.notes,
+    }));
+    const stirShakenPayload = {
+      number: AllNumbers,
+      default_stir_shaken: data.default_action,
+      trunk_id: TRUNK_ID,
+      default_stir_shaken: form.getValues("default_action"),
+    };
+    await APICALL(
+      API_TYPE.POST,
+      API_END_POINT.ADD_STIR_SHAKEN,
+      setLoading,
+      stirShakenPayload,
+      null,
+      null,
+      TOAST_MESSAGES.STIR_SHAKEN_ADDED
+    );
+    await getStirShakenData();
     setOpenSingle(!openSingle);
   }
   async function onSubmitBulk(data) {
@@ -72,8 +101,27 @@ const StirAndShaken = ({ form, MODE, DATA }) => {
         attestationType: data.attestation,
         notes: mappedData.notes[index] || "-",
       }));
-
-      setStirShaken((prevRecords) => [...prevRecords, ...newRecords]);
+      const AllNumbers = newRecords.map((item) => ({
+        number: item.phoneNumber,
+        attest: item.attestationType,
+        notes: item.notes,
+      }));
+      const stirShakenPayload = {
+        number: AllNumbers,
+        default_stir_shaken: data.default_action,
+        trunk_id: TRUNK_ID,
+        default_stir_shaken: form.getValues("default_action"),
+      };
+      await APICALL(
+        API_TYPE.POST,
+        API_END_POINT.ADD_STIR_SHAKEN,
+        setLoading,
+        stirShakenPayload,
+        null,
+        null,
+        TOAST_MESSAGES.STIR_SHAKEN_ADDED
+      );
+      await getStirShakenData();
       setOpen(false);
     }
   }
@@ -85,44 +133,54 @@ const StirAndShaken = ({ form, MODE, DATA }) => {
     formStarShakenBulk.reset();
     setOpen(!open);
   };
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  
   const [searchQuery, setSearchQuery] = useState("");
-  const totalPages = Math.ceil(StirShaken.length / rowsPerPage);
-  const startIndex = (currentPage - 1) * rowsPerPage;
-  const endIndex = startIndex + rowsPerPage;
 
-  const goToPage = (page) => {
-    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
+  const totalPages = Math.ceil(countStirShaken / limit);
+
+  const goToPage = (pageNum) => {
+    const newPage = Math.max(1, Math.min(pageNum, totalPages));
+    setPage(newPage);
   };
-  const paginatedData = useMemo(() => {
-    const startIndex = (currentPage - 1) * rowsPerPage;
-    const endIndex = startIndex + rowsPerPage;
-    return StirShaken.slice(startIndex, endIndex);
-  }, [StirShaken, currentPage, rowsPerPage]);
+
   const handleFileUploadComplete = (mappedData) => {
     formStarShakenBulk.setValue("mappedData", mappedData);
   };
-  const searchedData = useMemo(() => {
-    if (!searchQuery) return [];
-    return StirShaken.filter((record) =>
-      record.phoneNumber.toString().includes(searchQuery)
-    );
-  }, [StirShaken, searchQuery]);
+
   useEffect(() => {
-    // If DATA contains stirShakenData, initialize with that
-    if (DATA?.stirShakenData && Array.isArray(DATA.stirShakenData)) {
-      setStirShaken(DATA.stirShakenData);
+    if (TRUNK_ID !== null) {
+      getStirShakenData();
     }
-    
-    // Always ensure form has current data
-    form.setValue("stirShakenData", StirShaken);
-  }, [DATA, form]);
-  
-  // Update form value whenever StirShaken changes
+  }, [TRUNK_ID, page, limit]);
+
+  const getStirShakenData = async () => {
+    await APICALL(
+      API_TYPE.GET,
+      `${API_END_POINT.ADD_STIR_SHAKEN}/${TRUNK_ID}`,
+      setLoading,
+      { page, limit },
+      setStirShakenData,
+      setCountStirShaken
+    );
+  };
+
   useEffect(() => {
-    form.setValue("stirShakenData", StirShaken);
-  }, [StirShaken, form]);
+    if (StirShakenData?.number) {
+      const transformedData = StirShakenData.number.map((item) => ({
+        id: item.id,
+        attestationType: item.attest,
+        phoneNumber: item.number,
+        notes: item.notes || "-",
+      }));
+      setStirShaken(transformedData);
+    }
+  }, [StirShakenData]);
+
+  const handleRowsPerPageChange = (value) => {
+    setLimit(Number(value));
+    setPage(1);
+  };
+
   return (
     <>
       <div className="border-t mt-4 pt-4">
@@ -137,9 +195,9 @@ const StirAndShaken = ({ form, MODE, DATA }) => {
             {RadioGroupAndView({
               LABEL: "Default Action",
               NAME: "default_action",
-              ICON: <Badge />,
+              // ICON: <Badge />,
               OPTIONS: ATTESTATION_OPTIONS_DEFAULT,
-              VALUE: DATA?.default_action,
+              VALUE:StirShakenData.default_stir_shaken,
               MODE: MODE,
               EDIT: edit,
               FORM: form,
@@ -167,7 +225,7 @@ const StirAndShaken = ({ form, MODE, DATA }) => {
                 onOpenChange={handleDrawerClose}
                 onSave={() => formStarShaken.handleSubmit(onSubmit)()}
                 trigger={
-                  <Button type="button" variant="outline" size="sm">
+                  <Button type="button" variant="outline" size="sm" disabled={TRUNK_ID === null}>
                     <Plus className="mr-2 h-4 w-4" />
                     Add Single
                   </Button>
@@ -213,7 +271,7 @@ const StirAndShaken = ({ form, MODE, DATA }) => {
                 onOpenChange={handleDrawerCloseBulk}
                 onSave={() => formStarShakenBulk.handleSubmit(onSubmitBulk)()}
                 trigger={
-                  <Button type="button" variant="outline" size="sm">
+                  <Button type="button" variant="outline" size="sm" disabled={TRUNK_ID === null}>
                     <Plus className="mr-2 h-4 w-4" />
                     Add Bulk
                   </Button>
@@ -252,7 +310,7 @@ const StirAndShaken = ({ form, MODE, DATA }) => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {StirShaken.length === 0 ? (
+                {StirShaken?.length === 0 ? (
                   <TableRow>
                     <TableCell
                       colSpan={4}
@@ -262,7 +320,7 @@ const StirAndShaken = ({ form, MODE, DATA }) => {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  paginatedData.map((record) => (
+                  StirShaken?.map((record) => (
                     <TableRow key={record.id}>
                       <TableCell>
                         <Badge variant="outline">
@@ -282,7 +340,7 @@ const StirAndShaken = ({ form, MODE, DATA }) => {
             </Table>
           </div>
         </div>
-        {StirShaken.length > 0 && (
+        {StirShaken?.length > 0 && (
           <div className="overflow-x-auto grid grid-cols-1 md:grid-cols-5 gap-4">
             <div className="hidden lg:block lg:col-span-1"></div>
             <div className="col-span-1 md:col-span-4 lg:col-span-4 gap-4 ">
@@ -290,14 +348,11 @@ const StirAndShaken = ({ form, MODE, DATA }) => {
                 <div className="flex items-center space-x-2">
                   <p className="text-sm font-medium">Rows per page</p>
                   <Select
-                    value={rowsPerPage.toString()}
-                    onValueChange={(value) => {
-                      setRowsPerPage(Number(value));
-                      setCurrentPage(1);
-                    }}
+                    value={limit.toString()}
+                    onValueChange={handleRowsPerPageChange}
                   >
                     <SelectTrigger className="h-8 w-[70px]">
-                      <SelectValue placeholder={rowsPerPage} />
+                      <SelectValue placeholder={limit} />
                     </SelectTrigger>
                     <SelectContent side="top">
                       {[10, 20, 30, 40, 50].map((pageSize) => (
@@ -315,7 +370,7 @@ const StirAndShaken = ({ form, MODE, DATA }) => {
                     variant="outline"
                     className="hidden h-8 w-8 p-0 lg:flex"
                     onClick={() => goToPage(1)}
-                    disabled={currentPage === 1}
+                    disabled={page === 1}
                   >
                     <span className="sr-only">Go to first page</span>
                     <ChevronsLeft className="h-4 w-4" />
@@ -324,21 +379,21 @@ const StirAndShaken = ({ form, MODE, DATA }) => {
                     type="button"
                     variant="outline"
                     className="h-8 w-8 p-0"
-                    onClick={() => goToPage(currentPage - 1)}
-                    disabled={currentPage === 1}
+                    onClick={() => goToPage(page - 1)}
+                    disabled={page === 1}
                   >
                     <span className="sr-only">Go to previous page</span>
                     <ChevronLeft className="h-4 w-4" />
                   </Button>
                   <div className="flex items-center justify-center text-sm font-medium">
-                    Page {currentPage} of {totalPages}
+                    Page {page} of {totalPages || 1}
                   </div>
                   <Button
                     type="button"
                     variant="outline"
                     className="h-8 w-8 p-0"
-                    onClick={() => goToPage(currentPage + 1)}
-                    disabled={currentPage === totalPages}
+                    onClick={() => goToPage(page + 1)}
+                    disabled={page === totalPages || totalPages === 0}
                   >
                     <span className="sr-only">Go to next page</span>
                     <ChevronRight className="h-4 w-4" />
@@ -348,7 +403,7 @@ const StirAndShaken = ({ form, MODE, DATA }) => {
                     variant="outline"
                     className="hidden h-8 w-8 p-0 lg:flex"
                     onClick={() => goToPage(totalPages)}
-                    disabled={currentPage === totalPages}
+                    disabled={page === totalPages || totalPages === 0}
                   >
                     <span className="sr-only">Go to last page</span>
                     <ChevronsRight className="h-4 w-4" />
@@ -359,10 +414,7 @@ const StirAndShaken = ({ form, MODE, DATA }) => {
           </div>
         )}
       </div>
-      <input 
-        type="hidden" 
-        {...form.register("stirShakenData")}
-      />
+      <input type="hidden" {...form.register("stirShakenData")} />
     </>
   );
 };

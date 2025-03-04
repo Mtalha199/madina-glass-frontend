@@ -14,7 +14,7 @@ import TechnicalDetailForm from "@/components/Forms/CustomerForms/TechnicalDetai
 import {  useContactDetailCarrier } from "@/components/Hooks/CustomHooks";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { API_END_POINT, API_TYPE, SCREEN_PATH } from "@/Constant";
+import { API_END_POINT, API_TYPE, DATA_VIEW_MODE, SCREEN_PATH, TOAST_MESSAGES } from "@/Constant";
 import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -27,15 +27,12 @@ export const AddCarrier = () => {
   const [loading, setLoading] = useState(false);
   async function onSubmit(data) {
     const payload = {
-      user: {
+      carrier: {
         username: data.user_name,
         password: data.password,
       },
-      customer: {
+      profile: {
         company_name: data.company_name,
-        company_type: data.company_type,
-        company_frn: data.company_frn,
-        company_id: data.company_id,
         company_address1:data.company_street_1,
         company_address2: data.company_street_2,
         company_city: data.company_city,
@@ -53,7 +50,6 @@ export const AddCarrier = () => {
         billing_contact_email: data.billing_contact_email,
         billing_contact_phone: data.billing_contact_phone,
         billing_contact_skype: data.billing_contact_skype,
-        billing_contact_mobile: data.billing_contact_mobile,
         billing_address1:data.billing_contact_street_1,
         billing_address2: data.billing_contact_street_2,
         billing_city: data.billing_contact_city,
@@ -68,22 +64,19 @@ export const AddCarrier = () => {
         tech_contact_mobile: data.techinical_contact_mobile,
 
         trouble_ticket_email: data.notification_trouble_ticket_email,
-        rates_notification_email: data.notification_rate_email,
-        balance_notification_email: data.notification_balance_email,
-        general_notice_email: data.notification_notice_email,
       },
     };
     const response = await APICALL(
       API_TYPE.POST,
-      API_END_POINT.ADD_CUSTOMER,
+      API_END_POINT.CARRIERS,
       setLoading,
       payload,
       null,
       null,
-      "Customer Added Successfully"
+      TOAST_MESSAGES.CARRIER_ADDED
     );
     if (response !== undefined) {
-      navigate(SCREEN_PATH.CUSTOMER_LIST);
+      navigate(SCREEN_PATH.CARRIERS_LIST);
     }
   }
   return (
@@ -103,11 +96,12 @@ export const AddCarrier = () => {
             <FormSkeleton />
           ) : (
             <>
-              <CompanyDetailFormCarrier form={form} MODE={"Add"} />
-              <PrimaryContactDetailFormCarrier form={form} />
-              <BillingDetailFormCarrier form={form} />
-              <TechnicalDetailFormCarrier form={form} />
-              <NotificationDetailFormCarrier form={form} MODE={"Add"} />
+              <CompanyDetailFormCarrier form={form} MODE={DATA_VIEW_MODE.ADD} />
+              <PortalCredientials form={form} MODE={DATA_VIEW_MODE.ADD}  />
+              <PrimaryContactDetailFormCarrier form={form} MODE={DATA_VIEW_MODE.ADD} />
+              <BillingDetailFormCarrier form={form} MODE={DATA_VIEW_MODE.ADD} />
+              <TechnicalDetailFormCarrier form={form} MODE={DATA_VIEW_MODE.ADD} />
+              <NotificationDetailFormCarrier form={form} MODE={DATA_VIEW_MODE.ADD} />
             </>
           )}
 

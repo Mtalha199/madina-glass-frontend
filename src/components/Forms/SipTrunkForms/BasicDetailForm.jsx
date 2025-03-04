@@ -90,7 +90,7 @@ export const BasicDetailForm = ({ form, MODE, DATA, ID }) => {
     );
     await APICALL(
       API_TYPE.GET,
-      API_END_POINT.ALL_GROUP_CARRIER,
+      `${API_END_POINT.ALL_GROUP_CARRIER}`,
       setloading,
       null,
       setGroupCarrierData,

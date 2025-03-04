@@ -103,7 +103,7 @@ const DetailForm = ({ form, MODE, DATA }) => {
           <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
             {InputFieldAndView({
               LABEL: "Toll Free Price",
-              NAME: "max_profit",
+              NAME: "toll_free_price",
               TYPE: "number",
               ICON: <Network />,
               PLACEHOLDER: "0",
@@ -120,8 +120,8 @@ const DetailForm = ({ form, MODE, DATA }) => {
           <div className="col-span-1 md:col-span-1 lg:col-span-1 gap-4">
             {SelectAndView({
               LABEL: "Populate Interminate As",
-              NAME: "customer",
-              PLACEHOLDER: "Select Populate Interminate As",
+              NAME: "populate_interminate_as",
+              PLACEHOLDER: "Select Populate Inter..",
               ICON: <Server />,
               OPTIONS: POPULATE_INTERMINATE_AS,
               VALUE: DATA?.company_name,
@@ -148,11 +148,11 @@ const DetailForm = ({ form, MODE, DATA }) => {
           <div className="col-span-1 md:col-span-1 lg:col-span-1 gap-4">
             {SelectAndView({
               LABEL: "Rounding Method",
-              NAME: "customer",
+              NAME: "rounding_method",
               PLACEHOLDER: "Select Rounding",
               ICON: <Server />,
               OPTIONS: ROUNDING_METHOD,
-              VALUE: DATA?.company_name,
+              VALUE: DATA?.rounding_method,
               IS_REQUIRED: true,
               MODE: MODE,
               EDIT: edit,
@@ -171,7 +171,7 @@ const DetailForm = ({ form, MODE, DATA }) => {
           <div className="col-span-1 md:col-span-4 lg:col-span-4 gap-4 flex">
             {CheckboxFieldAndView({
               LABEL: "Non-Juridictional",
-              NAME: "customer",
+              NAME: "non_juridictional",
               ICON: <Server />,
               VALUE: DATA?.company_name,
               MODE: MODE,
@@ -180,7 +180,7 @@ const DetailForm = ({ form, MODE, DATA }) => {
             })}
             {CheckboxFieldAndView({
               LABEL: "Local Only Rate Deck",
-              NAME: "customer",
+              NAME: "local_only_rate_deck",
               ICON: <Server />,
               VALUE: DATA?.company_name,
               MODE: MODE,
@@ -189,7 +189,7 @@ const DetailForm = ({ form, MODE, DATA }) => {
             })}
             {CheckboxFieldAndView({
               LABEL: "Use Carrier Restrictions",
-              NAME: "customer",
+              NAME: "use_carrier_restrictions",
               ICON: <Server />,
               VALUE: DATA?.company_name,
               MODE: MODE,
@@ -209,7 +209,7 @@ const DetailForm = ({ form, MODE, DATA }) => {
           <div className="col-span-1 md:col-span-4 lg:col-span-4 gap-4 flex">
             {CheckboxFieldAndView({
               LABEL: "US48",
-              NAME: "customer",
+              NAME: "us48",
               ICON: <Server />,
               VALUE: DATA?.company_name,
               MODE: MODE,
@@ -218,7 +218,7 @@ const DetailForm = ({ form, MODE, DATA }) => {
             })}
             {CheckboxFieldAndView({
               LABEL: "Alaska",
-              NAME: "customer",
+              NAME: "alaska",
               ICON: <Server />,
               VALUE: DATA?.company_name,
               MODE: MODE,
@@ -227,7 +227,7 @@ const DetailForm = ({ form, MODE, DATA }) => {
             })}
             {CheckboxFieldAndView({
               LABEL: "Hawali",
-              NAME: "customer",
+              NAME: "hawali",
               ICON: <Server />,
               VALUE: DATA?.company_name,
               MODE: MODE,
@@ -236,7 +236,7 @@ const DetailForm = ({ form, MODE, DATA }) => {
             })}
             {CheckboxFieldAndView({
               LABEL: "Canada (w/o Yukon)",
-              NAME: "customer",
+              NAME: "canada",
               ICON: <Server />,
               VALUE: DATA?.company_name,
               MODE: MODE,
@@ -245,7 +245,7 @@ const DetailForm = ({ form, MODE, DATA }) => {
             })}
             {CheckboxFieldAndView({
               LABEL: "Yukon",
-              NAME: "customer",
+              NAME: "yukon",
               ICON: <Server />,
               VALUE: DATA?.company_name,
               MODE: MODE,
@@ -254,7 +254,7 @@ const DetailForm = ({ form, MODE, DATA }) => {
             })}
             {CheckboxFieldAndView({
               LABEL: "non US/Canada Country Code 1",
-              NAME: "customer",
+              NAME: "non_us_canada_country_code_1",
               ICON: <Server />,
               VALUE: DATA?.company_name,
               MODE: MODE,
@@ -263,7 +263,7 @@ const DetailForm = ({ form, MODE, DATA }) => {
             })}
             {CheckboxFieldAndView({
               LABEL: "User Defined  ",
-              NAME: "customer",
+              NAME: "user_defined",
               ICON: <Server />,
               VALUE: DATA?.company_name,
               MODE: MODE,

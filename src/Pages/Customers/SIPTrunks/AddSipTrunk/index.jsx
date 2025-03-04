@@ -71,10 +71,8 @@ export const AddSipTrunk = () => {
       null,
       TOAST_MESSAGES.SIP_TRUNK_ADDED
     );
-    debugger;
     if (response !== undefined) {
       setTrunkId(response?.data?.data?.id);
-      debugger;
     }
   }
   async function onSubmitIpWhiteListing(data) {
@@ -110,6 +108,9 @@ export const AddSipTrunk = () => {
       TOAST_MESSAGES.IP_WHITE_LISTING_ADDED
     );
   }
+  async function onSubmitRouting(data) {
+console.log(data)
+  }
   async function onSubmitStirShaken(data) {
   const AllNumbers = data.stirShakenData.map(item => ({
     number:item.phoneNumber,
@@ -132,7 +133,7 @@ const stirShakenPayload={
     );
   }
   async function onSubmitPricingInfo(data) {
-    console.log(data);
+
     
   const pricingInfoPayload={
     billing_type: data.billing_type,
@@ -150,11 +151,10 @@ const stirShakenPayload={
     use_global_404_blacklist: data.use_global_404_blacklist,
     call_extend: data.call_extend,
     override_call_extending: data.override_call_extending,
-    trunk_id:trunkId
   }
       await APICALL(
-        API_TYPE.POST,
-        API_END_POINT.ADD_PRICING_INFO,
+        API_TYPE.PUT,
+        `${API_END_POINT.ADD_PRICING_INFO}/${trunkId}`,
         setLoading,
         pricingInfoPayload,
         null,
@@ -236,7 +236,7 @@ const stirShakenPayload={
                   onSubmitStirShaken
                 )}
               >
-                <StirAndShaken form={formStirShaken} MODE={DATA_VIEW_MODE.ADD} />
+                <StirAndShaken form={formStirShaken} MODE={DATA_VIEW_MODE.ADD} TRUNK_ID={trunkId} />
                 <div className="col-span-2 flex justify-end mt-4">
                   <Button
                     type="submit"
@@ -250,18 +250,10 @@ const stirShakenPayload={
             </Form>
             <Form {...routingListing}>
               <form
-                onSubmit={routingListing.handleSubmit(onSubmitIpWhiteListing)}
+                onSubmit={routingListing.handleSubmit(onSubmitRouting)}
               >
-                <Routing form={form} MODE={DATA_VIEW_MODE.ADD} />
-                <div className="col-span-2 flex justify-end mt-4">
-                  <Button
-                    type="submit"
-                    disabled={trunkId === null}
-                    className=""
-                  >
-                    Save
-                  </Button>
-                </div>
+                <Routing form={form} MODE={DATA_VIEW_MODE.ADD} trunkId={trunkId} />
+      
               </form>
             </Form>
             <Form {...formPricingInfo}>
