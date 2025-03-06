@@ -36,12 +36,9 @@ export const AddSipTrunkCarrier = () => {
   const [trunkId, setTrunkId] = useState(null);
   const form = useBasicSipTrunkForm();
   const formIpWhiteListing = useIpWhitelistForm();
-  const stirAndShakenListing = useIpWhitelistForm();
-  const routingListing = useIpWhitelistForm();
 
   const [loading, setLoading] = useState(false);
   async function onSubmit(data) {
-    debugger
     const payload = {
       trunk_name: data?.trunk_name,
       trunk_type: data?.trunk_type,
@@ -104,7 +101,7 @@ export const AddSipTrunkCarrier = () => {
       payload1,
       null,
       null,
-      "IP white listing Added Succussfully"
+      TOAST_MESSAGES.IP_WHITE_LISTING_ADDED
     );
   }
   return (
@@ -160,23 +157,7 @@ export const AddSipTrunkCarrier = () => {
                   onSubmitIpWhiteListing
                 )}
               >
-                <IpWhiteListingFormCarrier form={form} MODE={DATA_VIEW_MODE.ADD} />
-                <div className="col-span-2 flex justify-end mt-4">
-                  <Button
-                    type="submit"
-                    disabled={trunkId === null}
-                    className=""
-                  >
-                    Save
-                  </Button>
-                </div>
-              </form>
-            </Form>
-            <Form {...routingListing}>
-              <form
-                onSubmit={routingListing.handleSubmit(onSubmitIpWhiteListing)}
-              >
-                <RoutingCarrier form={form} MODE={DATA_VIEW_MODE.ADD} />
+                <IpWhiteListingFormCarrier form={formIpWhiteListing} MODE={DATA_VIEW_MODE.ADD} />
                 <div className="col-span-2 flex justify-end mt-4">
                   <Button
                     type="submit"

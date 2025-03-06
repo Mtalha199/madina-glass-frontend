@@ -148,7 +148,6 @@ export default function SpecificSipTrunk() {
   };
   const handleSaveOneRow = async (index) => {
     const currentFormValues = formIpWhiteListing.getValues();
-    console.log(currentFormValues);
     const updatedFieldValues = currentFormValues.ipEntries[index];
     const { id, ...payloadData } = updatedFieldValues;
     const response = await APICALL(

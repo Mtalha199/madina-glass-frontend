@@ -36,6 +36,7 @@ import {
   API_TYPE,
   ATTESTATION_OPTIONS,
   ATTESTATION_OPTIONS_DEFAULT,
+  DATA_VIEW_MODE,
   TOAST_MESSAGES,
 } from "@/Constant";
 import {
@@ -43,14 +44,17 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
+  Download,
   Plus,
   Search,
 } from "lucide-react";
 import React, { useEffect, useMemo, useState } from "react";
 import { RadioGroupAndView } from "../CustomerForms/InputFieldAndView";
 import { APICALL } from "@/components/Api/ApiCall";
+import { DOWNLOADFILE } from "@/Commons/DownloadFile";
+import { Loader } from "@/Commons/Loader";
 
-const StirAndShaken = ({ form, MODE,  TRUNK_ID = null }) => {
+const StirAndShaken = ({ form, MODE, TRUNK_ID = null }) => {
   const [open, setOpen] = useState(false);
   const [openSingle, setOpenSingle] = useState(false);
   const [StirShaken, setStirShaken] = useState([]);
@@ -60,6 +64,8 @@ const StirAndShaken = ({ form, MODE,  TRUNK_ID = null }) => {
   const formStarShakenBulk = useStirShakenBulk();
   const [edit, setEdit] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loaderDownload, setLoaderDownload] = useState(false);
+
   const [countStirShaken, setCountStirShaken] = useState(0);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
@@ -133,7 +139,7 @@ const StirAndShaken = ({ form, MODE,  TRUNK_ID = null }) => {
     formStarShakenBulk.reset();
     setOpen(!open);
   };
-  
+
   const [searchQuery, setSearchQuery] = useState("");
 
   const totalPages = Math.ceil(countStirShaken / limit);
@@ -180,7 +186,14 @@ const StirAndShaken = ({ form, MODE,  TRUNK_ID = null }) => {
     setLimit(Number(value));
     setPage(1);
   };
-
+  const handleDownload = async () => {
+    await DOWNLOADFILE(
+      `${API_END_POINT.ADD_STIR_SHAKEN}/download/${TRUNK_ID}`,
+      "Stir Shaken",
+      setLoaderDownload,
+      "CSV file download successfully"
+    );
+  };
   return (
     <>
       <div className="border-t mt-4 pt-4">
@@ -197,7 +210,7 @@ const StirAndShaken = ({ form, MODE,  TRUNK_ID = null }) => {
               NAME: "default_action",
               // ICON: <Badge />,
               OPTIONS: ATTESTATION_OPTIONS_DEFAULT,
-              VALUE:StirShakenData.default_stir_shaken,
+              VALUE: StirShakenData.default_stir_shaken,
               MODE: MODE,
               EDIT: edit,
               FORM: form,
@@ -218,6 +231,17 @@ const StirAndShaken = ({ form, MODE,  TRUNK_ID = null }) => {
               />
             </div>
             <div className="flex space-x-2">
+              {StirShaken.length > 0 && MODE === DATA_VIEW_MODE.VIEW && (
+                <Button variant="outline" onClick={handleDownload}>
+                  {loaderDownload ? (
+                    <Loader size={60} />
+                  ) : (
+                    <>
+                      <Download className="mr-2 h-4 w-4" /> Download
+                    </>
+                  )}
+                </Button>
+              )}
               <CommonDrawer
                 title="Add Single DID"
                 description="Please enter a single number and choose the attestation label"
@@ -225,7 +249,12 @@ const StirAndShaken = ({ form, MODE,  TRUNK_ID = null }) => {
                 onOpenChange={handleDrawerClose}
                 onSave={() => formStarShaken.handleSubmit(onSubmit)()}
                 trigger={
-                  <Button type="button" variant="outline" size="sm" disabled={TRUNK_ID === null}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={TRUNK_ID === null}
+                  >
                     <Plus className="mr-2 h-4 w-4" />
                     Add Single
                   </Button>
@@ -271,7 +300,12 @@ const StirAndShaken = ({ form, MODE,  TRUNK_ID = null }) => {
                 onOpenChange={handleDrawerCloseBulk}
                 onSave={() => formStarShakenBulk.handleSubmit(onSubmitBulk)()}
                 trigger={
-                  <Button type="button" variant="outline" size="sm" disabled={TRUNK_ID === null}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={TRUNK_ID === null}
+                  >
                     <Plus className="mr-2 h-4 w-4" />
                     Add Bulk
                   </Button>

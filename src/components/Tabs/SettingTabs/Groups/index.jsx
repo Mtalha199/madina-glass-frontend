@@ -67,7 +67,6 @@ const Groups = () => {
     setOpenSingle(!openSingle);
   };
   async function onSubmit(data) {
-    console.log(data);
     const payload={
       name:data.group_name,
     }

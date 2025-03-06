@@ -11,7 +11,6 @@ import { API_END_POINT, API_TYPE, ROUTING_TABS, TOAST_MESSAGES } from "@/Constan
 import { toast } from "@/hooks/use-toast";
 
 const Percentage = ({trunkId ,GET_ROUTING=false}) => {
-  console.log(trunkId,GET_ROUTING,"dsdfasdfs")
   const form = usePercentage();
   const defaultValues = {
     limit_cps: 0,

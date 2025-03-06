@@ -38,7 +38,6 @@ const Routing = ({ form, MODE, trunkId, GET_ROUTING }) => {
       setCount
     );
   };
-  console.log(routingData?.type);
   useEffect(() => {
     if (MODE === DATA_VIEW_MODE.VIEW) {
       getAlreadyRouting();

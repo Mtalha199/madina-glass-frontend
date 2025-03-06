@@ -19,7 +19,7 @@ const SipTrunkCommonTable = ({ id,CARRIER=false }) => {
         const fullName = row.getValue("trunk_name");
         const id = row.getValue("id");
         return (
-          <Link to={`/siptrunk/${id}`}>
+          <Link to={CARRIER ? `/carrier/siptrunk/${id}` : `/siptrunk/${id}`}>
             <span className="text-primary hover:underline">{fullName}</span>
           </Link>
         );

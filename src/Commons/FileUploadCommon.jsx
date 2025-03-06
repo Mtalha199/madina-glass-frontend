@@ -64,7 +64,6 @@ const FileUpload = ({onMappingComplete }) => {
     });
   };
 
-  // Update mapped data when columns are selected
   useEffect(() => {
     if (parsedData.length > 0 && didColumn && noteColumn) {
       const mapped = {
@@ -73,7 +72,6 @@ const FileUpload = ({onMappingComplete }) => {
       };
       setMappedData(mapped);
       onMappingComplete(mapped);
-      console.log("Mapped Data:", mapped); // For debugging
     }
   }, [parsedData, didColumn, noteColumn]);
 
