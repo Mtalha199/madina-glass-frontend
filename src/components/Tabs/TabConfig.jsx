@@ -37,8 +37,8 @@ export const CARRIER_LIST_TABS = [
 ];
 
 export const ROUTING_TABS = [
-  { value: "lcr", label: "LCR", component: <LcrTab /> },
-  { value: "percentage", label: "Percentage", component: <Percentage /> },
+  { value: "LCR", label: "LCR", component: <LcrTab /> },
+  { value: "Percentage", label: "Percentage", component: <Percentage /> },
 ];
 
 export const SETTING_TABS = [

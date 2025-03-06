@@ -57,7 +57,7 @@ export const CheckboxFieldAndView = ({
   return (
     <>
       {MODE === DATA_VIEW_MODE.VIEW && !EDIT ? (
-        <CustomerViewCommon  ICON={ICON} VALUE={VALUE == false ? <Badge variant="secondary">Disable</Badge>: <Badge>Enable</Badge> || "N/A"} />
+        <CustomerViewCommon TITLE={LABEL}  ICON={ICON} VALUE={VALUE == true ?<Badge>Enable</Badge> :  <Badge variant="secondary">Disable</Badge> || "N/A"} />
       ) : (
         <CheckboxCommon LABEL={LABEL} NAME={NAME} CONTROL={FORM.control} />
       )}

@@ -580,3 +580,9 @@ export const BUILD_OFF_PLACE_CARRIER = [
   { value: "4th", label: "4th" },
   { value: "5th", label: "5th" },
 ];
+
+
+export const ROUTING_TABS={
+  LCR :'LCR',
+  PERCENTAGE : 'Percentage',
+}

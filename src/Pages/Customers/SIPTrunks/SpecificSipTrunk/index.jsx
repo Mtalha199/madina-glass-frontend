@@ -263,10 +263,19 @@ export default function SpecificSipTrunk() {
           />
         </form>
       </Form>
-      <Routing form={form} MODE={DATA_VIEW_MODE.ADD} />
+      <Routing
+        form={form}
+        MODE={DATA_VIEW_MODE.VIEW}
+        trunkId={id}
+        GET_ROUTING={true}
+      />
       <Form {...formPricingInfo}>
         <form onSubmit={formPricingInfo.handleSubmit(onSubmitPricingInfo)}>
-          <PricingInfoForm form={formPricingInfo} MODE={DATA_VIEW_MODE.VIEW} DATA={data?.pricing_info}  />
+          <PricingInfoForm
+            form={formPricingInfo}
+            MODE={DATA_VIEW_MODE.VIEW}
+            DATA={data?.pricing_info}
+          />
         </form>
       </Form>
     </div>

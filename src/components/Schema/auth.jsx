@@ -338,7 +338,60 @@ export const SipTrunkForm = z.object({
     )
     .optional(),
 });
+export const LCRForm = z.object({
+  limit_cps:z.preprocess(
+    val => val === "" ? undefined : Number(val),
+    z.number({ required_error: "limit cps is required" })
+  ),
+  limit_session:z.preprocess(
+    val => val === "" ? undefined : Number(val),
+    z.number({ required_error: "limit session is required" })
+  ),
+  limit_ani:z.preprocess(
+    val => val === "" ? undefined : Number(val),
+    z.number({ required_error: "limit ani is required" })
+  ),
 
+  limit_dnis:z.preprocess(
+    val => val === "" ? undefined : Number(val),
+    z.number({ required_error: "limit dnis is required" })
+  ),
+  priority:z.coerce.number().min(1, { message: "Required" }),
+  override_extend:z.preprocess(
+    val => val === "" ? undefined : Number(val),
+    z.number({ required_error: "override extend is required" })
+  ),
+
+
+});
+export const PercentageForm = z.object({
+  limit_cps:z.preprocess(
+    val => val === "" ? undefined : Number(val),
+    z.number({ required_error: "limit cps is required" })
+  ),
+  limit_session:z.preprocess(
+    val => val === "" ? undefined : Number(val),
+    z.number({ required_error: "limit session is required" })
+  ),
+  limit_ani:z.preprocess(
+    val => val === "" ? undefined : Number(val),
+    z.number({ required_error: "limit ani is required" })
+  ),
+
+  limit_dnis:z.preprocess(
+    val => val === "" ? undefined : Number(val),
+    z.number({ required_error: "limit dnis is required" })
+  ),
+  priority:z.coerce.number().min(1, { message: "Required" }),
+  override_extend:z.preprocess(
+    val => val === "" ? undefined : Number(val),
+    z.number({ required_error: "override extend is required" })
+  ),
+  percentage:z.coerce.number().min(1, { message: "Required" }),
+
+
+
+});
 // -----------------------SIP_TRUNK_SCEHEMA---------------------
 
 export const BasicSipTrunkSchema = z.object({

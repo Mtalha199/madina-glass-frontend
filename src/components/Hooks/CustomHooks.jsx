@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AddGroup, BasicSipTrunkSchema, ContactFormSchema, ContactFormSchemaCarrier, ContactFormSchemaCarrierEdit, ContactFormSchemaEdit, IpWhitelistSchema, IpWhitelistSchemaForEdit, loginFormSchema, NewGroupFormSchema, NewUrlFormSchema, PricingInfochema, SignUpFormSchema, SipTrunkForm, StirShakenFormBulk, StirShakenFormSingle, StirShakenSchema } from "../Schema/auth";
+import { AddGroup, BasicSipTrunkSchema, ContactFormSchema, ContactFormSchemaCarrier, ContactFormSchemaCarrierEdit, ContactFormSchemaEdit, IpWhitelistSchema, IpWhitelistSchemaForEdit, LCRForm, loginFormSchema, NewGroupFormSchema, NewUrlFormSchema, PercentageForm, PricingInfochema, SignUpFormSchema, SipTrunkForm, StirShakenFormBulk, StirShakenFormSingle, StirShakenSchema } from "../Schema/auth";
 import { ATTESTATION_OPTIONS, ATTESTATION_OPTIONS_DEFAULT, TRUNK_TYPE_OPTIONS, VERIFY_CALL_TOKEN } from "@/Constant";
 
 export function useLoginForm() {
@@ -354,16 +354,33 @@ export function useStirShakenBulk(){
 
 export function useLCR(){
   return useForm({
-      resolver: zodResolver(SipTrunkForm),
+      resolver: zodResolver(LCRForm),
       defaultValues: {
 
         limit_cps:0,
         limit_session:0,
         limit_ani:0,
-
         limit_dnis:0,
         priority:50,
         override_extend:0,
+
+
+      },
+    });
+}
+
+export function usePercentage(){
+  return useForm({
+      resolver: zodResolver(PercentageForm),
+      defaultValues: {
+
+        limit_cps:0,
+        limit_session:0,
+        limit_ani:0,
+        limit_dnis:0,
+        priority:50,
+        override_extend:0,
+        percentage:0,
 
 
       },
