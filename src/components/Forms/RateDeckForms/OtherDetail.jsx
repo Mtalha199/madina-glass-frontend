@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from 'recharts';
 import CommonDrawer from '@/Commons/DrawerCommon';
 import { BUILD_OFF_PLACE_CARRIER, POPULATE_INTERMINATE_AS } from '@/Constant';
+import LcrTab from '@/components/Tabs/SipTrunkTabs/LcrTab';
 
 const OtherDetail = ({ form, MODE, DATA }) => {
       const [edit, setEdit] = useState(false);
@@ -35,6 +36,7 @@ const OtherDetail = ({ form, MODE, DATA }) => {
                   </Button>
                 }
               >
+                <LcrTab />
                 {/* <Form {...formStarShaken}>
                   <form onSubmit={formStarShaken.handleSubmit(onSubmit)}>
                     <div className="space-y-4 pb-4">

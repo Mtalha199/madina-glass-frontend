@@ -11,7 +11,7 @@ export const API_END_POINT = {
   ALL_CUSTOMER: "users/names",
   ALL_CARRIER: "carriers/names",
 
-
+STATUS_CUSTOMER:"users/{id}/status",
   SIP_TRUNK_LIST: "siptrunk",
   ADD_NEW_SIP_TRUNK: "siptrunk",
   ADD_IP_WHITE_LISTING: "siptrunk/ip-auth",
@@ -47,7 +47,9 @@ export const TOAST_MESSAGES = {
   PRICING_INFO_ADDED: "Pricing info added successfully",
   PRICING_INFO_UPDATED: "Pricing info updated successfully",
   CARRIER_ADDED:"Carrier added succesfully",
-  CARRIER_UPDATED:"Carrier updated succesfully"
+  CARRIER_UPDATED:"Carrier updated succesfully",
+
+  CUSTOMER_STATUS:"Customer status changed successfully ",
 
 }
 
@@ -586,3 +588,10 @@ export const ROUTING_TABS={
   LCR :'LCR',
   PERCENTAGE : 'Percentage',
 }
+
+
+
+export const CUSTOMER_STATUS_CONFIG = {
+    true: { label: "Active", variant: "default" },
+    false: { label: "In Active", variant: "secondary" },
+  };

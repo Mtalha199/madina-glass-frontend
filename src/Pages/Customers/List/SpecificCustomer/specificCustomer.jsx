@@ -4,13 +4,20 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft } from "lucide-react";
-import { API_END_POINT, API_TYPE, SCREEN_PATH } from "@/Constant";
+import {
+  API_END_POINT,
+  API_TYPE,
+  CUSTOMER_STATUS_CONFIG,
+  SCREEN_PATH,
+  TOAST_MESSAGES,
+} from "@/Constant";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import TabsCommon from "@/Commons/TabsCommon";
 import { CUSTOMER_LIST_TABS } from "@/components/Tabs/TabConfig";
 import { useEffect, useState } from "react";
 import { APICALL } from "@/components/Api/ApiCall";
 import AccountHeaderSkeleton from "@/Commons/AccountHeaderSkeleton";
+import StatusBadge from "@/Commons/StatusBadge";
 export default function SpecificCustomer() {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -30,6 +37,22 @@ export default function SpecificCustomer() {
       setData,
       setCount
     );
+  };
+
+  const handleStatusChange = async (newStatus) => {
+    const response = await APICALL(
+      API_TYPE.PATCH,
+      `${API_END_POINT.STATUS_CUSTOMER.replace("{id}", id)}`,
+      setloading,
+      { is_active: newStatus },
+      null,
+      null,
+      TOAST_MESSAGES.CUSTOMER_STATUS
+    );
+    if(response!==undefined)
+    {
+      getData();
+    }
   };
   return (
     <div className="p-6">
@@ -58,15 +81,7 @@ export default function SpecificCustomer() {
               <h2 className="text-2xl font-semibold">
                 {data?.account?.company_name}
               </h2>
-              <Badge
-                variant={
-                  data?.is_active === true
-                    ? "success"
-                    : "destructive"
-                }
-              >
-                {data?.is_active === true ? "Active" : "Suspended"}
-              </Badge>
+              <StatusBadge DATA={data?.is_active} STATUS_CONFIG={CUSTOMER_STATUS_CONFIG} ON_STATUS_CHANGE={handleStatusChange} />
             </div>
           </div>
         </div>
