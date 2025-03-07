@@ -60,7 +60,9 @@ const GenerateRateDecks = () => {
           null,
           TOAST_MESSAGES.RATE_DECK_ADDED
         );
-        
+        if (response !== undefined) {
+          navigate(SCREEN_PATH.RATE_DECK_LIST_CUSTOMER);
+        }
   }
   return (
     <div className="p-6">
