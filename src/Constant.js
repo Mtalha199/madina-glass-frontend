@@ -28,7 +28,12 @@ STATUS_CUSTOMER:"users/{id}/status",
 
 
   // -----------------------------CARRIERS--------------------------
-  CARRIERS:"/carriers"
+  CARRIERS:"/carriers",
+
+
+  // ---------------------------------RATE_DECKS-------------------------
+  RATE_DECK:"rate-deck",
+  ALL_RATE_DECK:"rate-deck/names"
 };
 
 /* --------------------------------- TOAST_MESSAGES --------------------------------- */
@@ -49,7 +54,11 @@ export const TOAST_MESSAGES = {
   CARRIER_ADDED:"Carrier added succesfully",
   CARRIER_UPDATED:"Carrier updated succesfully",
 
-  CUSTOMER_STATUS:"Customer status changed successfully ",
+  CUSTOMER_STATUS:"Customer status changed successfully ", 
+
+  RATE_DECK_ADDED:"Rate deck added successfuly",
+  RATE_DECK_UPDATED:"Rate deck updated successfuly",
+
 
 }
 
@@ -521,24 +530,24 @@ export const BLOCK_MATCHING_SRC_DST = [
 ];
 
 export const POPULATE_INTERMINATE_AS = [
-  { value: "disabled", label: "Copy of intrastate" },
-  { value: "A", label: "Copy of Interstate" },
-  { value: "B", label: "Higher of Inter/Intra" },
-  { value: "C", label: "Lower of Inter/Intra" },
-  { value: "C", label: "True LCR of Carrier Indeterminate" },
+  { value: "Copy of intrastate", label: "Copy of intrastate" },
+  { value: "Copy of Interstate", label: "Copy of Interstate" },
+  { value: "Higher of Inter/Intra", label: "Higher of Inter/Intra" },
+  { value: "Lower of Inter/Intra", label: "Lower of Inter/Intra" },
+  { value: "True LCR of Carrier Indeterminate", label: "True LCR of Carrier Indeterminate" },
 ];
 
 export const ROUNDING_PRECISION = [
-  { value: "disabled", label: "6" },
-  { value: "A", label: "5" },
-  { value: "B", label: "3" },
-  { value: "C", label: "2" },
-  { value: "C", label: "1" },
+  { value: 6, label: "6" },
+  { value: 5, label: "5" },
+  { value: 3, label: "3" },
+  { value: 2, label: "2" },
+  { value: 1, label: "1" },
 ];
 export const ROUNDING_METHOD = [
-  { value: "a", label: "Round up" },
-  { value: "A", label: "True Math" },
-  { value: "B", label: "Round down" },
+  { value:"Round up", label: "Round up" },
+  { value: "True Math", label: "True Math" },
+  { value:"Round down" , label: "Round down" },
 ];
 
 
@@ -595,3 +604,9 @@ export const CUSTOMER_STATUS_CONFIG = {
     true: { label: "Active", variant: "default" },
     false: { label: "In Active", variant: "secondary" },
   };
+
+
+  export const DAYS_NOTICE_RATE_DECK = Array.from({ length: 30 }, (_, index) => {
+    const day = index + 1;
+    return { value: day, label: day };
+  });

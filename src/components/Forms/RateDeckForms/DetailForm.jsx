@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   CheckboxFieldAndView,
   InputFieldAndView,
@@ -13,13 +13,37 @@ import {
   ROUNDING_PRECISION,
 } from "@/Constant";
 import { Label } from "@/components/ui/label";
+import { useFormContext } from "react-hook-form";
 
 const DetailForm = ({ form, MODE, DATA }) => {
   const [edit, setEdit] = useState(false);
-
+   const { setValue, watch } = useFormContext();
+useEffect(() => {
+  if (DATA) {
+    setValue("margin", DATA?.margin );
+    setValue("file_name", DATA?.file_name );
+    setValue("min_profit", DATA?.min_profit );
+    setValue("max_profit", DATA?.max_profit );
+    setValue("include_toll_free", DATA?.include_toll_free);
+    setValue("toll_free_price", DATA?.toll_free_price );
+    setValue("populate_interminate_as", DATA?.populate_interminate_as );
+    setValue("rounding_percision", DATA?.rounding_precision ); 
+    setValue("rounding_method", DATA?.rounding_method);
+    setValue("non_juridictional", DATA?.options?.non_juridictional);
+    setValue("local_only_rate_deck", DATA?.options?.local_only_rate_deck);
+    setValue("use_carrier_restrictions", DATA?.options?.use_carrier_restrictions );
+    setValue("us48", DATA?.areas?.us48 );
+    setValue("alaska", DATA?.areas?.alaska);
+    setValue("hawaii", DATA?.areas?.hawaii ); 
+    setValue("canada", DATA?.areas?.canada);
+    setValue("yukon", DATA?.areas?.yukon );
+    setValue("non_us_canada_country_code_1", DATA?.areas?.non_us_canada_country_code_1);
+    setValue("user_defined", DATA?.areas?.user_defined );
+  }
+}, [DATA, setValue]);
   return (
     <>
-      <div className="">
+   <div className="">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 ">
           <div className="col-span-1 md:col-span-5 lg:col-span-1 gap-4">
             <h2 className="text-lg font-semibold mb-2">Rate Deck Detail</h2>
@@ -34,7 +58,7 @@ const DetailForm = ({ form, MODE, DATA }) => {
               TYPE: "number",
               PLACEHOLDER: "0",
               ICON: <Network />,
-              VALUE: DATA?.trunk_name,
+              VALUE: DATA?.margin,
               IS_REQUIRED: true,
               MODE: MODE,
               EDIT: edit,
@@ -48,7 +72,7 @@ const DetailForm = ({ form, MODE, DATA }) => {
               TYPE: "text",
               PLACEHOLDER: "e.g., Global Voice Solutions",
               ICON: <Network />,
-              VALUE: DATA?.trunk_name,
+              VALUE: DATA?.file_name, 
               IS_REQUIRED: true,
               MODE: MODE,
               EDIT: edit,
@@ -65,7 +89,7 @@ const DetailForm = ({ form, MODE, DATA }) => {
               TYPE: "number",
               ICON: <Network />,
               PLACEHOLDER: "0",
-              VALUE: DATA?.trunk_name,
+              VALUE: DATA?.min_profit, 
               IS_REQUIRED: true,
               MODE: MODE,
               EDIT: edit,
@@ -79,7 +103,7 @@ const DetailForm = ({ form, MODE, DATA }) => {
               TYPE: "number",
               ICON: <Network />,
               PLACEHOLDER: "0",
-              VALUE: DATA?.trunk_name,
+              VALUE: DATA?.max_profit, 
               IS_REQUIRED: true,
               MODE: MODE,
               EDIT: edit,
@@ -92,9 +116,9 @@ const DetailForm = ({ form, MODE, DATA }) => {
           <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
             {SwitchAndView({
               LABEL: "Include Toll Free",
-              NAME: "status",
+              NAME: "include_toll_free",
               ICON: <Badge />,
-              VALUE: DATA?.status,
+              VALUE: DATA?.include_toll_free, 
               MODE: MODE,
               EDIT: edit,
               FORM: form,
@@ -107,7 +131,7 @@ const DetailForm = ({ form, MODE, DATA }) => {
               TYPE: "number",
               ICON: <Network />,
               PLACEHOLDER: "0",
-              VALUE: DATA?.trunk_name,
+              VALUE: DATA?.toll_free_price, 
               IS_REQUIRED: true,
               MODE: MODE,
               EDIT: edit,
@@ -124,7 +148,7 @@ const DetailForm = ({ form, MODE, DATA }) => {
               PLACEHOLDER: "Select Populate Inter..",
               ICON: <Server />,
               OPTIONS: POPULATE_INTERMINATE_AS,
-              VALUE: DATA?.company_name,
+              VALUE: DATA?.populate_interminate_as, 
               IS_REQUIRED: true,
               MODE: MODE,
               EDIT: edit,
@@ -134,11 +158,11 @@ const DetailForm = ({ form, MODE, DATA }) => {
           <div className="col-span-1 md:col-span-1 lg:col-span-1 gap-4">
             {SelectAndView({
               LABEL: "Rounding Precision",
-              NAME: "customer",
+              NAME: "rounding_percision",
               PLACEHOLDER: "Select Rounding",
               ICON: <Server />,
               OPTIONS: ROUNDING_PRECISION,
-              VALUE: DATA?.company_name,
+              VALUE: DATA?.rounding_precision, 
               IS_REQUIRED: true,
               MODE: MODE,
               EDIT: edit,
@@ -152,7 +176,7 @@ const DetailForm = ({ form, MODE, DATA }) => {
               PLACEHOLDER: "Select Rounding",
               ICON: <Server />,
               OPTIONS: ROUNDING_METHOD,
-              VALUE: DATA?.rounding_method,
+              VALUE: DATA?.rounding_method, 
               IS_REQUIRED: true,
               MODE: MODE,
               EDIT: edit,
@@ -169,33 +193,38 @@ const DetailForm = ({ form, MODE, DATA }) => {
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 space-y-4 ">
           <div className="hidden lg:block lg:col-span-1"></div>
           <div className="col-span-1 md:col-span-4 lg:col-span-4 gap-4 flex">
-            {CheckboxFieldAndView({
-              LABEL: "Non-Juridictional",
-              NAME: "non_juridictional",
-              ICON: <Server />,
-              VALUE: DATA?.company_name,
-              MODE: MODE,
-              EDIT: edit,
-              FORM: form,
-            })}
-            {CheckboxFieldAndView({
-              LABEL: "Local Only Rate Deck",
-              NAME: "local_only_rate_deck",
-              ICON: <Server />,
-              VALUE: DATA?.company_name,
-              MODE: MODE,
-              EDIT: edit,
-              FORM: form,
-            })}
-            {CheckboxFieldAndView({
-              LABEL: "Use Carrier Restrictions",
-              NAME: "use_carrier_restrictions",
-              ICON: <Server />,
-              VALUE: DATA?.company_name,
-              MODE: MODE,
-              EDIT: edit,
-              FORM: form,
-            })}
+            <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
+              {CheckboxFieldAndView({
+                LABEL: "Non-Juridictional",
+                NAME: "non_juridictional",
+                ICON: <Server />,
+                VALUE: DATA?.options?.non_juridictional, 
+                MODE: MODE,
+                EDIT: edit,
+                FORM: form,
+              })}
+            </div>
+            <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
+              {CheckboxFieldAndView({
+                LABEL: "Local Only Rate Deck",
+                NAME: "local_only_rate_deck",
+                ICON: <Server />,
+                VALUE: DATA?.options?.local_only_rate_deck, 
+                MODE: MODE,
+                EDIT: edit,
+                FORM: form,
+              })}
+            </div>
+            <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
+              {CheckboxFieldAndView({
+                LABEL: "Use Carrier Restrictions",
+                NAME: "use_carrier_restrictions",
+                VALUE: DATA?.options?.use_carrier_restrictions, 
+                MODE: MODE,
+                EDIT: edit,
+                FORM: form,
+              })}
+            </div>
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 space-y-4 ">
@@ -207,69 +236,83 @@ const DetailForm = ({ form, MODE, DATA }) => {
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 space-y-4 ">
           <div className="hidden lg:block lg:col-span-1"></div>
           <div className="col-span-1 md:col-span-4 lg:col-span-4 gap-4 flex">
-            {CheckboxFieldAndView({
-              LABEL: "US48",
-              NAME: "us48",
-              ICON: <Server />,
-              VALUE: DATA?.company_name,
-              MODE: MODE,
-              EDIT: edit,
-              FORM: form,
-            })}
-            {CheckboxFieldAndView({
-              LABEL: "Alaska",
-              NAME: "alaska",
-              ICON: <Server />,
-              VALUE: DATA?.company_name,
-              MODE: MODE,
-              EDIT: edit,
-              FORM: form,
-            })}
-            {CheckboxFieldAndView({
-              LABEL: "Hawali",
-              NAME: "hawali",
-              ICON: <Server />,
-              VALUE: DATA?.company_name,
-              MODE: MODE,
-              EDIT: edit,
-              FORM: form,
-            })}
-            {CheckboxFieldAndView({
-              LABEL: "Canada (w/o Yukon)",
-              NAME: "canada",
-              ICON: <Server />,
-              VALUE: DATA?.company_name,
-              MODE: MODE,
-              EDIT: edit,
-              FORM: form,
-            })}
-            {CheckboxFieldAndView({
-              LABEL: "Yukon",
-              NAME: "yukon",
-              ICON: <Server />,
-              VALUE: DATA?.company_name,
-              MODE: MODE,
-              EDIT: edit,
-              FORM: form,
-            })}
-            {CheckboxFieldAndView({
-              LABEL: "non US/Canada Country Code 1",
-              NAME: "non_us_canada_country_code_1",
-              ICON: <Server />,
-              VALUE: DATA?.company_name,
-              MODE: MODE,
-              EDIT: edit,
-              FORM: form,
-            })}
-            {CheckboxFieldAndView({
-              LABEL: "User Defined  ",
-              NAME: "user_defined",
-              ICON: <Server />,
-              VALUE: DATA?.company_name,
-              MODE: MODE,
-              EDIT: edit,
-              FORM: form,
-            })}
+            <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
+              {CheckboxFieldAndView({
+                LABEL: "US48",
+                NAME: "us48",
+                ICON: <Server />,
+                VALUE: DATA?.areas?.us48, 
+                MODE: MODE,
+                EDIT: edit,
+                FORM: form,
+              })}
+            </div>
+            <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
+              {CheckboxFieldAndView({
+                LABEL: "Alaska",
+                NAME: "alaska",
+                ICON: <Server />,
+                VALUE: DATA?.areas?.alaska,
+                MODE: MODE,
+                EDIT: edit,
+                FORM: form,
+              })}
+            </div>
+            <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
+              {CheckboxFieldAndView({
+                LABEL: "Hawaii",
+                NAME: "hawaii",
+                ICON: <Server />,
+                VALUE: DATA?.areas?.hawaii,
+                MODE: MODE,
+                EDIT: edit,
+                FORM: form,
+              })}
+            </div>
+            <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
+              {CheckboxFieldAndView({
+                LABEL: "Canada (w/o Yukon)",
+                NAME: "canada",
+                ICON: <Server />,
+                VALUE: DATA?.areas?.canada,
+                MODE: MODE,
+                EDIT: edit,
+                FORM: form,
+              })}
+            </div>
+            <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
+              {CheckboxFieldAndView({
+                LABEL: "Yukon",
+                NAME: "yukon",
+                ICON: <Server />,
+                VALUE: DATA?.areas?.yukon,
+                MODE: MODE,
+                EDIT: edit,
+                FORM: form,
+              })}
+            </div>
+            <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
+              {CheckboxFieldAndView({
+                LABEL: "Non US/Canada Country Code 1",
+                NAME: "non_us_canada_country_code_1",
+                ICON: <Server />,
+                VALUE: DATA?.areas?.non_us_canada_country_code_1,
+                MODE: MODE,
+                EDIT: edit,
+                FORM: form,
+              })}
+            </div>
+            <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
+              {CheckboxFieldAndView({
+                LABEL: "User Defined",
+                NAME: "user_defined",
+                ICON: <Server />,
+                VALUE: DATA?.areas?.user_defined,
+                MODE: MODE,
+                EDIT: edit,
+                FORM: form,
+              })}
+            </div>
           </div>
         </div>
 
@@ -297,8 +340,6 @@ const DetailForm = ({ form, MODE, DATA }) => {
             )}
           </div>
         </div>
-
-        
       </div>
     </>
   );

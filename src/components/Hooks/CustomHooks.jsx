@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AddGroup, BasicSipTrunkSchema, ContactFormSchema, ContactFormSchemaCarrier, ContactFormSchemaCarrierEdit, ContactFormSchemaEdit, IpWhitelistSchema, IpWhitelistSchemaForEdit, LCRForm, loginFormSchema, NewGroupFormSchema, NewUrlFormSchema, PercentageForm, PricingInfochema, SignUpFormSchema, SipTrunkForm, StirShakenFormBulk, StirShakenFormSingle, StirShakenSchema } from "../Schema/auth";
+import { AddGroup, AssignRateDeckSchema, BasicSipTrunkSchema, ContactFormSchema, ContactFormSchemaCarrier, ContactFormSchemaCarrierEdit, ContactFormSchemaEdit, IpWhitelistSchema, IpWhitelistSchemaForEdit, LCRForm, loginFormSchema, NewGroupFormSchema, NewUrlFormSchema, PercentageForm, PricingInfochema, RateDeckForm, SignUpFormSchema, SipTrunkForm, StirShakenFormBulk, StirShakenFormSingle, StirShakenSchema } from "../Schema/auth";
 import { ATTESTATION_OPTIONS, ATTESTATION_OPTIONS_DEFAULT, TRUNK_TYPE_OPTIONS, VERIFY_CALL_TOKEN } from "@/Constant";
 
 export function useLoginForm() {
@@ -329,7 +329,27 @@ export function usePricingInfo() {
     },
   });
 }
-
+export function useAssignRateDeck() {
+  return useForm({
+    resolver: zodResolver(AssignRateDeckSchema),
+    defaultValues: {
+      billing_type: "",
+      initial: "",
+      subsequent: "",
+      price_cap: false,
+      price_protection: false,
+      override_carrier_price_protection: false,
+      digits_used: "",
+      rounding_method: "",
+      outbound_media_ip_block: false,
+      inbound_media_ip_block: false,
+      allow555: false,
+      use_global_404_blacklist: false,
+      call_extend: false,
+      override_call_extending: false,
+    },
+  });
+}
 export function useStirShakenSingle(){
   return useForm({
       resolver: zodResolver(StirShakenFormSingle),
@@ -393,6 +413,41 @@ export function useAddGroup(){
       resolver: zodResolver(AddGroup),
       defaultValues: {
         group_name:"",
+      },
+    });
+}
+
+// ---------------------------------------------------RATE+DECK----------------------------------------------------------------------
+export function useRateDeck(){
+  return useForm({
+      resolver: zodResolver(RateDeckForm),
+      defaultValues: {
+        margin: "",
+        file_name:"",
+        min_profit:"",
+        max_profit:"",
+        include_toll_free :false,
+        toll_free_price:"",
+        populate_interminate_as:"",
+        rounding_percision:"",
+        rounding_method:"",
+        non_juridictional:false,
+        local_only_rate_deck:false,
+        use_carrier_restrictions:false,
+        us48:false,
+        alaska:false,
+        hawaii:false,
+        canada:false,
+        yukon:false,
+        non_us_canada_country_code_1:false,
+        user_defined:false,
+
+        build_off_which_place_carrier:"",
+        max_devision:"",
+        effective_date:"",
+        custom_for_one_account:false,
+        selectedCarriers: [],
+
       },
     });
 }

@@ -492,6 +492,22 @@ export const PricingInfochema = z.object({
   call_extend: z.boolean().optional(),
   override_call_extending: z.boolean().optional(),
 });
+export const AssignRateDeckSchema = z.object({
+  billing_type: z.string().min(1, "Billing Type is required"),
+  initial: z.coerce.number().min(1, "Initial is required"),
+  subsequent: z.coerce.number().min(1, "Subsequent is required"),
+  price_cap: z.boolean().optional(),
+  price_protection: z.boolean().optional(),
+  override_carrier_price_protection: z.boolean().optional(),
+  digits_used: z.coerce.number().min(1, "Digits Used is required"),
+  rounding_method: z.string().min(1, "Rounding Method is required"),
+  outbound_media_ip_block: z.boolean().optional(),
+  inbound_media_ip_block: z.boolean().optional(),
+  allow555: z.boolean().optional(),
+  use_global_404_blacklist: z.boolean().optional(),
+  call_extend: z.boolean().optional(),
+  override_call_extending: z.boolean().optional(),
+});
 export const IpWhitelistSchemaForEdit = z.object({
   ipEntries: z
     .array(
@@ -544,4 +560,37 @@ export const LCR = z.object({
 
 export const AddGroup = z.object({
   group_name: z.string().min(1, { message: "Group name is required" }),
+});
+
+
+
+
+
+export const RateDeckForm = z.object({
+  margin: z.coerce.number().min(1, { message: "Margin is required" }),
+  file_name: z.string().min(1, { message: "File name is required" }),
+  min_profit: z.coerce.number().min(1, { message: "Minimum profit is required" }),
+  max_profit: z.coerce.number().min(1, { message: "Maximum profit is required" }),
+  include_toll_free: z.boolean({ required_error: "Include toll-free is required" }),
+  toll_free_price: z.coerce.number().min(1, { message: "Toll-free price is required" }),
+  populate_interminate_as: z.string().min(1, { message: "Populate indeterminate as is required" }),
+  rounding_percision: z.coerce.number().min(1, { message: "Rounding precision is required" }),
+  rounding_method: z.string().min(1, { message: "Rounding method is required" }),
+  non_juridictional: z.boolean({ required_error: "Non-jurisdictional is required" }),
+  local_only_rate_deck: z.boolean({ required_error: "Local only rate deck is required" }),
+  use_carrier_restrictions: z.boolean({ required_error: "Use carrier restrictions is required" }),
+  us48: z.boolean({ message: "US48 is required" }),
+  alaska: z.boolean({ required_error: "Alaska is required" }),
+  hawaii: z.boolean({ required_error: "Hawaii is required" }), // Note: corrected typo "hawali" to "hawaii"
+  canada: z.boolean({ required_error: "Canada is required" }),
+  yukon: z.boolean({ required_error: "Yukon is required" }),
+  non_us_canada_country_code_1: z.boolean({ required_error: "Non-US/Canada country code 1 is required" }),
+  user_defined: z.boolean({ required_error: "User defined is required" }),
+  build_off_which_place_carrier: z.string().min(1, { message: "Build off which place carrier is required" }),
+  max_devision: z.coerce.number().min(1, { message: "Max deviation is required" }), // Note: corrected typo "devision" to "deviation"
+  effective_date: z.string().min(1, { message: "Effective date is required" }),
+  custom_for_one_account: z.boolean({ required_error: "Custom for one account is required" }),
+  selectedCarriers: z
+  .array(z.any()) // Accept any array items
+  .min(1, { message: "At least one carrier must be selected" }),
 });

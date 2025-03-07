@@ -274,6 +274,7 @@ export default function SpecificSipTrunk() {
             form={formPricingInfo}
             MODE={DATA_VIEW_MODE.VIEW}
             DATA={data?.pricing_info}
+            COMPANY_NAME={data?.user?.accounts?.company_name}
           />
         </form>
       </Form>
