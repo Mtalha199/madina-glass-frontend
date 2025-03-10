@@ -68,6 +68,9 @@ const routes = [
       { path: SCREEN_PATH.SIP_TRUNK_LIST_CARRIER, element: <SipTrunkListCarrier /> },
       { path: SCREEN_PATH.ADD_NEW_SIP_TRUNK_CARRIER, element: <AddSipTrunkCarrier /> },
       { path: SCREEN_PATH.SIP_TRUNK_LIST_UNIQUE_CARRIER, element: <SpecificSipTrunkCarrier /> },
+      
+      { path: SCREEN_PATH.RATE_DECK_CARRIER, element: <RateDeckCustomer /> },
+
 
       { path: SCREEN_PATH.SETTINGS, element: <Settings /> },
 

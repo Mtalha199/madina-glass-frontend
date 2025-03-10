@@ -33,7 +33,8 @@ STATUS_CUSTOMER:"users/{id}/status",
 
   // ---------------------------------RATE_DECKS-------------------------
   RATE_DECK:"rate-deck",
-  ALL_RATE_DECK:"rate-deck/names"
+  ALL_RATE_DECK:"rate-deck/names",
+  ASSIGN_RATE_DECK:"rate-deck/assign"
 };
 
 /* --------------------------------- TOAST_MESSAGES --------------------------------- */
@@ -58,6 +59,8 @@ export const TOAST_MESSAGES = {
 
   RATE_DECK_ADDED:"Rate deck added successfuly",
   RATE_DECK_UPDATED:"Rate deck updated successfuly",
+
+  RATE_DECK_ASSIGN:"Rate deck assign successfully"
 
 
 }
@@ -104,6 +107,8 @@ export const SCREEN_PATH = {
   SIP_TRUNK_LIST_CARRIER: "/carrier/siptrunk",
   ADD_NEW_SIP_TRUNK_CARRIER: "/carrier/siptrunk/register",
   SIP_TRUNK_LIST_UNIQUE_CARRIER: "/carrier/siptrunk/:id",
+
+  RATE_DECK_CARRIER:"carrier/rate-deck",
 
   SETTINGS: "/settings",
 
@@ -197,7 +202,7 @@ export const NAVIGATION = {
         },
         {
           title: "Rate decks",
-          url: "#",
+          url: SCREEN_PATH.RATE_DECK_CARRIER,
         },
       ],
     },
@@ -606,7 +611,10 @@ export const CUSTOMER_STATUS_CONFIG = {
   };
 
 
-  export const DAYS_NOTICE_RATE_DECK = Array.from({ length: 30 }, (_, index) => {
-    const day = index + 1;
-    return { value: day, label: day };
-  });
+  export const DAYS_NOTICE_RATE_DECK = [
+    { value: "immediately", label: "Immediately" }, // Add "Immediately" as the first option
+    ...Array.from({ length: 30 }, (_, index) => {
+      const day = index + 1;
+      return { value: day.toString(), label: day }; // Convert to string
+    }),
+  ];

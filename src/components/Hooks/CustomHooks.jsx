@@ -333,20 +333,9 @@ export function useAssignRateDeck() {
   return useForm({
     resolver: zodResolver(AssignRateDeckSchema),
     defaultValues: {
-      billing_type: "",
-      initial: "",
-      subsequent: "",
-      price_cap: false,
-      price_protection: false,
-      override_carrier_price_protection: false,
-      digits_used: "",
-      rounding_method: "",
-      outbound_media_ip_block: false,
-      inbound_media_ip_block: false,
-      allow555: false,
-      use_global_404_blacklist: false,
-      call_extend: false,
-      override_call_extending: false,
+      rate_deck: "",
+      days_notice: "",
+      effective_date: "",
     },
   });
 }

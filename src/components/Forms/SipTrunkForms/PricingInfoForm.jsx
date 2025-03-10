@@ -13,18 +13,24 @@ import {
   DAYS_NOTICE_RATE_DECK,
   DIGIT_USED,
   PRICING_ROUNDING_METHOD,
+  TOAST_MESSAGES,
 } from "@/Constant";
 import { Network, Plus, Server } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useFormContext } from "react-hook-form";
 import CommonDrawer from "@/Commons/DrawerCommon";
-import { Form } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useAssignRateDeck } from "@/components/Hooks/CustomHooks";
-import { ComboboxCommon } from "@/Commons/FormCommons";
+import {
+  ComboboxCommon,
+  InputCommon,
+  SelectCommon,
+} from "@/Commons/FormCommons";
 import { APICALL } from "@/components/Api/ApiCall";
+import { Input } from "@/components/ui/input";
 
-function PricingInfoForm({ MODE, DATA, form, COMPANY_NAME }) {
+function PricingInfoForm({ MODE, DATA, form, COMPANY_NAME,TRUNK_ID }) {
   const [edit, setEdit] = useState(false);
   const { setValue, watch } = useFormContext();
   const formAssignRateDeck = useAssignRateDeck();
@@ -76,37 +82,25 @@ function PricingInfoForm({ MODE, DATA, form, COMPANY_NAME }) {
 
   async function onSubmit(data) {
     console.log(data);
-    // const payload = {
-    //   trunk_name: data?.trunk_name,
-    //   trunk_type: data?.trunk_type,
-    //   cps_limit: data?.cps_limit,
-    //   session_limit: data?.session_limit,
-    //   dnis_call_limit: data?.dnis_call_limit,
-    //   ani_call_limit: data?.ani_call_limit,
-    //   global_ani_block: data?.global_ani_block,
-    //   global_dnis_block: data?.global_dnis_block,
-    //   customer_ani_block: data?.customer_ani_block,
-    //   customer_dnis_block: data?.customer_dnis_block,
-    //   status: data?.status,
-    //   somos: data?.somos,
-    //   customer_id: data?.customer_id,
-    //   verify_call_token: data?.verify_call_token,
-    //   block_matching_src_dst: data?.block_matching_src_dst,
-    //   group_id: data?.group_id,
-    // };
+    const payload = {
+      sip_trunk_id: Number(TRUNK_ID),
+      rate_deck_id: Number(data?.rate_deck),
+      days_notice: data?.days_notice,
+      effective_date: new Date(data.effective_date).toISOString(),
+    };
 
-    // const response = await APICALL(
-    //   API_TYPE.POST,
-    //   API_END_POINT.ADD_NEW_SIP_TRUNK,
-    //   setLoading,
-    //   payload,
-    //   null,
-    //   null,
-    //   TOAST_MESSAGES.SIP_TRUNK_ADDED
-    // );
-    // if (response !== undefined) {
-    //   setTrunkId(response?.data?.data?.id);
-    // }
+    const response = await APICALL(
+      API_TYPE.POST,
+      API_END_POINT.ASSIGN_RATE_DECK,
+      setloading,
+      payload,
+      null,
+      null,
+      TOAST_MESSAGES.RATE_DECK_ASSIGN
+    );
+    if (response !== undefined) {
+      setOpenDrawer(false)
+    }
   }
   return (
     <div className="">
@@ -161,27 +155,38 @@ function PricingInfoForm({ MODE, DATA, form, COMPANY_NAME }) {
                     FORM: form,
                   })}
                   <div className="mt-4">
-                  <ComboboxCommon
-                    LABEL={"Rate Deck"}
-                    NAME={"rate_deck"}
-                    OPTIONS={rateDeckData?.map((item) => ({
-                      value: String(item?.id),
-                      label: item?.company_name,
-                    }))}
-                    CONTROL={formAssignRateDeck.control}
-                    IS_REQUIRED={true}
-                    PLACEHOLDER={"Select Rate Deck"}
-                  />
+                    <SelectCommon
+                      LABEL={"Rate Deck"}
+                      NAME={"rate_deck"}
+                      OPTIONS={rateDeckData?.map((item) => ({
+                        value: String(item?.id),
+                        label: item?.file_name,
+                      }))}
+                      CONTROL={formAssignRateDeck.control}
+                      IS_REQUIRED={true}
+                      PLACEHOLDER={"Select Rate Deck"}
+                    />
                   </div>
                   <div className="mt-4">
-                  <ComboboxCommon
-                    LABEL={"Days Notice"}
-                    NAME={"days_notice"}
-                    OPTIONS={DAYS_NOTICE_RATE_DECK}
-                    CONTROL={formAssignRateDeck.control}
-                    IS_REQUIRED={true}
-                    PLACEHOLDER={"Select Rate Deck"}
-                  />
+                    <SelectCommon
+                      LABEL={"Days Notice"}
+                      NAME={"days_notice"}
+                      OPTIONS={DAYS_NOTICE_RATE_DECK}
+                      CONTROL={formAssignRateDeck.control}
+                      IS_REQUIRED={true}
+                      PLACEHOLDER={"Select Rate Deck"}
+                    />
+                    <div className="mt-4">
+                      <InputCommon
+                        LABEL={"Effective Date"}
+                        IS_REQUIRED={true}
+                        NAME={"effective_date"}
+                        TYPE={"date"}
+                        PLACEHOLDER={"Effective Date"}
+                        CONTROL={formAssignRateDeck.control}
+                        ICON={<Server />}
+                      />
+                    </div>
                   </div>
                 </form>
               </Form>

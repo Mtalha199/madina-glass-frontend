@@ -493,20 +493,9 @@ export const PricingInfochema = z.object({
   override_call_extending: z.boolean().optional(),
 });
 export const AssignRateDeckSchema = z.object({
-  billing_type: z.string().min(1, "Billing Type is required"),
-  initial: z.coerce.number().min(1, "Initial is required"),
-  subsequent: z.coerce.number().min(1, "Subsequent is required"),
-  price_cap: z.boolean().optional(),
-  price_protection: z.boolean().optional(),
-  override_carrier_price_protection: z.boolean().optional(),
-  digits_used: z.coerce.number().min(1, "Digits Used is required"),
-  rounding_method: z.string().min(1, "Rounding Method is required"),
-  outbound_media_ip_block: z.boolean().optional(),
-  inbound_media_ip_block: z.boolean().optional(),
-  allow555: z.boolean().optional(),
-  use_global_404_blacklist: z.boolean().optional(),
-  call_extend: z.boolean().optional(),
-  override_call_extending: z.boolean().optional(),
+  rate_deck:z.string().min(1, "Rate deck is required"),
+  days_notice: z.string().min(1, "Days notice is required"),
+  effective_date:z.string().min(1, "Effective date is required"),
 });
 export const IpWhitelistSchemaForEdit = z.object({
   ipEntries: z

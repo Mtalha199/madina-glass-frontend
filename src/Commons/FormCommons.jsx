@@ -200,12 +200,6 @@ export const SelectCommon = ({
   CLASSNAME = "",
   DESCRIPTION = null,
 }) => {
-  const [search, setSearch] = useState("");
-
-  const filteredOptions = OPTIONS.filter((option) =>
-    option.label.toLowerCase().includes(search.toLowerCase())
-  );
-
   return (
     <FormField
       control={CONTROL}
@@ -220,25 +214,21 @@ export const SelectCommon = ({
           </div>
 
           <FormControl>
-            <Select onValueChange={field.onChange} defaultValue={field.value}>
+            <Select
+              onValueChange={(value) => field.onChange(value)}
+              value={field.value}
+              defaultValue={field.value}
+            >
               <SelectTrigger className={`w-full ${CLASSNAME}`}>
                 <SelectValue placeholder={PLACEHOLDER} />
               </SelectTrigger>
-              <SelectContent>
-                <div className="p-2">
-                  <Input
-                    placeholder="Search..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className="mb-2"
-                  />
-                </div>
-                {filteredOptions.map((option) => (
+              <SelectContent className="max-h-60 overflow-y-auto">
+                {OPTIONS.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
                   </SelectItem>
                 ))}
-                {filteredOptions.length === 0 && (
+                {OPTIONS.length === 0 && (
                   <div className="p-2 text-center text-gray-500">
                     No options found
                   </div>
