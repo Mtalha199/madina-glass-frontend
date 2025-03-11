@@ -15,12 +15,20 @@ import {
   PRICING_ROUNDING_METHOD,
   TOAST_MESSAGES,
 } from "@/Constant";
-import { Network, Plus, Server } from "lucide-react";
+import { CalendarIcon, Network, Plus, Server } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useFormContext } from "react-hook-form";
 import CommonDrawer from "@/Commons/DrawerCommon";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { useAssignRateDeck } from "@/components/Hooks/CustomHooks";
 import {
   ComboboxCommon,
@@ -29,8 +37,15 @@ import {
 } from "@/Commons/FormCommons";
 import { APICALL } from "@/components/Api/ApiCall";
 import { Input } from "@/components/ui/input";
-
-function PricingInfoForm({ MODE, DATA, form, COMPANY_NAME,TRUNK_ID }) {
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { format } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
+function PricingInfoForm({ MODE, DATA, form, COMPANY_NAME, TRUNK_ID }) {
   const [edit, setEdit] = useState(false);
   const { setValue, watch } = useFormContext();
   const formAssignRateDeck = useAssignRateDeck();
@@ -99,7 +114,7 @@ function PricingInfoForm({ MODE, DATA, form, COMPANY_NAME,TRUNK_ID }) {
       TOAST_MESSAGES.RATE_DECK_ASSIGN
     );
     if (response !== undefined) {
-      setOpenDrawer(false)
+      setOpenDrawer(false);
     }
   }
   return (
@@ -168,7 +183,15 @@ function PricingInfoForm({ MODE, DATA, form, COMPANY_NAME,TRUNK_ID }) {
                     />
                   </div>
                   <div className="mt-4">
-                    <SelectCommon
+                    {/* <SelectCommon
+                      LABEL={"Days Notice"}
+                      NAME={"days_notice"}
+                      OPTIONS={DAYS_NOTICE_RATE_DECK}
+                      CONTROL={formAssignRateDeck.control}
+                      IS_REQUIRED={true}
+                      PLACEHOLDER={"Select Rate Deck"}
+                    /> */}
+                    <ComboboxCommon
                       LABEL={"Days Notice"}
                       NAME={"days_notice"}
                       OPTIONS={DAYS_NOTICE_RATE_DECK}
@@ -177,14 +200,46 @@ function PricingInfoForm({ MODE, DATA, form, COMPANY_NAME,TRUNK_ID }) {
                       PLACEHOLDER={"Select Rate Deck"}
                     />
                     <div className="mt-4">
-                      <InputCommon
-                        LABEL={"Effective Date"}
-                        IS_REQUIRED={true}
-                        NAME={"effective_date"}
-                        TYPE={"date"}
-                        PLACEHOLDER={"Effective Date"}
-                        CONTROL={formAssignRateDeck.control}
-                        ICON={<Server />}
+                      <FormField
+                        control={formAssignRateDeck.control}
+                        name="effective_date"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-col">
+                            <FormLabel>Effective Date</FormLabel>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <FormControl>
+                                  <Button
+                                    variant={"outline"}
+                                    className={cn(
+                                      "w-full pl-3 text-left font-normal",
+                                      !field.value && "text-muted-foreground"
+                                    )}
+                                  >
+                                    {field.value ? (
+                                      format(field.value, "PPP")
+                                    ) : (
+                                      <span>Select effective date</span>
+                                    )}
+                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                  </Button>
+                                </FormControl>
+                              </PopoverTrigger>
+                              <PopoverContent
+                                className="w-auto p-0"
+                                align="start"
+                              >
+                                <Calendar
+                                  mode="single"
+                                  selected={field.value}
+                                  onSelect={field.onChange}
+                                  initialFocus
+                                />
+                              </PopoverContent>
+                            </Popover>
+                            <FormMessage />
+                          </FormItem>
+                        )}
                       />
                     </div>
                   </div>

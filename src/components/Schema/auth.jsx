@@ -495,7 +495,9 @@ export const PricingInfochema = z.object({
 export const AssignRateDeckSchema = z.object({
   rate_deck:z.string().min(1, "Rate deck is required"),
   days_notice: z.string().min(1, "Days notice is required"),
-  effective_date:z.string().min(1, "Effective date is required"),
+  effective_date: z.date({
+    required_error: "Effective date is required",
+  }),
 });
 export const IpWhitelistSchemaForEdit = z.object({
   ipEntries: z
