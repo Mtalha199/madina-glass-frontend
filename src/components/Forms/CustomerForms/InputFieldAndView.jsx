@@ -20,6 +20,7 @@ export const InputFieldAndView = ({
   MODE,
   EDIT,
   FORM,
+  DISABLED,
 }) => {
   return (
     <>
@@ -39,6 +40,7 @@ export const InputFieldAndView = ({
           CONTROL={FORM.control}
           ICON={ICON}
           VALUE={VALUE}
+          DISABLED={DISABLED}
         />
       )}
     </>

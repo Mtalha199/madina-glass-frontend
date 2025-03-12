@@ -24,6 +24,8 @@ import RateDeckCustomer from "./Pages/Customers/Rate decks";
 import GenerateRateDecks from "./Pages/Customers/Rate decks/AddRateDecks/GenerateRateDeck";
 import SpecificRateDeck from "./Pages/Customers/Rate decks/SpecificRateDeck";
 import Settings from "./Pages/Settings";
+import RateDeckCarrier from "./Pages/Carriers/Ratedeck";
+import RateDeckApproval from "./Commons/RateDeckCommons/RateDeckApprovel";
 
 const routes = [
   {
@@ -34,6 +36,8 @@ const routes = [
       { path: SCREEN_PATH.REGISTER, element: <SignUp /> },
       { path: SCREEN_PATH.FORGOT_PASSWORD, element: <ForgotPassword /> },
       { path: SCREEN_PATH.RESET_PASSWORD, element: <ResetPassword /> },
+      { path: SCREEN_PATH.RATE_DECK_APPROVEL, element: <RateDeckApproval /> },
+
     ],
   },
   {
@@ -69,7 +73,7 @@ const routes = [
       { path: SCREEN_PATH.ADD_NEW_SIP_TRUNK_CARRIER, element: <AddSipTrunkCarrier /> },
       { path: SCREEN_PATH.SIP_TRUNK_LIST_UNIQUE_CARRIER, element: <SpecificSipTrunkCarrier /> },
       
-      { path: SCREEN_PATH.RATE_DECK_CARRIER, element: <RateDeckCustomer /> },
+      { path: SCREEN_PATH.RATE_DECK_CARRIER, element: <RateDeckCarrier /> },
 
 
       { path: SCREEN_PATH.SETTINGS, element: <Settings /> },

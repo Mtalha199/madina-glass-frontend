@@ -17,6 +17,7 @@ const GenerateRateDecks = () => {
 
   const form = useRateDeck();
   async function onSubmit(data) {
+    console.log(data,"data")
     const payload = {
       margin: data.margin,
       file_name: data.file_name,
@@ -27,13 +28,13 @@ const GenerateRateDecks = () => {
       populate_interminate_as: data.populate_interminate_as,
       rounding_precision:data.rounding_percision,
       rounding_method: data.rounding_method,
-      options: {
-        non_juridictional: data.non_juridictional,
-        local_only_rate_deck: data.local_only_rate_deck,
-        use_carrier_restrictions: data.use_carrier_restrictions,
-        price_cap:data.price_cap,
+      // options: {
+      //   non_juridictional: data.non_juridictional,
+      //   local_only_rate_deck: data.local_only_rate_deck,
+      //   use_carrier_restrictions: data.use_carrier_restrictions,
+      //   price_cap:data.price_cap,
 
-      },
+      // },
       areas: {
         us48: data.us48,
         alaska: data.alaska,
@@ -48,8 +49,8 @@ const GenerateRateDecks = () => {
       ).flat(),
       build_off_which_place: data.build_off_which_place_carrier,
       max_division: parseInt(data.max_devision, 10),
-      max_effective_date: new Date(data.effective_date).toISOString(),
-      custom_for_one_account: data.custom_for_one_account,
+      // max_effective_date: new Date(data.effective_date).toISOString(),
+      // custom_for_one_account: data.custom_for_one_account,
     };
         const response = await APICALL(
           API_TYPE.POST,

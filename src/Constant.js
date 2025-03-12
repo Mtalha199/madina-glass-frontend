@@ -94,6 +94,8 @@ export const SCREEN_PATH = {
   RATE_DECK_LIST_CUSTOMER: "/customer/rate-deck",
   ADD_NEW_RATE_DECK_GENERATE: "/customer/rate-deck/generate",
   RATE_DECK_GENERATE_VIEW: "/customer/rate-deck/:id",
+  RATE_DECK_APPROVEL: "rate-deck-approvel/:id",
+
 
 
   SIP_TRUNK_LIST: "/siptrunk",

@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AddGroup, AssignRateDeckSchema, BasicSipTrunkSchema, ContactFormSchema, ContactFormSchemaCarrier, ContactFormSchemaCarrierEdit, ContactFormSchemaEdit, IpWhitelistSchema, IpWhitelistSchemaForEdit, LCRForm, loginFormSchema, NewGroupFormSchema, NewUrlFormSchema, PercentageForm, PricingInfochema, RateDeckForm, SignUpFormSchema, SipTrunkForm, StirShakenFormBulk, StirShakenFormSingle, StirShakenSchema } from "../Schema/auth";
+import { AddGroup, AssignRateDeckSchema, BasicSipTrunkSchema, ContactFormSchema, ContactFormSchemaCarrier, ContactFormSchemaCarrierEdit, ContactFormSchemaEdit, IpWhitelistSchema, IpWhitelistSchemaForEdit, LCRForm, loginFormSchema, NewGroupFormSchema, NewUrlFormSchema, PercentageForm, PricingInfochema, RateDeckForm, rateDeckUplaodForm, SignUpFormSchema, SipTrunkForm, StirShakenFormBulk, StirShakenFormSingle, StirShakenSchema } from "../Schema/auth";
 import { ATTESTATION_OPTIONS, ATTESTATION_OPTIONS_DEFAULT, TRUNK_TYPE_OPTIONS, VERIFY_CALL_TOKEN } from "@/Constant";
 
 export function useLoginForm() {
@@ -334,7 +334,7 @@ export function useAssignRateDeck() {
     resolver: zodResolver(AssignRateDeckSchema),
     defaultValues: {
       rate_deck: "",
-      days_notice: "",
+      // days_notice: "",
       effective_date: "",
     },
   });
@@ -359,7 +359,14 @@ export function useStirShakenBulk(){
       },
     });
 }
-
+export function useRateDeckUpload(){
+  return useForm({
+      resolver: zodResolver(rateDeckUplaodForm),
+      defaultValues: {
+        mappedData:null,
+      },
+    });
+}
 
 export function useLCR(){
   return useForm({
@@ -420,21 +427,21 @@ export function useRateDeck(){
         populate_interminate_as:"",
         rounding_percision:"",
         rounding_method:"",
-        non_juridictional:false,
-        local_only_rate_deck:false,
-        use_carrier_restrictions:false,
+        // non_juridictional:false,
+        // local_only_rate_deck:false,
+        // use_carrier_restrictions:false,
         us48:false,
         alaska:false,
         hawaii:false,
         canada:false,
         yukon:false,
         non_us_canada_country_code_1:false,
-        user_defined:false,
+        // user_defined:false,
 
         build_off_which_place_carrier:"",
         max_devision:"",
-        effective_date:"",
-        custom_for_one_account:false,
+        // effective_date:"",
+        // custom_for_one_account:false,
         selectedCarriers: [],
 
       },

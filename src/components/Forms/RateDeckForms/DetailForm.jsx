@@ -18,6 +18,7 @@ import { useFormContext } from "react-hook-form";
 const DetailForm = ({ form, MODE, DATA }) => {
   const [edit, setEdit] = useState(false);
    const { setValue, watch } = useFormContext();
+   const includeTollFree = form.watch("include_toll_free");
 useEffect(() => {
   if (DATA) {
     setValue("margin", DATA?.margin );
@@ -136,6 +137,7 @@ useEffect(() => {
               MODE: MODE,
               EDIT: edit,
               FORM: form,
+              DISABLED:!includeTollFree
             })}
           </div>
         </div>
@@ -184,13 +186,13 @@ useEffect(() => {
             })}
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 space-y-4 ">
+        {/* <div className="grid grid-cols-1 md:grid-cols-5 gap-4 space-y-4 ">
           <div className="hidden lg:block lg:col-span-1"></div>
           <div className="col-span-1 md:col-span-4 lg:col-span-4 gap-4">
             <Label>Options</Label>
           </div>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 space-y-4 ">
+        </div> */}
+        {/* <div className="grid grid-cols-1 md:grid-cols-5 gap-4 space-y-4 ">
           <div className="hidden lg:block lg:col-span-1"></div>
           <div className="col-span-1 md:col-span-4 lg:col-span-4 gap-4 flex">
             <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
@@ -226,7 +228,7 @@ useEffect(() => {
               })}
             </div>
           </div>
-        </div>
+        </div> */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 space-y-4 ">
           <div className="hidden lg:block lg:col-span-1"></div>
           <div className="col-span-1 md:col-span-4 lg:col-span-4 gap-4">
@@ -302,7 +304,7 @@ useEffect(() => {
                 FORM: form,
               })}
             </div>
-            <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
+            {/* <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
               {CheckboxFieldAndView({
                 LABEL: "User Defined",
                 NAME: "user_defined",
@@ -312,7 +314,7 @@ useEffect(() => {
                 EDIT: edit,
                 FORM: form,
               })}
-            </div>
+            </div> */}
           </div>
         </div>
 

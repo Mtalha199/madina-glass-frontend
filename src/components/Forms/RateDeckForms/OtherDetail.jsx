@@ -336,7 +336,7 @@ const OtherDetail = ({ form, MODE, DATA }) => {
             FORM: form,
           })}
         </div>
-        <div className="col-span-1 md:col-span-2 lg:col-span-2 gap-4">
+        {/* <div className="col-span-1 md:col-span-2 lg:col-span-2 gap-4">
           {InputFieldAndView({
             LABEL:
               "Maximum effective date to choose when selecting carrier rate decks",
@@ -354,9 +354,9 @@ const OtherDetail = ({ form, MODE, DATA }) => {
             EDIT: edit,
             FORM: form,
           })}
-        </div>
+        </div> */}
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 space-y-4">
+      {/* <div className="grid grid-cols-1 md:grid-cols-5 gap-4 space-y-4">
         <div className="hidden lg:block lg:col-span-1"></div>
         <div className="col-span-1 md:col-span-1 lg:col-span-1 gap-4 flex">
           <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
@@ -371,7 +371,7 @@ const OtherDetail = ({ form, MODE, DATA }) => {
             })}
           </div>
         </div>
-      </div>
+      </div> */}
 
       <div className="col-span-2 flex justify-end mt-4 mb-4">
         <div className="space-x-2">

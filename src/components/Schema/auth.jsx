@@ -494,7 +494,7 @@ export const PricingInfochema = z.object({
 });
 export const AssignRateDeckSchema = z.object({
   rate_deck:z.string().min(1, "Rate deck is required"),
-  days_notice: z.string().min(1, "Days notice is required"),
+  // days_notice: z.string().min(1, "Days notice is required"),
   effective_date: z.date({
     required_error: "Effective date is required",
   }),
@@ -537,6 +537,10 @@ export const StirShakenFormSingle = z.object({
 export const StirShakenFormBulk = z.object({
   attestation: z.string().min(1, { message: "Attestation is required" }),
 });
+export const rateDeckUplaodForm = z.object({
+  // attestation: z.string().min(1, { message: "Attestation is required" }),
+});
+
 
 export const LCR = z.object({
   limit_cps: z.string().optional(),
@@ -563,25 +567,35 @@ export const RateDeckForm = z.object({
   min_profit: z.coerce.number().min(1, { message: "Minimum profit is required" }),
   max_profit: z.coerce.number().min(1, { message: "Maximum profit is required" }),
   include_toll_free: z.boolean({ required_error: "Include toll-free is required" }),
-  toll_free_price: z.coerce.number().min(1, { message: "Toll-free price is required" }),
+  toll_free_price: z.coerce.number().optional(),
   populate_interminate_as: z.string().min(1, { message: "Populate indeterminate as is required" }),
   rounding_percision: z.coerce.number().min(1, { message: "Rounding precision is required" }),
   rounding_method: z.string().min(1, { message: "Rounding method is required" }),
-  non_juridictional: z.boolean({ required_error: "Non-jurisdictional is required" }),
-  local_only_rate_deck: z.boolean({ required_error: "Local only rate deck is required" }),
-  use_carrier_restrictions: z.boolean({ required_error: "Use carrier restrictions is required" }),
+  // non_juridictional: z.boolean({ required_error: "Non-jurisdictional is required" }),
+  // local_only_rate_deck: z.boolean({ required_error: "Local only rate deck is required" }),
+  // use_carrier_restrictions: z.boolean({ required_error: "Use carrier restrictions is required" }),
   us48: z.boolean({ message: "US48 is required" }),
   alaska: z.boolean({ required_error: "Alaska is required" }),
-  hawaii: z.boolean({ required_error: "Hawaii is required" }), // Note: corrected typo "hawali" to "hawaii"
+  hawaii: z.boolean({ required_error: "Hawaii is required" }),
   canada: z.boolean({ required_error: "Canada is required" }),
   yukon: z.boolean({ required_error: "Yukon is required" }),
   non_us_canada_country_code_1: z.boolean({ required_error: "Non-US/Canada country code 1 is required" }),
-  user_defined: z.boolean({ required_error: "User defined is required" }),
+  // user_defined: z.boolean({ required_error: "User defined is required" }),
   build_off_which_place_carrier: z.string().min(1, { message: "Build off which place carrier is required" }),
-  max_devision: z.coerce.number().min(1, { message: "Max deviation is required" }), // Note: corrected typo "devision" to "deviation"
-  effective_date: z.string().min(1, { message: "Effective date is required" }),
-  custom_for_one_account: z.boolean({ required_error: "Custom for one account is required" }),
+  max_devision: z.coerce.number().min(1, { message: "Max deviation is required" }),
+  // effective_date: z.string().min(1, { message: "Effective date is required" }),
+  // custom_for_one_account: z.boolean({ required_error: "Custom for one account is required" }),
   selectedCarriers: z
-  .array(z.any()) // Accept any array items
-  .min(1, { message: "At least one carrier must be selected" }),
+    .array(z.any())
+    .min(1, { message: "At least one carrier must be selected" }),
+}).superRefine((data, ctx) => {
+  if (data.include_toll_free === true) {
+    if (data.toll_free_price === undefined || data.toll_free_price < 1) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Toll-free price is required when include toll-free is checked",
+        path: ["toll_free_price"],
+      });
+    }
+  }
 });

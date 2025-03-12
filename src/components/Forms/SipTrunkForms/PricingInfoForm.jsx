@@ -191,14 +191,14 @@ function PricingInfoForm({ MODE, DATA, form, COMPANY_NAME, TRUNK_ID }) {
                       IS_REQUIRED={true}
                       PLACEHOLDER={"Select Rate Deck"}
                     /> */}
-                    <ComboboxCommon
+                    {/* <ComboboxCommon
                       LABEL={"Days Notice"}
                       NAME={"days_notice"}
                       OPTIONS={DAYS_NOTICE_RATE_DECK}
                       CONTROL={formAssignRateDeck.control}
                       IS_REQUIRED={true}
                       PLACEHOLDER={"Select Rate Deck"}
-                    />
+                    /> */}
                     <div className="mt-4">
                       <FormField
                         control={formAssignRateDeck.control}

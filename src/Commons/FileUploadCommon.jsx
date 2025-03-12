@@ -5,7 +5,11 @@ import { CloudUpload, X, CheckCircle, AlertCircle } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import Papa from "papaparse";
 
-const FileUpload = ({onMappingComplete }) => {
+const FileUpload = ({ 
+  onMappingComplete,
+  additionalSelects = [],
+  DID=true, // Array of select configurations
+}) => {
   const [file, setFile] = useState(null);
   const [progress, setProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
@@ -18,8 +22,19 @@ const FileUpload = ({onMappingComplete }) => {
     phoneNumbers: [],
     notes: []
   });
+  // State for additional selects
+  const [additionalSelectValues, setAdditionalSelectValues] = useState({});
   const fileInputRef = useRef(null);
   const progressContainerRef = useRef(null);
+
+  // Initialize additionalSelectValues when additionalSelects prop changes
+  useEffect(() => {
+    const initialValues = {};
+    additionalSelects.forEach(select => {
+      initialValues[select.name] = "";
+    });
+    setAdditionalSelectValues(initialValues);
+  }, [additionalSelects]);
 
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
@@ -64,16 +79,34 @@ const FileUpload = ({onMappingComplete }) => {
     });
   };
 
+  // Handle additional select change
+  const handleAdditionalSelectChange = (name, value) => {
+    setAdditionalSelectValues(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
   useEffect(() => {
-    if (parsedData.length > 0 && didColumn && noteColumn) {
+    if (parsedData.length > 0 ) {
+      // Create base mapped data
       const mapped = {
         phoneNumbers: parsedData.map(row => row[didColumn]),
-        notes: parsedData.map(row => row[noteColumn])
+        notes: parsedData.map(row => row[noteColumn]),
       };
+      
+      // Add data from additional selects
+      Object.keys(additionalSelectValues).forEach(selectName => {
+        const selectedColumn = additionalSelectValues[selectName];
+        if (selectedColumn) {
+          mapped[selectName] = parsedData.map(row => row[selectedColumn]);
+        }
+      });
+      
       setMappedData(mapped);
       onMappingComplete(mapped);
     }
-  }, [parsedData, didColumn, noteColumn]);
+  }, [parsedData, didColumn, noteColumn, additionalSelectValues]);
 
   const startUpload = () => {
     setIsUploading(true);
@@ -111,6 +144,14 @@ const FileUpload = ({onMappingComplete }) => {
     setDidColumn("");
     setNoteColumn("");
     setParsedData([]);
+    
+    // Reset additional select values
+    const initialValues = {};
+    additionalSelects.forEach(select => {
+      initialValues[select.name] = "";
+    });
+    setAdditionalSelectValues(initialValues);
+    
     setMappedData({ phoneNumbers: [], notes: [] });
   };
 
@@ -187,42 +228,73 @@ const FileUpload = ({onMappingComplete }) => {
 
         {headers.length > 0 && (
           <>
+          {
+            DID &&
+            <>
             <div className="mt-4">
-              <Label>Select DID Column<span className="text-red-500">*</span></Label>
-              <Select 
-                value={didColumn} 
-                onValueChange={setDidColumn}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Choose a header" />
-                </SelectTrigger>
-                <SelectContent>
-                  {headers.map((header) => (
-                    <SelectItem key={header} value={header}>
-                      {header}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="mt-4">
-              <Label>Select Note Column</Label>
-              <Select 
-                value={noteColumn} 
-                onValueChange={setNoteColumn}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Choose a header" />
-                </SelectTrigger>
-                <SelectContent>
-                  {headers.map((header) => (
-                    <SelectItem key={header} value={header}>
-                      {header}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <Label>Select DID Column<span className="text-red-500">*</span></Label>
+            <Select 
+              value={didColumn} 
+              onValueChange={setDidColumn}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Choose a header" />
+              </SelectTrigger>
+              <SelectContent>
+                {headers.map((header) => (
+                  <SelectItem key={header} value={header}>
+                    {header}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="mt-4">
+            <Label>Select Note Column</Label>
+            <Select 
+              value={noteColumn} 
+              onValueChange={setNoteColumn}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Choose a header" />
+              </SelectTrigger>
+              <SelectContent>
+                {headers.map((header) => (
+                  <SelectItem key={header} value={header}>
+                    {header}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          </>
+          }
+   
+            
+            {/* Render additional selects */}
+            {additionalSelects.map((select) => (
+              <div className="mt-4" key={select.name}>
+                <Label>
+                  {select.label}
+                  {select.required && <span className="text-red-500">*</span>}
+                </Label>
+                <Select 
+                  value={additionalSelectValues[select.name] || ""} 
+                  onValueChange={(value) => handleAdditionalSelectChange(select.name, value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={select.placeholder || "Choose a header"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {headers.map((header) => (
+                      <SelectItem key={header} value={header}>
+                        {header}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            ))}
           </>
         )}
       </div>

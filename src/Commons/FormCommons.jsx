@@ -44,6 +44,7 @@ export const InputCommon = ({
   CONTROL,
   CLASSNAME,
   ICON,
+  DISABLED,
 }) => {
   return (
     <>
@@ -68,6 +69,7 @@ export const InputCommon = ({
                 <Input
                   placeholder={PLACEHOLDER}
                   type={TYPE}
+                  disabled={DISABLED}
                   {...field}
                   className={`${ICON ? "pl-10" : ""} ${
                     fieldState.error ? "border-red-500" : CLASSNAME
