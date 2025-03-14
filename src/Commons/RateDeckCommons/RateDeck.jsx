@@ -78,9 +78,19 @@ const RateDeck = ({ CUSTOMER = true }) => {
   const [open, setOpen] = useState(false);
   const [siptrunkData, setSipTrunkData] = useState([]);
 
-  const handleDrawerCloseBulk = () => {
+  const handleDrawerCloseBulk =async () => {
     form.reset();
     setOpen(!open);
+    if(open === false && CUSTOMER === false){
+    await APICALL(
+      API_TYPE.GET,
+      `${API_END_POINT.ALL_GROUP_CARRIER}?extend=true&carrier=1`,
+      setloading,
+      null,
+      setSipTrunkData,
+      setCountSipTrunk
+    );
+  }
   };
   useEffect(() => {
     const debounceTimer = setTimeout(() => {
@@ -90,22 +100,16 @@ const RateDeck = ({ CUSTOMER = true }) => {
     return () => clearTimeout(debounceTimer);
   }, [page, limit, orderBy, order, search]);
   const getData = async () => {
+    const API_END= CUSTOMER ? `${API_END_POINT.RATE_DECK}?carrier=0` : `${API_END_POINT.RATE_DECK}?carrier=1`;
     await APICALL(
       API_TYPE.GET,
-      `${API_END_POINT.RATE_DECK}`,
+      API_END,
       setloading,
       { page, limit, orderBy, order, search },
       setData,
       setCount
     );
-    await APICALL(
-      API_TYPE.GET,
-      `${API_END_POINT.ALL_GROUP_CARRIER}?extend=true&carrier=1`,
-      setloading,
-      null,
-      setSipTrunkData,
-      setCountSipTrunk
-    );
+    
   };
   const handleSort = (column) => {
     if (orderBy === column) {
