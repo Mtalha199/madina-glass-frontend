@@ -1,21 +1,49 @@
-
 import SkeletonTable from "@/Commons/SkeletonTable";
 import TableContainer from "@/Commons/TableContainer";
 import { APICALL } from "@/components/Api/ApiCall";
 import { Button } from "@/components/ui/button";
 import DataTable from "@/components/ui/data-table";
-import { API_END_POINT, API_TYPE, SCREEN_PATH } from "@/Constant";
-import { Plus } from "lucide-react";
+import {
+  API_END_POINT,
+  API_TYPE,
+  COLUMN_TO_MAP_UPLOAD_RATE_DECK,
+  DATA_VIEW_MODE,
+  SCREEN_PATH,
+  TOAST_MESSAGES,
+} from "@/Constant";
+import { CalendarIcon, Plus, Server } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import CommonDrawer from "../DrawerCommon";
 import FileUpload from "../FileUploadCommon";
-import { Form } from "@/components/ui/form";
-import { useRateDeckUpload, useStirShakenBulk } from "@/components/Hooks/CustomHooks";
-const RateDeck = ({CUSTOMER=true}) => {
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  useRateDeckUpload,
+  useRateDeckUploadWithSipTrunk,
+  useStirShakenBulk,
+} from "@/components/Hooks/CustomHooks";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { format } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
+import CommonFileUpload from "../CommonFileUploading";
+import { SelectAndView } from "@/components/Forms/CustomerForms/InputFieldAndView";
+const RateDeck = ({ CUSTOMER = true }) => {
   const navigate = useNavigate();
-    const formStarShakenBulk = useRateDeckUpload();
-  
+  const formRateDeck = useRateDeckUpload();
+  const formRateDeckWithSipTrunk = useRateDeckUploadWithSipTrunk();
+  const form = CUSTOMER ? formRateDeck : formRateDeckWithSipTrunk;
   const columns = [
     {
       header: "Name",
@@ -31,11 +59,14 @@ const RateDeck = ({CUSTOMER=true}) => {
       },
     },
 
-    { header: "Min Profit", accessorKey: "min_profit" },
+    { header: "Effective Date", accessorKey: "min_profit" },
   ];
+  const [uploadData, setUploadData] = useState(null);
   const [loading, setloading] = useState(false);
   const [data, setData] = useState([]);
   const [count, setCount] = useState(0);
+  const [countSipTrunk, setCountSipTrunk] = useState(0);
+
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [orderBy, setOrderBy] = useState(null);
@@ -44,11 +75,13 @@ const RateDeck = ({CUSTOMER=true}) => {
     columns.map((col) => col.accessorKey)
   );
   const [search, setSearch] = useState(null);
-    const [open, setOpen] = useState(false);
-    const handleDrawerCloseBulk = () => {
-        formStarShakenBulk.reset();
-        setOpen(!open);
-      };
+  const [open, setOpen] = useState(false);
+  const [siptrunkData, setSipTrunkData] = useState([]);
+
+  const handleDrawerCloseBulk = () => {
+    form.reset();
+    setOpen(!open);
+  };
   useEffect(() => {
     const debounceTimer = setTimeout(() => {
       getData();
@@ -59,11 +92,19 @@ const RateDeck = ({CUSTOMER=true}) => {
   const getData = async () => {
     await APICALL(
       API_TYPE.GET,
-      API_END_POINT.RATE_DECK,
+      `${API_END_POINT.RATE_DECK}`,
       setloading,
       { page, limit, orderBy, order, search },
       setData,
       setCount
+    );
+    await APICALL(
+      API_TYPE.GET,
+      `${API_END_POINT.ALL_GROUP_CARRIER}?extend=true&carrier=1`,
+      setloading,
+      null,
+      setSipTrunkData,
+      setCountSipTrunk
     );
   };
   const handleSort = (column) => {
@@ -83,78 +124,141 @@ const RateDeck = ({CUSTOMER=true}) => {
   const handleVisibleColumnsChange = (newVisibleColumns) => {
     setVisibleColumns(newVisibleColumns);
   };
-    async function onSubmitBulk(data) {
-      const mappedData = formStarShakenBulk.getValues("mappedData")
-      console.log(mappedData,"mappedData")
+  async function onSubmitBulk(data) {
+    console.log(data);
+
+    const formData = new FormData();
+    formData.append("file", uploadData.file);
+    formData.append("coloumns", JSON.stringify(uploadData.columns));
+    if (data?.effective_date) {
+      const date = new Date(data.effective_date);
+      const isoDate = date.toISOString();
+      formData.append("effective_date", isoDate);
     }
-    const handleFileUploadComplete = (mappedData) => {
-        formStarShakenBulk.setValue("mappedData", mappedData);
-      };
-      const additionalSelects = [
-        {
-            name: "NPAXXXX",
-            label: "Select NPAXXX",
-            placeholder: "Choose Inter npaxxx",
-            required: false
-          },
-        {
-          name: "inter",
-          label: "Select Inter Column",
-          placeholder: "Choose Inter header",
-          required: false
-        },
-        {
-          name: "intra",
-          label: "Select Intra Column",
-          placeholder: "Choose Intra header",
-          required: false
-        },
-        {
-          name: "immediate",
-          label: "Select Immediate Column",
-          placeholder: "Choose Immediate header",
-          required: false
-        }
-      ];
+    if (data?.sip_trunk_id) {
+      formData.append("sip_trunk_id", data?.sip_trunk_id);
+    }
+    const response = await APICALL(
+      API_TYPE.POST,
+      API_END_POINT.UPLOAD_RATE_DECK,
+      setloading,
+      formData,
+      null,
+      null,
+      TOAST_MESSAGES.RATE_DECK_UPLOAD
+    );
+    {
+      response !== undefined && setOpen(false);
+      getData();
+    }
+  }
+  const handleUploadComplete = (data) => {
+    setUploadData(data);
+    console.log(data);
+  };
+
   return (
     <>
       <div className="p-6">
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl font-bold">Rate Decks</h1>
           <div className="flex space-x-2">
-            {
-                CUSTOMER && 
-                <Link to={SCREEN_PATH.ADD_NEW_RATE_DECK_GENERATE}>
+            {CUSTOMER && (
+              <Link to={SCREEN_PATH.ADD_NEW_RATE_DECK_GENERATE}>
                 <Button>
                   <Plus className=" h-4 w-4" />
                   Generate Rate Deck
                 </Button>
               </Link>
-            }
+            )}
             <CommonDrawer
-                title="Upload File"
-                description="Please upload file and choose the header to map"
-                isOpen={open}
-                onOpenChange={handleDrawerCloseBulk}
-                onSave={() => formStarShakenBulk.handleSubmit(onSubmitBulk)()}
-                loading={loading}
-                trigger={
-                  <Button
-                    type="button"
-                  >
-                    <Plus className="h-4 w-4"/>
-                    Upload Rate Deck
-                  </Button>
-                }
-              >
-                <Form {...formStarShakenBulk}>
-                  <form
-                    onSubmit={formStarShakenBulk.handleSubmit(onSubmitBulk)}
-                  >
-                    <FileUpload onMappingComplete={handleFileUploadComplete}  additionalSelects={additionalSelects} DID={false}/>
-                  </form>
-                </Form>
-              </CommonDrawer>
+              title="Upload File"
+              description="Please upload file and choose the header to map"
+              isOpen={open}
+              onOpenChange={handleDrawerCloseBulk}
+              onSave={() => form.handleSubmit(onSubmitBulk)()}
+              loading={loading}
+              trigger={
+                <Button type="button">
+                  <Plus className="h-4 w-4" />
+                  Upload Rate Deck
+                </Button>
+              }
+            >
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmitBulk)}>
+                  <CommonFileUpload
+                    columnMappings={COLUMN_TO_MAP_UPLOAD_RATE_DECK}
+                    onComplete={handleUploadComplete}
+                  />
+                  {CUSTOMER === false && (
+                    <>
+                      <div className="mt-4">
+                        {SelectAndView({
+                          LABEL: "Sip Trunk",
+                          NAME: "sip_trunk_id",
+                          PLACEHOLDER: "Select Sip trunk",
+                          ICON: <Server />,
+                          OPTIONS: siptrunkData?.flatMap((item) =>
+                            item?.sip_trunks.map((newItem) => ({
+                              value: String(newItem?.id),
+                              label: newItem?.trunk_name,
+                            }))
+                          ),
+                          IS_REQUIRED: true,
+                          MODE: DATA_VIEW_MODE.ADD,
+                          EDIT: false,
+                          FORM: form,
+                        })}
+                      </div>
+                      <div className="mt-4">
+                        <FormField
+                          control={form.control}
+                          name="effective_date"
+                          render={({ field }) => (
+                            <FormItem className="flex flex-col">
+                              <FormLabel>Effective Date</FormLabel>
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <FormControl>
+                                    <Button
+                                      variant={"outline"}
+                                      className={cn(
+                                        "w-full pl-3 text-left font-normal",
+                                        !field.value && "text-muted-foreground"
+                                      )}
+                                    >
+                                      {field.value ? (
+                                        format(field.value, "PPP")
+                                      ) : (
+                                        <span>Select effective date</span>
+                                      )}
+                                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                    </Button>
+                                  </FormControl>
+                                </PopoverTrigger>
+                                <PopoverContent
+                                  className="w-auto p-0"
+                                  align="start"
+                                >
+                                  <Calendar
+                                    mode="single"
+                                    selected={field.value}
+                                    onSelect={field.onChange}
+                                    initialFocus
+                                  />
+                                </PopoverContent>
+                              </Popover>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </>
+                  )}
+                </form>
+              </Form>
+            </CommonDrawer>
           </div>
         </div>
         {loading ? (

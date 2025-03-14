@@ -42,8 +42,8 @@ export const ROUTING_TABS = [
 ];
 
 export const SETTING_TABS = [
-  { value: "profile", label: "User", component: <UserSetting /> },
-  { value: "setting", label: "Groups", component: <Groups /> },
+  { value: "user", label: "User", component: <UserSetting /> },
+  { value: "groups", label: "Groups", component: <Groups /> },
   { value: "payments", label: "Role", component: <Role /> },
   {
     value: "notifications",

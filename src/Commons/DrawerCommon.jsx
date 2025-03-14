@@ -59,7 +59,12 @@ const CommonDrawer = ({
                     Cancel
                   </Button>
                   {loading ? (
-                    <Loader size={60} />
+                    <>
+                    
+                    <Button size="sm">
+                    <Loader size={20} LOADING={false} /> Saving
+                    </Button>
+                    </>
                   ) : (
                     <Button size="sm" onClick={onSave}>
                       Save

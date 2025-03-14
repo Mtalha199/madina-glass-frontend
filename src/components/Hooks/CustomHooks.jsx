@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AddGroup, AssignRateDeckSchema, BasicSipTrunkSchema, ContactFormSchema, ContactFormSchemaCarrier, ContactFormSchemaCarrierEdit, ContactFormSchemaEdit, IpWhitelistSchema, IpWhitelistSchemaForEdit, LCRForm, loginFormSchema, NewGroupFormSchema, NewUrlFormSchema, PercentageForm, PricingInfochema, RateDeckForm, rateDeckUplaodForm, SignUpFormSchema, SipTrunkForm, StirShakenFormBulk, StirShakenFormSingle, StirShakenSchema } from "../Schema/auth";
+import { AddGroup, AddUser, AssignRateDeckSchema, BasicSipTrunkSchema, ContactFormSchema, ContactFormSchemaCarrier, ContactFormSchemaCarrierEdit, ContactFormSchemaEdit, IpWhitelistSchema, IpWhitelistSchemaForEdit, LCRForm, loginFormSchema, NewGroupFormSchema, NewUrlFormSchema, PercentageForm, PricingInfochema, RateDeckForm, rateDeckUploadBaseSchema, rateDeckUploadWithSipTrunkSchema, SignUpFormSchema, SipTrunkForm, StirShakenFormBulk, StirShakenFormSingle, StirShakenSchema } from "../Schema/auth";
 import { ATTESTATION_OPTIONS, ATTESTATION_OPTIONS_DEFAULT, TRUNK_TYPE_OPTIONS, VERIFY_CALL_TOKEN } from "@/Constant";
 
 export function useLoginForm() {
@@ -359,13 +359,22 @@ export function useStirShakenBulk(){
       },
     });
 }
-export function useRateDeckUpload(){
+export function useRateDeckUpload() {
   return useForm({
-      resolver: zodResolver(rateDeckUplaodForm),
-      defaultValues: {
-        mappedData:null,
-      },
-    });
+    resolver: zodResolver(rateDeckUploadBaseSchema),
+    defaultValues: {
+      // effective_date: "", 
+    },
+  });
+}
+export function useRateDeckUploadWithSipTrunk() {
+  return useForm({
+    resolver: zodResolver(rateDeckUploadWithSipTrunkSchema),
+    defaultValues: {
+      effective_date: "",
+      sip_trunk_id: "",
+    },
+  });
 }
 
 export function useLCR(){
@@ -413,6 +422,19 @@ export function useAddGroup(){
     });
 }
 
+export function useAddUser(){
+  return useForm({
+      resolver: zodResolver(AddUser),
+      defaultValues: {
+        user_name:"",
+        time_zone:"",
+        email:"",
+        first_name:"",
+        last_name:"",
+
+      },
+    });
+}
 // ---------------------------------------------------RATE+DECK----------------------------------------------------------------------
 export function useRateDeck(){
   return useForm({

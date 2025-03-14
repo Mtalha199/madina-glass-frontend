@@ -1,13 +1,80 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { CheckCircle2, Download, FileText } from 'lucide-react';
-import { Checkbox } from '@/components/ui/checkbox';
+import React, { useEffect, useState, useRef } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { AlertCircle, CheckCircle2, Download, FileText } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { APICALL } from "@/components/Api/ApiCall";
+import { API_END_POINT, API_TYPE } from "@/Constant";
+import { useParams } from "react-router-dom";
 
 const RateDeckApproval = () => {
+  const { id } = useParams();
+
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [loading, setloading] = useState(false);
+  const [data, setData] = useState([]);
+  const [count, setCount] = useState(0);
+  
+  // reCAPTCHA states
+  const [captchaVerified, setCaptchaVerified] = useState(false);
+  const recaptchaRef = useRef(null);
+  
+  useEffect(() => {
+    getData();
+    
+    // Load the reCAPTCHA script
+    const loadRecaptchaScript = () => {
+      const script = document.createElement("script");
+      script.src = "https://www.google.com/recaptcha/api.js";
+      script.async = true;
+      script.defer = true;
+      document.body.appendChild(script);
+    };
+    
+    loadRecaptchaScript();
+    
+    // Add a cleanup function to remove the script when component unmounts
+    return () => {
+      const recaptchaScript = document.querySelector('script[src="https://www.google.com/recaptcha/api.js"]');
+      if (recaptchaScript) {
+        document.body.removeChild(recaptchaScript);
+      }
+    };
+  }, []);
+  
+  const getData = async () => {
+    await APICALL(
+      API_TYPE.GET,
+      `${API_END_POINT.APPROVED_RATE_DECK}/${id}`,
+      setloading,
+      null,
+      setData,
+      setCount
+    );
+  };
+  
+  // Handle reCAPTCHA verification
+  const handleRecaptchaChange = (value) => {
+    if (value) {
+      setCaptchaVerified(true);
+    } else {
+      setCaptchaVerified(false);
+    }
+  };
+  
+  // Handle reCAPTCHA expiration
+  const handleRecaptchaExpired = () => {
+    setCaptchaVerified(false);
+  };
   
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
@@ -17,109 +84,153 @@ const RateDeckApproval = () => {
           <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mb-2">
             <span className="text-white text-2xl font-bold">RC</span>
           </div>
-          <h1 className="text-xl font-bold text-blue-600">RateCloud Solutions</h1>
+          <h1 className="text-xl font-bold text-blue-600">
+            RateCloud Solutions
+          </h1>
         </div>
-        
-        {/* Success Banner */}
-        <div className="bg-green-500 text-white rounded-lg p-6 flex items-center gap-4 shadow-lg">
-          <CheckCircle2 size={36} />
-          <div>
-            <h2 className="text-xl font-bold">Approved!</h2>
-            <p className="opacity-90">Your rate deck has been approved</p>
-          </div>
-        </div>
-        
+
         {/* Main Card */}
         <Card className="shadow-md">
           <CardHeader className="pb-2">
             <CardTitle className="text-xl">Rate Deck Details</CardTitle>
-            <CardDescription>Your submission has been reviewed and accepted</CardDescription>
+            <CardDescription>
+              Your submission has been reviewed and accepted
+            </CardDescription>
           </CardHeader>
-          
+
           <CardContent className="pt-4">
             <div className="space-y-4">
               {/* File Information */}
               <div className="bg-blue-50 rounded-md p-4 mb-4 flex items-center">
                 <FileText className="text-blue-500 mr-3" size={24} />
                 <div>
-                  <h3 className="font-medium">Standard_Rate_Deck_Q2_2025.xlsx</h3>
-                  <p className="text-sm text-slate-500">2.4 MB • Excel Spreadsheet</p>
+                  <h3 className="font-medium">{data?.rate_deck?.file_name}</h3>
+                  <p className="text-sm text-slate-500">
+                    2.4 MB • Excel Spreadsheet
+                  </p>
                 </div>
               </div>
-            
+
               {/* Summary Details */}
               <div className="bg-slate-50 rounded-md p-4 space-y-3">
+                <Separator />
                 <div className="flex justify-between items-center">
-                  <span className="text-slate-600 font-medium">Submission Date:</span>
-                  <span>March 13, 2025</span>
+                  <span className="text-slate-600 font-medium">
+                    Sip Trunk ID:
+                  </span>
+                  <span>{data?.sip_trunk?.id}</span>
                 </div>
                 <Separator />
-                
                 <div className="flex justify-between items-center">
-                  <span className="text-slate-600 font-medium">Approval Date:</span>
-                  <span>March 13, 2025</span>
+                  <span className="text-slate-600 font-medium">
+                    Sip Trunk Name:
+                  </span>
+                  <span>{data?.sip_trunk?.trunk_name}</span>
                 </div>
                 <Separator />
-                
                 <div className="flex justify-between items-center">
-                  <span className="text-slate-600 font-medium">Effective Date:</span>
-                  <span className="font-medium text-blue-600">April 1, 2025</span>
+                  <span className="text-slate-600 font-medium">
+                    Assign Date:
+                  </span>
+                  <span>{data?.createdAt}</span>
                 </div>
                 <Separator />
-                
+
                 <div className="flex justify-between items-center">
-                  <span className="text-slate-600 font-medium">Reference Number:</span>
-                  <span className="font-mono">RD-2025-0313</span>
+                  <span className="text-slate-600 font-medium">
+                    Effective Date:
+                  </span>
+                  <span className="font-medium text-blue-600">
+                    {data?.effective_date}
+                  </span>
                 </div>
                 <Separator />
-                
+
                 <div className="flex justify-between items-center">
                   <span className="text-slate-600 font-medium">Status:</span>
-                  <Badge variant="success" className="bg-green-500 hover:bg-green-500">Approved</Badge>
+                  <Badge
+                    variant="success"
+                    className="bg-green-500 hover:bg-green-500"
+                  >
+                    Approved
+                  </Badge>
                 </div>
               </div>
-              
+
+              {/* Google reCAPTCHA */}
+              <div className="mt-4 space-y-3">
+                <div className="text-center mb-2">
+                  {/* <h3 className="font-medium">Verify you're human</h3> */}
+                  <p className="text-sm text-slate-500 mb-4">
+                    Please complete the CAPTCHA verification
+                  </p>
+                  
+                  <div className="flex justify-center">
+                    <div
+                      className="g-recaptcha"
+                      data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" // Replace with your actual site key in production
+                      data-callback="onRecaptchaSuccess"
+                      data-expired-callback="onRecaptchaExpired"
+                      ref={recaptchaRef}
+                    ></div>
+                  </div>
+                  
+                  {/* Add global callback functions for reCAPTCHA */}
+                  <script dangerouslySetInnerHTML={{ 
+                    __html: `
+                      window.onRecaptchaSuccess = function(token) {
+                        ${handleRecaptchaChange.toString().replace('function handleRecaptchaChange(value)', 'function(token)')}
+                      };
+                      window.onRecaptchaExpired = function() {
+                        ${handleRecaptchaExpired.toString().replace('function handleRecaptchaExpired()', 'function()')}
+                      };
+                    `
+                  }} />
+                  
+                  {captchaVerified && (
+                    <div className="mt-4 bg-green-50 rounded-md p-3 flex items-center justify-center">
+                      <CheckCircle2 className="text-green-500 mr-2" size={20} />
+                      <span className="text-green-700">Verification successful</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
               {/* Terms and Conditions */}
               <div className="mt-4 space-y-3">
                 <div className="flex items-start space-x-2">
-                  <Checkbox 
-                    id="terms" 
+                  <Checkbox
+                    id="terms"
                     checked={termsAccepted}
                     onCheckedChange={() => setTermsAccepted(!termsAccepted)}
                     className="mt-1"
                   />
                   <label htmlFor="terms" className="text-sm text-slate-600">
-                    I acknowledge that by downloading this rate deck, I agree to implement these rates 
-                    effective April 1, 2025, and comply with all applicable terms and conditions as 
-                    outlined in our service agreement.
+                    I acknowledge that by downloading this rate deck, I agree to
+                    implement these rates effective April 1, 2025, and comply
+                    with all applicable terms and conditions as outlined in our
+                    service agreement.
                   </label>
                 </div>
               </div>
             </div>
           </CardContent>
-          
+
           <CardFooter className="flex flex-col gap-3 pt-2 pb-6">
-            <Button 
+            <Button
               className="w-full py-6 bg-green-500 hover:bg-green-600 shadow-md flex items-center justify-center"
-              disabled={!termsAccepted}
+              disabled={!termsAccepted || !captchaVerified}
             >
               <Download className="mr-2 h-4 w-4" />
               Download Rate Deck
             </Button>
-            
-            <Button 
-              variant="outline" 
-              className="w-full py-3 border-green-500 text-green-600 hover:bg-green-50"
-              disabled={!termsAccepted}
-            >
-              I Accept
-            </Button>
           </CardFooter>
         </Card>
-        
+
         {/* Footer */}
         <div className="text-center text-sm text-slate-500">
-          This is an automated notification. Please contact support if you have any questions.
+          This is an automated notification. Please contact support if you have
+          any questions.
         </div>
       </div>
     </div>

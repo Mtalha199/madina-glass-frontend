@@ -1,6 +1,6 @@
 import { Loader2 } from "lucide-react";
 
-export const Loader = ({ size = 24, className = "" }) => {
+export const Loader = ({ size = 24, className = "", LOADING=true }) => {
   return (
     <div className="flex items-center justify-center space-x-2">
       <Loader2
@@ -8,7 +8,9 @@ export const Loader = ({ size = 24, className = "" }) => {
         width={size}
         height={size}
       />
-      <span>Loading...</span>
+      {
+        LOADING && <span>Loading...</span>
+      }
     </div>
   );
 };

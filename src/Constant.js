@@ -11,7 +11,7 @@ export const API_END_POINT = {
   ALL_CUSTOMER: "users/names",
   ALL_CARRIER: "carriers/names",
 
-STATUS_CUSTOMER:"users/{id}/status",
+  STATUS_CUSTOMER: "users/{id}/status",
   SIP_TRUNK_LIST: "siptrunk",
   ADD_NEW_SIP_TRUNK: "siptrunk",
   ADD_IP_WHITE_LISTING: "siptrunk/ip-auth",
@@ -19,22 +19,22 @@ STATUS_CUSTOMER:"users/{id}/status",
 
   ADD_STIR_SHAKEN: "siptrunk/stir-shaken",
   ADD_PRICING_INFO: "siptrunk/pricing-info",
-  ADD_ROUTING:"siptrunk/routing",
+  ADD_ROUTING: "siptrunk/routing",
   VIEW_SIP_TRUNK: "siptrunk",
   SIP_TRUNK_LIST_CUSTOMER: "admin/siptrunk-customer",
-  ALL_GROUP_CARRIER:"groups/names",
+  ALL_GROUP_CARRIER: "groups/names",
   GROUP_LIST: "groups",
-  ALL_CARRIER_FOR_ROUTING:"groups/users",
-
+  ALL_CARRIER_FOR_ROUTING: "groups/users",
 
   // -----------------------------CARRIERS--------------------------
-  CARRIERS:"/carriers",
-
+  CARRIERS: "/carriers",
 
   // ---------------------------------RATE_DECKS-------------------------
-  RATE_DECK:"rate-deck",
-  ALL_RATE_DECK:"rate-deck/names",
-  ASSIGN_RATE_DECK:"rate-deck/assign"
+  RATE_DECK: "rate-deck",
+  ALL_RATE_DECK: "rate-deck/names",
+  ASSIGN_RATE_DECK: "rate-deck/assign",
+  APPROVED_RATE_DECK: "rate-deck/approve",
+  UPLOAD_RATE_DECK: "rate-deck/upload",
 };
 
 /* --------------------------------- TOAST_MESSAGES --------------------------------- */
@@ -49,22 +49,20 @@ export const TOAST_MESSAGES = {
   IP_WHITE_LISTING_UPDATED: "IP white listing updated successfully",
   IP_WHITE_LISTING_DELETED: "IP white listing deleted successfully",
   STIR_SHAKEN_ADDED: "Stir/shaken added successfully",
-  ROUTING_ADDED:"Rounting added succesfully",
+  ROUTING_ADDED: "Rounting added succesfully",
   PRICING_INFO_ADDED: "Pricing info added successfully",
   PRICING_INFO_UPDATED: "Pricing info updated successfully",
-  CARRIER_ADDED:"Carrier added succesfully",
-  CARRIER_UPDATED:"Carrier updated succesfully",
+  CARRIER_ADDED: "Carrier added succesfully",
+  CARRIER_UPDATED: "Carrier updated succesfully",
 
-  CUSTOMER_STATUS:"Customer status changed successfully ", 
+  CUSTOMER_STATUS: "Customer status changed successfully ",
 
-  RATE_DECK_ADDED:"Rate deck added successfuly",
-  RATE_DECK_UPDATED:"Rate deck updated successfuly",
+  RATE_DECK_ADDED: "Rate deck added successfuly",
+  RATE_DECK_UPDATED: "Rate deck updated successfuly",
 
-  RATE_DECK_ASSIGN:"Rate deck assign successfully"
-
-
-}
-
+  RATE_DECK_ASSIGN: "Rate deck assign successfully",
+  RATE_DECK_UPLOAD: "Rate deck uploaded successfully",
+};
 
 export const API_TYPE = {
   GET: "get",
@@ -96,8 +94,6 @@ export const SCREEN_PATH = {
   RATE_DECK_GENERATE_VIEW: "/customer/rate-deck/:id",
   RATE_DECK_APPROVEL: "rate-deck-approvel/:id",
 
-
-
   SIP_TRUNK_LIST: "/siptrunk",
   ADD_NEW_SIP_TRUNK: "/siptrunk/register",
   SIP_TRUNK_LIST_UNIQUE: "/siptrunk/:id",
@@ -110,10 +106,9 @@ export const SCREEN_PATH = {
   ADD_NEW_SIP_TRUNK_CARRIER: "/carrier/siptrunk/register",
   SIP_TRUNK_LIST_UNIQUE_CARRIER: "/carrier/siptrunk/:id",
 
-  RATE_DECK_CARRIER:"carrier/rate-deck",
+  RATE_DECK_CARRIER: "carrier/rate-deck",
 
   SETTINGS: "/settings",
-
 };
 // ----------------------------------------NAVIGATION----------------------------------
 import {
@@ -541,7 +536,10 @@ export const POPULATE_INTERMINATE_AS = [
   { value: "Copy of Interstate", label: "Copy of Interstate" },
   { value: "Higher of Inter/Intra", label: "Higher of Inter/Intra" },
   { value: "Lower of Inter/Intra", label: "Lower of Inter/Intra" },
-  { value: "True LCR of Carrier Indeterminate", label: "True LCR of Carrier Indeterminate" },
+  {
+    value: "True LCR of Carrier Indeterminate",
+    label: "True LCR of Carrier Indeterminate",
+  },
 ];
 
 export const ROUNDING_PRECISION = [
@@ -552,12 +550,10 @@ export const ROUNDING_PRECISION = [
   { value: 1, label: "1" },
 ];
 export const ROUNDING_METHOD = [
-  { value:"Round up", label: "Round up" },
+  { value: "Round up", label: "Round up" },
   { value: "True Math", label: "True Math" },
-  { value:"Round down" , label: "Round down" },
+  { value: "Round down", label: "Round down" },
 ];
-
-
 
 export const BILLING_TYPE_OPTIONS = [
   { value: "dialed_number", label: "Dialed Number" },
@@ -575,7 +571,6 @@ export const BILLING_INCREMENT_OPTIONS = [
   { value: 24, label: "24" },
   { value: 30, label: "30" },
   { value: 60, label: "60" },
-
 ];
 export const DIGIT_USED = [
   { value: 2, label: "2" },
@@ -599,24 +594,47 @@ export const BUILD_OFF_PLACE_CARRIER = [
   { value: "5th", label: "5th" },
 ];
 
-
-export const ROUTING_TABS={
-  LCR :'LCR',
-  PERCENTAGE : 'Percentage',
-}
-
-
+export const ROUTING_TABS = {
+  LCR: "LCR",
+  PERCENTAGE: "Percentage",
+};
 
 export const CUSTOMER_STATUS_CONFIG = {
-    true: { label: "Active", variant: "default" },
-    false: { label: "In Active", variant: "secondary" },
-  };
+  true: { label: "Active", variant: "default" },
+  false: { label: "In Active", variant: "secondary" },
+};
 
+export const DAYS_NOTICE_RATE_DECK = [
+  { value: "immediately", label: "Immediately" }, // Add "Immediately" as the first option
+  ...Array.from({ length: 30 }, (_, index) => {
+    const day = index + 1;
+    return { value: day.toString(), label: day }; // Convert to string
+  }),
+];
 
-  export const DAYS_NOTICE_RATE_DECK = [
-    { value: "immediately", label: "Immediately" }, // Add "Immediately" as the first option
-    ...Array.from({ length: 30 }, (_, index) => {
-      const day = index + 1;
-      return { value: day.toString(), label: day }; // Convert to string
-    }),
-  ];
+export const COLUMN_TO_MAP_UPLOAD_RATE_DECK = [
+  {
+    name: "npa_nxx",
+    label: "NPA NXX Column",
+    required: true,
+    placeholder: "Select NPA NXX column",
+  },
+  {
+    name: "interstate_rate",
+    label: "Interstate Rate Column",
+    required: true,
+    placeholder: "Select Interstate Rate column",
+  },
+  {
+    name: "intrastate_rate",
+    label: "Intrastate Rate Column",
+    required: true,
+    placeholder: "Select Intrastate Rate column",
+  },
+  {
+    name: "indeterminate_rate",
+    label: "Indeterminate Rate Column",
+    required: true,
+    placeholder: "Select Indeterminate Rate column",
+  },
+];

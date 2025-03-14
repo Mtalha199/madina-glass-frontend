@@ -248,6 +248,7 @@ const StirAndShaken = ({ form, MODE, TRUNK_ID = null }) => {
                 isOpen={openSingle}
                 onOpenChange={handleDrawerClose}
                 onSave={() => formStarShaken.handleSubmit(onSubmit)()}
+                loading={loading}
                 trigger={
                   <Button
                     type="button"
