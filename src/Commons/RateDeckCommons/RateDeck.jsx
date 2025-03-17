@@ -11,7 +11,7 @@ import {
   SCREEN_PATH,
   TOAST_MESSAGES,
 } from "@/Constant";
-import { CalendarIcon, Plus, Server } from "lucide-react";
+import { CalendarIcon, Download, Plus, Server } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import CommonDrawer from "../DrawerCommon";
@@ -39,11 +39,25 @@ import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import CommonFileUpload from "../CommonFileUploading";
 import { SelectAndView } from "@/components/Forms/CustomerForms/InputFieldAndView";
+import { Loader } from "../Loader";
+import { DOWNLOADFILE } from "../DownloadFile";
 const RateDeck = ({ CUSTOMER = true }) => {
   const navigate = useNavigate();
   const formRateDeck = useRateDeckUpload();
   const formRateDeckWithSipTrunk = useRateDeckUploadWithSipTrunk();
   const form = CUSTOMER ? formRateDeck : formRateDeckWithSipTrunk;
+  const [loadingDownload, setloadingDownload] = useState(false);
+  const [loaderDownload, setLoaderDownload] = useState({});
+  const handleDownload = async (id) => {
+    setLoaderDownload((prev) => ({ ...prev, [id]: true }));
+    await DOWNLOADFILE(
+      `${API_END_POINT.RATE_DECK}/download/${id}`,
+      "Rate deck",
+      setloadingDownload,
+      "CSV file download successfully"
+    );
+    setLoaderDownload((prev) => ({ ...prev, [id]: false }));
+  };
   const columns = [
     {
       header: "Name",
@@ -60,6 +74,31 @@ const RateDeck = ({ CUSTOMER = true }) => {
     },
 
     { header: "Effective Date", accessorKey: "min_profit" },
+    {
+      header: "Actions",
+
+      cell: ({ row }) => {
+        const ID = row.getValue("id");
+        const isLoading = loaderDownload[ID] || false;
+        return (
+          <div className="flex space-x-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => handleDownload(ID)}
+            >
+              {isLoading ? (
+                <Loader size={60} />
+              ) : (
+                <>
+                  <Download className="mr-2 h-4 w-4" /> Download
+                </>
+              )}
+            </Button>
+          </div>
+        );
+      },
+    },
   ];
   const [uploadData, setUploadData] = useState(null);
   const [loading, setloading] = useState(false);
@@ -78,19 +117,19 @@ const RateDeck = ({ CUSTOMER = true }) => {
   const [open, setOpen] = useState(false);
   const [siptrunkData, setSipTrunkData] = useState([]);
 
-  const handleDrawerCloseBulk =async () => {
+  const handleDrawerCloseBulk = async () => {
     form.reset();
     setOpen(!open);
-    if(open === false && CUSTOMER === false){
-    await APICALL(
-      API_TYPE.GET,
-      `${API_END_POINT.ALL_GROUP_CARRIER}?extend=true&carrier=1`,
-      setloading,
-      null,
-      setSipTrunkData,
-      setCountSipTrunk
-    );
-  }
+    if (open === false && CUSTOMER === false) {
+      await APICALL(
+        API_TYPE.GET,
+        `${API_END_POINT.ALL_GROUP_CARRIER}?extend=true&carrier=1`,
+        setloading,
+        null,
+        setSipTrunkData,
+        setCountSipTrunk
+      );
+    }
   };
   useEffect(() => {
     const debounceTimer = setTimeout(() => {
@@ -100,7 +139,9 @@ const RateDeck = ({ CUSTOMER = true }) => {
     return () => clearTimeout(debounceTimer);
   }, [page, limit, orderBy, order, search]);
   const getData = async () => {
-    const API_END= CUSTOMER ? `${API_END_POINT.RATE_DECK}?carrier=0` : `${API_END_POINT.RATE_DECK}?carrier=1`;
+    const API_END = CUSTOMER
+      ? `${API_END_POINT.RATE_DECK}?carrier=0`
+      : `${API_END_POINT.RATE_DECK}?carrier=1`;
     await APICALL(
       API_TYPE.GET,
       API_END,
@@ -109,7 +150,6 @@ const RateDeck = ({ CUSTOMER = true }) => {
       setData,
       setCount
     );
-    
   };
   const handleSort = (column) => {
     if (orderBy === column) {
