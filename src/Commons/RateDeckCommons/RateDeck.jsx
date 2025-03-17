@@ -51,7 +51,7 @@ const RateDeck = ({ CUSTOMER = true }) => {
   const handleDownload = async (id) => {
     setLoaderDownload((prev) => ({ ...prev, [id]: true }));
     await DOWNLOADFILE(
-      `${API_END_POINT.RATE_DECK}/download/${id}`,
+      `${API_END_POINT.RATE_DECK}'download/internal/${id}`,
       "Rate deck",
       setloadingDownload,
       "CSV file download successfully"
