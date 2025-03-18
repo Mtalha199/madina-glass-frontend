@@ -93,8 +93,8 @@ const RateDeckApproval = () => {
         "CSV file download successfully",
         false
       );
-
-      if (response !== undefined) {
+      console.log(response,"respisein")
+      if (response == true) {
         await axios.put(
           `${import.meta.env.VITE_BASE_URL}${
             API_END_POINT.APPROVED_RATE_DECK

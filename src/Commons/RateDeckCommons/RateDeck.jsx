@@ -41,6 +41,7 @@ import CommonFileUpload from "../CommonFileUploading";
 import { SelectAndView } from "@/components/Forms/CustomerForms/InputFieldAndView";
 import { Loader } from "../Loader";
 import { DOWNLOADFILE } from "../DownloadFile";
+import AssignRateDeck from "./AssignRateDeck";
 const RateDeck = ({ CUSTOMER = true }) => {
   const navigate = useNavigate();
   const formRateDeck = useRateDeckUpload();
@@ -51,7 +52,7 @@ const RateDeck = ({ CUSTOMER = true }) => {
   const handleDownload = async (id) => {
     setLoaderDownload((prev) => ({ ...prev, [id]: true }));
     await DOWNLOADFILE(
-      `${API_END_POINT.RATE_DECK}'download/internal/${id}`,
+      `${API_END_POINT.RATE_DECK}/download/internal/${id}`,
       "Rate deck",
       setloadingDownload,
       "CSV file download successfully"
@@ -82,19 +83,26 @@ const RateDeck = ({ CUSTOMER = true }) => {
         const isLoading = loaderDownload[ID] || false;
         return (
           <div className="flex space-x-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => handleDownload(ID)}
-            >
-              {isLoading ? (
-                <Loader size={60} />
-              ) : (
-                <>
-                  <Download className="mr-2 h-4 w-4" /> Download
-                </>
-              )}
-            </Button>
+            {isLoading ? (
+              <>
+                <Button variant="outline" size="sm">
+                  <Loader size={20} LOADING={false} /> Download
+                </Button>
+              </>
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleDownload(ID)}
+              >
+                <Download className="mr-2 h-4 w-4" /> Download
+              </Button>
+            )}
+            {
+              CUSTOMER && (
+                <AssignRateDeck SIP_TRUNK_IN_RATE_DECK={false} />
+              )
+            }
           </div>
         );
       },

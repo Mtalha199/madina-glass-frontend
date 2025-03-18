@@ -51,6 +51,7 @@ export const DOWNLOADFILE = async (
         });
         link.parentNode.removeChild(link);
       }
+      return true
 
     } catch (error) {
       toast({

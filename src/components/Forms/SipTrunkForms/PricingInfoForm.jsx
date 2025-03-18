@@ -1,78 +1,27 @@
 import React, { useEffect, useState } from "react";
 import {
   CheckboxFieldAndView,
-  InputFieldAndView,
   SelectAndView,
 } from "../CustomerForms/InputFieldAndView";
 import {
-  API_END_POINT,
-  API_TYPE,
   BILLING_INCREMENT_OPTIONS,
   BILLING_TYPE_OPTIONS,
   DATA_VIEW_MODE,
-  DAYS_NOTICE_RATE_DECK,
   DIGIT_USED,
   PRICING_ROUNDING_METHOD,
-  TOAST_MESSAGES,
 } from "@/Constant";
-import { CalendarIcon, Network, Plus, Server } from "lucide-react";
-import { Label } from "@/components/ui/label";
+import {  Server } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useFormContext } from "react-hook-form";
-import CommonDrawer from "@/Commons/DrawerCommon";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { useAssignRateDeck } from "@/components/Hooks/CustomHooks";
-import {
-  ComboboxCommon,
-  InputCommon,
-  SelectCommon,
-} from "@/Commons/FormCommons";
-import { APICALL } from "@/components/Api/ApiCall";
-import { Input } from "@/components/ui/input";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { format } from "date-fns";
-import { Calendar } from "@/components/ui/calendar";
-import { cn } from "@/lib/utils";
+import AssignRateDeck from "@/Commons/RateDeckCommons/AssignRateDeck";
 function PricingInfoForm({ MODE, DATA, form, COMPANY_NAME, TRUNK_ID }) {
   const [edit, setEdit] = useState(false);
   const { setValue, watch } = useFormContext();
-  const formAssignRateDeck = useAssignRateDeck();
 
-  const [openDrawer, setOpenDrawer] = useState(false);
-  const [loading, setloading] = useState(false);
-  const [rateDeckData, setRateDeckData] = useState([]);
-  const [count, setCount] = useState([]);
+  //   formAssignRateDeck.reset();
+  //   setOpenDrawer(!openDrawer);
+  // };
 
-  const handleDrawerClose = () => {
-    formAssignRateDeck.reset();
-    setOpenDrawer(!openDrawer);
-  };
-
-  useEffect(() => {
-    getData();
-  }, []);
-  const getData = async () => {
-    await APICALL(
-      API_TYPE.GET,
-      API_END_POINT.ALL_RATE_DECK,
-      setloading,
-      null,
-      setRateDeckData,
-      setCount
-    );
-  };
   useEffect(() => {
     if (DATA) {
       setValue("billing_type", DATA?.billing_type);
@@ -95,28 +44,6 @@ function PricingInfoForm({ MODE, DATA, form, COMPANY_NAME, TRUNK_ID }) {
     }
   }, [DATA, setValue]);
 
-  async function onSubmit(data) {
-    console.log(data);
-    const payload = {
-      sip_trunk_id: Number(TRUNK_ID),
-      rate_deck_id: Number(data?.rate_deck),
-      days_notice: data?.days_notice,
-      effective_date: new Date(data.effective_date).toISOString(),
-    };
-
-    const response = await APICALL(
-      API_TYPE.POST,
-      API_END_POINT.ASSIGN_RATE_DECK,
-      setloading,
-      payload,
-      null,
-      null,
-      TOAST_MESSAGES.RATE_DECK_ASSIGN
-    );
-    if (response !== undefined) {
-      setOpenDrawer(false);
-    }
-  }
   return (
     <div className="">
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4 border-t mt-4 pt-4 ">
@@ -142,110 +69,7 @@ function PricingInfoForm({ MODE, DATA, form, COMPANY_NAME, TRUNK_ID }) {
         </div>
         {MODE === DATA_VIEW_MODE.VIEW && (
           <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
-            <CommonDrawer
-              title="Assign Rate Deck"
-              description="Please choose a rate deck and days notice and effective data"
-              isOpen={openDrawer}
-              onOpenChange={handleDrawerClose}
-              onSave={() => formAssignRateDeck.handleSubmit(onSubmit)()}
-              trigger={
-                <Button type="button" variant="outline" size="sm">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Assign Rate Deck
-                </Button>
-              }
-            >
-              <Form {...formAssignRateDeck}>
-                <form onSubmit={formAssignRateDeck.handleSubmit(onSubmit)}>
-                  {InputFieldAndView({
-                    LABEL: "Company",
-                    NAME: "company",
-                    TYPE: "text",
-                    PLACEHOLDER: "e.g., Global Voice Solutions",
-                    ICON: <Network />,
-                    VALUE: COMPANY_NAME,
-                    IS_REQUIRED: true,
-                    MODE: MODE,
-                    EDIT: edit,
-                    FORM: form,
-                  })}
-                  <div className="mt-4">
-                    <SelectCommon
-                      LABEL={"Rate Deck"}
-                      NAME={"rate_deck"}
-                      OPTIONS={rateDeckData?.map((item) => ({
-                        value: String(item?.id),
-                        label: item?.file_name,
-                      }))}
-                      CONTROL={formAssignRateDeck.control}
-                      IS_REQUIRED={true}
-                      PLACEHOLDER={"Select Rate Deck"}
-                    />
-                  </div>
-                  <div className="mt-4">
-                    {/* <SelectCommon
-                      LABEL={"Days Notice"}
-                      NAME={"days_notice"}
-                      OPTIONS={DAYS_NOTICE_RATE_DECK}
-                      CONTROL={formAssignRateDeck.control}
-                      IS_REQUIRED={true}
-                      PLACEHOLDER={"Select Rate Deck"}
-                    /> */}
-                    {/* <ComboboxCommon
-                      LABEL={"Days Notice"}
-                      NAME={"days_notice"}
-                      OPTIONS={DAYS_NOTICE_RATE_DECK}
-                      CONTROL={formAssignRateDeck.control}
-                      IS_REQUIRED={true}
-                      PLACEHOLDER={"Select Rate Deck"}
-                    /> */}
-                    <div className="mt-4">
-                      <FormField
-                        control={formAssignRateDeck.control}
-                        name="effective_date"
-                        render={({ field }) => (
-                          <FormItem className="flex flex-col">
-                            <FormLabel>Effective Date</FormLabel>
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <FormControl>
-                                  <Button
-                                    variant={"outline"}
-                                    className={cn(
-                                      "w-full pl-3 text-left font-normal",
-                                      !field.value && "text-muted-foreground"
-                                    )}
-                                  >
-                                    {field.value ? (
-                                      format(field.value, "PPP")
-                                    ) : (
-                                      <span>Select effective date</span>
-                                    )}
-                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                  </Button>
-                                </FormControl>
-                              </PopoverTrigger>
-                              <PopoverContent
-                                className="w-auto p-0"
-                                align="start"
-                              >
-                                <Calendar
-                                  mode="single"
-                                  selected={field.value}
-                                  onSelect={field.onChange}
-                                  initialFocus
-                                />
-                              </PopoverContent>
-                            </Popover>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  </div>
-                </form>
-              </Form>
-            </CommonDrawer>
+            <AssignRateDeck COMPANY_NAME={COMPANY_NAME} TRUNK_ID={TRUNK_ID}   />
           </div>
         )}
       </div>
