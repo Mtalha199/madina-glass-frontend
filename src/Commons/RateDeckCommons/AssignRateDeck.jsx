@@ -15,7 +15,7 @@ import {
   InputFieldAndView,
   SelectAndView,
 } from "@/components/Forms/CustomerForms/InputFieldAndView";
-import { SelectCommon } from "../FormCommons";
+import { ComboboxCommon, SelectCommon } from "../FormCommons";
 import {
   Popover,
   PopoverContent,
@@ -39,23 +39,23 @@ const AssignRateDeck = ({
   sipTrunkData = [],
   rateDeckData = [],
 }) => {
-  const form = SIP_TRUNK_IN_RATE_DECK 
-    ? useAssignRateDeck({ inSipTrunk: true }) 
+  const form = SIP_TRUNK_IN_RATE_DECK
+    ? useAssignRateDeck({ inSipTrunk: true })
     : useAssignRateDeck({ inRateDeck: true });
-  
+
   const [openDrawer, setOpenDrawer] = useState(false);
   const [loading, setloading] = useState(false);
-  
+
   const handleDrawerClose = () => {
     form.reset();
     setOpenDrawer(!openDrawer);
   };
-  
+
   async function onSubmit(data) {
     console.log(data);
-    
+
     // Create the appropriate payload based on the context
-    const payload = SIP_TRUNK_IN_RATE_DECK 
+    const payload = SIP_TRUNK_IN_RATE_DECK
       ? {
           sip_trunk_id: Number(TRUNK_ID),
           rate_deck_id: Number(data?.rate_deck),
@@ -76,12 +76,12 @@ const AssignRateDeck = ({
       null,
       TOAST_MESSAGES.RATE_DECK_ASSIGN
     );
-    
+
     if (response !== undefined) {
       setOpenDrawer(false);
     }
   }
-  
+
   return (
     <>
       <CommonDrawer
@@ -113,10 +113,10 @@ const AssignRateDeck = ({
                 EDIT: false,
                 FORM: form,
               })}
-              
+
             {SIP_TRUNK_IN_RATE_DECK && (
               <div className="mt-4">
-                <SelectCommon
+                <ComboboxCommon
                   LABEL={"Rate Deck"}
                   NAME={"rate_deck"}
                   OPTIONS={rateDeckData?.map((item) => ({
@@ -129,7 +129,7 @@ const AssignRateDeck = ({
                 />
               </div>
             )}
-            
+
             {!SIP_TRUNK_IN_RATE_DECK && (
               <div className="mt-4">
                 {SelectAndView({

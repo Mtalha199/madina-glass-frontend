@@ -266,7 +266,25 @@ export const ComboboxCommon = ({
       name={NAME}
       render={({ field, fieldState }) => {
         const [open, setOpen] = React.useState(false);
-
+        const commandListRef = React.useRef(null);
+        React.useEffect(() => {
+          const handleWheel = (e) => {
+            if (!commandListRef.current) return;
+            const rect = commandListRef.current.getBoundingClientRect();
+            const isMouseOverCombobox =
+              e.clientX >= rect.left &&
+              e.clientX <= rect.right &&
+              e.clientY >= rect.top &&
+              e.clientY <= rect.bottom;
+            if (isMouseOverCombobox) {
+              e.stopPropagation();
+            }
+          };
+          window.addEventListener("wheel", handleWheel, { passive: false });
+          return () => {
+            window.removeEventListener("wheel", handleWheel);
+          };
+        }, [open]);
         return (
           <FormItem>
             <div className="flex items-center space-x-2 mb-2">
@@ -301,10 +319,17 @@ export const ComboboxCommon = ({
                     <CommandInput
                       placeholder="Search options..."
                       className="h-9"
+                     
                     />
                     <CommandList>
                       <CommandEmpty>No options found.</CommandEmpty>
-                      <CommandGroup>
+                      <CommandGroup
+                      ref={commandListRef}
+                      className="max-h-60 overflow-y-auto relative"
+                      onWheel={(e) => {
+                        e.stopPropagation();
+                      }}
+                      >
                         {OPTIONS.map((option) => (
                           <CommandItem
                             key={option.value}
