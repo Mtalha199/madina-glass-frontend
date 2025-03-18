@@ -26,7 +26,7 @@ const CommonDrawer = ({
   height,
   loading,
 }) => {
-  const contentHeight = height || "90vh";
+  const contentHeight = height;
   const maxHeightContent = `calc(${contentHeight} - 120px)`;
 
   return (

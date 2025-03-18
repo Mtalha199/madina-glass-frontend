@@ -52,9 +52,6 @@ const AssignRateDeck = ({
   };
 
   async function onSubmit(data) {
-    console.log(data);
-
-    // Create the appropriate payload based on the context
     const payload = SIP_TRUNK_IN_RATE_DECK
       ? {
           sip_trunk_id: Number(TRUNK_ID),
@@ -63,7 +60,7 @@ const AssignRateDeck = ({
         }
       : {
           sip_trunk_id: Number(data?.sip_trunk_id),
-          rate_deck_id: Number(TRUNK_ID), // Assuming TRUNK_ID is rate_deck_id in this context
+          rate_deck_id: Number(TRUNK_ID),
           effective_date: new Date(data.effective_date).toISOString(),
         };
 

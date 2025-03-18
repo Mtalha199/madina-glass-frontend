@@ -332,8 +332,8 @@ export const ComboboxCommon = ({
                       >
                         {OPTIONS.map((option) => (
                           <CommandItem
-                            key={option.value}
-                            value={option.value}
+                            key={option.label}
+                            value={option.label}
                             onSelect={(currentValue) => {
                               field.onChange(
                                 currentValue === field.value ? "" : currentValue
