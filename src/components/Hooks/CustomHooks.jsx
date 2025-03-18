@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AddGroup, AddUser, AssignRateDeckSchema, BasicSipTrunkSchema, ContactFormSchema, ContactFormSchemaCarrier, ContactFormSchemaCarrierEdit, ContactFormSchemaEdit, IpWhitelistSchema, IpWhitelistSchemaForEdit, LCRForm, loginFormSchema, NewGroupFormSchema, NewUrlFormSchema, PercentageForm, PricingInfochema, RateDeckForm, rateDeckUploadBaseSchema, rateDeckUploadWithSipTrunkSchema, SignUpFormSchema, SipTrunkForm, StirShakenFormBulk, StirShakenFormSingle, StirShakenSchema } from "../Schema/auth";
+import { AddGroup, AddUser, AssignRateDeckInRateDeck, AssignRateDeckInSipTrunk, AssignRateDeckSchema, BasicSipTrunkSchema, ContactFormSchema, ContactFormSchemaCarrier, ContactFormSchemaCarrierEdit, ContactFormSchemaEdit, IpWhitelistSchema, IpWhitelistSchemaForEdit, LCRForm, loginFormSchema, NewGroupFormSchema, NewUrlFormSchema, PercentageForm, PricingInfochema, RateDeckForm, rateDeckUploadBaseSchema, rateDeckUploadWithSipTrunkSchema, SignUpFormSchema, SipTrunkForm, StirShakenFormBulk, StirShakenFormSingle, StirShakenSchema } from "../Schema/auth";
 import { ATTESTATION_OPTIONS, ATTESTATION_OPTIONS_DEFAULT, TRUNK_TYPE_OPTIONS, VERIFY_CALL_TOKEN } from "@/Constant";
 
 export function useLoginForm() {
@@ -329,14 +329,37 @@ export function usePricingInfo() {
     },
   });
 }
-export function useAssignRateDeck() {
+// export function useAssignRateDeck() {
+//   return useForm({
+//     resolver: zodResolver(AssignRateDeckSchema),
+//     defaultValues: {
+//       rate_deck: "",
+//       // days_notice: "",
+//       effective_date: "",
+//     },
+//   });
+// }
+export function useAssignRateDeck(options = {}) {
+  const { inSipTrunk = false, inRateDeck = false } = options;
+  
+  // Determine which schema to use
+  let schema = AssignRateDeckSchema;
+  if (inSipTrunk) {
+    schema = AssignRateDeckInSipTrunk;
+  } else if (inRateDeck) {
+    schema = AssignRateDeckInRateDeck;
+  }
+  
+  // Set appropriate default values
+  const defaultValues = {
+    effective_date: "",
+    ...(inSipTrunk ? { rate_deck: "" } : {}),
+    ...(inRateDeck ? { sip_trunk_id: "" } : {})
+  };
+  
   return useForm({
-    resolver: zodResolver(AssignRateDeckSchema),
-    defaultValues: {
-      rate_deck: "",
-      // days_notice: "",
-      effective_date: "",
-    },
+    resolver: zodResolver(schema),
+    defaultValues,
   });
 }
 export function useStirShakenSingle(){

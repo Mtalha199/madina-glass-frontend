@@ -503,12 +503,20 @@ export const PricingInfochema = z.object({
   override_call_extending: z.boolean().optional(),
 });
 export const AssignRateDeckSchema = z.object({
-  rate_deck: z.string().min(1, "Rate deck is required"),
-  // days_notice: z.string().min(1, "Days notice is required"),
   effective_date: z.date({
     required_error: "Effective date is required",
   }),
 });
+export const AssignRateDeckInSipTrunk = AssignRateDeckSchema.extend(
+  {
+    rate_deck: z.string().min(1, "Rate deck is required"),
+  }
+);
+export const AssignRateDeckInRateDeck = AssignRateDeckSchema.extend(
+  {
+    sip_trunk_id: z.string().min(1, "Sip Trunk is required"),
+  }
+);
 export const IpWhitelistSchemaForEdit = z.object({
   ipEntries: z
     .array(

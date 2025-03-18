@@ -100,7 +100,7 @@ const RateDeck = ({ CUSTOMER = true }) => {
             )}
             {
               CUSTOMER && (
-                <AssignRateDeck SIP_TRUNK_IN_RATE_DECK={false} />
+                <AssignRateDeck SIP_TRUNK_IN_RATE_DECK={false} TRUNK_ID={ID} sipTrunkData={siptrunkData}  />
               )
             }
           </div>
@@ -208,7 +208,21 @@ const RateDeck = ({ CUSTOMER = true }) => {
     setUploadData(data);
     console.log(data);
   };
-
+  useEffect(() => {
+    if(CUSTOMER===true){
+      getSiptrunkData();
+    }
+    }, []);
+  const getSiptrunkData = async () => {
+    await APICALL(
+      API_TYPE.GET,
+      `${API_END_POINT.ALL_GROUP_CARRIER}?extend=true&carrier=0`,
+      setloading,
+      null,
+      setSipTrunkData,
+      setCount
+    );
+  };
   return (
     <>
       <div className="p-6">
@@ -227,7 +241,7 @@ const RateDeck = ({ CUSTOMER = true }) => {
               title="Upload File"
               description="Please upload file and choose the header to map"
               isOpen={open}
-              onOpenChange={handleDrawerCloseBulk}
+              onOpenChange={()=>handleDrawerCloseBulk}
               onSave={() => form.handleSubmit(onSubmitBulk)()}
               loading={loading}
               trigger={

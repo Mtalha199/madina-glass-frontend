@@ -4,6 +4,8 @@ import {
   SelectAndView,
 } from "../CustomerForms/InputFieldAndView";
 import {
+  API_END_POINT,
+  API_TYPE,
   BILLING_INCREMENT_OPTIONS,
   BILLING_TYPE_OPTIONS,
   DATA_VIEW_MODE,
@@ -14,13 +16,27 @@ import {  Server } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useFormContext } from "react-hook-form";
 import AssignRateDeck from "@/Commons/RateDeckCommons/AssignRateDeck";
+import { APICALL } from "@/components/Api/ApiCall";
 function PricingInfoForm({ MODE, DATA, form, COMPANY_NAME, TRUNK_ID }) {
   const [edit, setEdit] = useState(false);
   const { setValue, watch } = useFormContext();
-
-  //   formAssignRateDeck.reset();
-  //   setOpenDrawer(!openDrawer);
-  // };
+  const [loading, setloading] = useState(false);
+  const [rateDeckData, setRateDeckData] = useState([]);
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+      getData();
+  }, []);
+  const getData = async () => {
+    await APICALL(
+      API_TYPE.GET,
+      API_END_POINT.ALL_RATE_DECK,
+      setloading,
+      null,
+      setRateDeckData,
+      setCount
+    );
+  };
+  
 
   useEffect(() => {
     if (DATA) {
@@ -69,7 +85,7 @@ function PricingInfoForm({ MODE, DATA, form, COMPANY_NAME, TRUNK_ID }) {
         </div>
         {MODE === DATA_VIEW_MODE.VIEW && (
           <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
-            <AssignRateDeck COMPANY_NAME={COMPANY_NAME} TRUNK_ID={TRUNK_ID}   />
+            <AssignRateDeck COMPANY_NAME={COMPANY_NAME} TRUNK_ID={TRUNK_ID} rateDeckData={rateDeckData}   />
           </div>
         )}
       </div>
