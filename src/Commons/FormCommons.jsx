@@ -335,9 +335,7 @@ export const ComboboxCommon = ({
                             key={option.label}
                             value={option.label}
                             onSelect={(currentValue) => {
-                              field.onChange(
-                                currentValue === field.value ? "" : currentValue
-                              );
+                              field.onChange(option.value === field.value ? "" : option.value);
                               setOpen(false);
                             }}
                           >

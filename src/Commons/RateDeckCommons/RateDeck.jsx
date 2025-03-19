@@ -42,11 +42,14 @@ import { SelectAndView } from "@/components/Forms/CustomerForms/InputFieldAndVie
 import { Loader } from "../Loader";
 import { DOWNLOADFILE } from "../DownloadFile";
 import AssignRateDeck from "./AssignRateDeck";
+import { pollInProgressItems } from "@/components/Utils/Utils";
 const RateDeck = ({ CUSTOMER = true }) => {
   const navigate = useNavigate();
   const formRateDeck = useRateDeckUpload();
   const formRateDeckWithSipTrunk = useRateDeckUploadWithSipTrunk();
   const form = CUSTOMER ? formRateDeck : formRateDeckWithSipTrunk;
+
+
   const [loadingDownload, setloadingDownload] = useState(false);
   const [loaderDownload, setLoaderDownload] = useState({});
   const handleDownload = async (id) => {
@@ -81,6 +84,7 @@ const RateDeck = ({ CUSTOMER = true }) => {
       cell: ({ row }) => {
         const ID = row.getValue("id");
         const isLoading = loaderDownload[ID] || false;
+        // {isItemLoading(ID) &&  <p>Talha</p>}
         return (
           <div className="flex space-x-2">
             {isLoading ? (
@@ -139,6 +143,7 @@ const RateDeck = ({ CUSTOMER = true }) => {
       );
     }
   };
+
   useEffect(() => {
     const debounceTimer = setTimeout(() => {
       getData();
@@ -159,6 +164,8 @@ const RateDeck = ({ CUSTOMER = true }) => {
       setCount
     );
   };
+  // const { isItemLoading } = pollInProgressItems(data, getData);
+
   const handleSort = (column) => {
     if (orderBy === column) {
       setOrder((prev) => (prev === "asc" ? "desc" : "asc"));
@@ -241,7 +248,7 @@ const RateDeck = ({ CUSTOMER = true }) => {
               title="Upload File"
               description="Please upload file and choose the header to map"
               isOpen={open}
-              onOpenChange={()=>handleDrawerCloseBulk}
+              onOpenChange={handleDrawerCloseBulk}
               onSave={() => form.handleSubmit(onSubmitBulk)()}
               loading={loading}
               trigger={

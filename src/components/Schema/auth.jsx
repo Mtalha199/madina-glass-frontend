@@ -624,9 +624,7 @@ export const RateDeckForm = z
       required_error: "Non-US/Canada country code 1 is required",
     }),
     // user_defined: z.boolean({ required_error: "User defined is required" }),
-    build_off_which_place_carrier: z
-      .string()
-      .min(1, { message: "Build off which place carrier is required" }),
+    build_off_which_place_carrier:z.coerce.number().min(1, { message: "Build off which place carrier is required" }),
     max_devision: z.coerce
       .number()
       .min(1, { message: "Max deviation is required" }),

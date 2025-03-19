@@ -532,14 +532,14 @@ export const BLOCK_MATCHING_SRC_DST = [
 ];
 
 export const POPULATE_INTERMINATE_AS = [
-  { value: "Copy of intrastate", label: "Copy of intrastate" },
-  { value: "Copy of Interstate", label: "Copy of Interstate" },
-  { value: "Higher of Inter/Intra", label: "Higher of Inter/Intra" },
-  { value: "Lower of Inter/Intra", label: "Lower of Inter/Intra" },
+{ value: "COPY_OF_INTRASTATE", label: "Copy of intrastate" },
+  { value: "COPY_OF_INTERSTATE", label: "Copy of Interstate" },
+  { value: "COPY_OF_HIGER", label: "Higher of Inter/Intra" },
+  { value: "COPY_OF_LOWER", label: "Lower of Inter/Intra" },
   {
-    value: "True LCR of Carrier Indeterminate",
+    value: "COPY_TRUE_LCR",
     label: "True LCR of Carrier Indeterminate",
-  },
+  }
 ];
 
 export const ROUNDING_PRECISION = [
@@ -550,9 +550,9 @@ export const ROUNDING_PRECISION = [
   { value: 1, label: "1" },
 ];
 export const ROUNDING_METHOD = [
-  { value: "Round up", label: "Round up" },
-  { value: "True Math", label: "True Math" },
-  { value: "Round down", label: "Round down" },
+  { value: "ROUND_UP", label: "Round up" },
+  { value: "TRUE_MATH", label: "True Math" },
+  { value: "ROUND_DOWN", label: "Round down" },
 ];
 
 export const BILLING_TYPE_OPTIONS = [
@@ -587,11 +587,11 @@ export const PRICING_ROUNDING_METHOD = [
 ];
 
 export const BUILD_OFF_PLACE_CARRIER = [
-  { value: "1st", label: "1st" },
-  { value: "2nd", label: "2nd" },
-  { value: "3rd", label: "3rd" },
-  { value: "4th", label: "4th" },
-  { value: "5th", label: "5th" },
+  { value: 1, label: "1st" },
+  { value: 2, label: "2nd" },
+  { value: 3, label: "3rd" },
+  { value: 4, label: "4th" },
+  { value: 5, label: "5th" },
 ];
 
 export const ROUTING_TABS = {

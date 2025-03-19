@@ -23,7 +23,7 @@ const CommonDrawer = ({
   onSave,
   showActions = true,
   fullWidth = false,
-  height,
+  height="90vh",
   loading,
 }) => {
   const contentHeight = height;

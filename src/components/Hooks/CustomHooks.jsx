@@ -329,20 +329,10 @@ export function usePricingInfo() {
     },
   });
 }
-// export function useAssignRateDeck() {
-//   return useForm({
-//     resolver: zodResolver(AssignRateDeckSchema),
-//     defaultValues: {
-//       rate_deck: "",
-//       // days_notice: "",
-//       effective_date: "",
-//     },
-//   });
-// }
+
 export function useAssignRateDeck(options = {}) {
   const { inSipTrunk = false, inRateDeck = false } = options;
   
-  // Determine which schema to use
   let schema = AssignRateDeckSchema;
   if (inSipTrunk) {
     schema = AssignRateDeckInSipTrunk;
@@ -350,7 +340,6 @@ export function useAssignRateDeck(options = {}) {
     schema = AssignRateDeckInRateDeck;
   }
   
-  // Set appropriate default values
   const defaultValues = {
     effective_date: "",
     ...(inSipTrunk ? { rate_deck: "" } : {}),
@@ -362,6 +351,7 @@ export function useAssignRateDeck(options = {}) {
     defaultValues,
   });
 }
+
 export function useStirShakenSingle(){
   return useForm({
       resolver: zodResolver(StirShakenFormSingle),
