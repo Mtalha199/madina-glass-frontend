@@ -76,29 +76,6 @@ const RateDeck = ({ CUSTOMER = true }) => {
         );
       },
     },
-
-    // {
-    //   header: "Name",
-    //   accessorKey: "file_name",
-    //   cell: ({ row }) => {
-    //     const fullName = row.getValue("file_name");
-    //     const id = row.getValue("id");
-    //     return (
-    //       <Link to={`/customer/rate-deck/${id}`}>
-    //         <span className="text-primary hover:underline">
-    //           {rowsLoading[id] ? (
-    //             <div className="flex items-center">
-    //               <Loader size={16} className="mr-2" />
-    //               {fullName}
-    //             </div>
-    //           ) : (
-    //             fullName
-    //           )}
-    //         </span>
-    //       </Link>
-    //     );
-    //   },
-    // },
     { header: "Effective Date", accessorKey: "min_profit" },
     {
       header: "Actions",
@@ -196,7 +173,7 @@ const RateDeck = ({ CUSTOMER = true }) => {
   };
 
   useEffect(() => {
-    pollInProgressItems(data, 2, setLoaderDownload, 5000 ,`${API_END_POINT.RATE_DECK}` ,RATE_DECK_STATE.COMPLETED);
+    pollInProgressItems(data, 30, setLoaderDownload, 10000 ,`${API_END_POINT.RATE_DECK}` ,RATE_DECK_STATE.COMPLETED);
   }, [data]);
   const handleSort = (column) => {
     if (orderBy === column) {
