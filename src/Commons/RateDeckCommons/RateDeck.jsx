@@ -49,7 +49,6 @@ const RateDeck = ({ CUSTOMER = true }) => {
   const formRateDeckWithSipTrunk = useRateDeckUploadWithSipTrunk();
   const form = CUSTOMER ? formRateDeck : formRateDeckWithSipTrunk;
 
-
   const [loadingDownload, setloadingDownload] = useState(false);
   const [loaderDownload, setLoaderDownload] = useState({});
   const handleDownload = async (id) => {
@@ -77,6 +76,28 @@ const RateDeck = ({ CUSTOMER = true }) => {
       },
     },
 
+    // {
+    //   header: "Name",
+    //   accessorKey: "file_name",
+    //   cell: ({ row }) => {
+    //     const fullName = row.getValue("file_name");
+    //     const id = row.getValue("id");
+    //     return (
+    //       <Link to={`/customer/rate-deck/${id}`}>
+    //         <span className="text-primary hover:underline">
+    //           {rowsLoading[id] ? (
+    //             <div className="flex items-center">
+    //               <Loader size={16} className="mr-2" />
+    //               {fullName}
+    //             </div>
+    //           ) : (
+    //             fullName
+    //           )}
+    //         </span>
+    //       </Link>
+    //     );
+    //   },
+    // },
     { header: "Effective Date", accessorKey: "min_profit" },
     {
       header: "Actions",
@@ -102,20 +123,29 @@ const RateDeck = ({ CUSTOMER = true }) => {
                 <Download className="mr-2 h-4 w-4" /> Download
               </Button>
             )}
-            {
-              CUSTOMER && (
-                <AssignRateDeck SIP_TRUNK_IN_RATE_DECK={false} TRUNK_ID={ID} sipTrunkData={siptrunkData}  />
-              )
-            }
+            {CUSTOMER && (
+              <AssignRateDeck
+                SIP_TRUNK_IN_RATE_DECK={false}
+                TRUNK_ID={ID}
+                sipTrunkData={siptrunkData}
+              />
+            )}
           </div>
         );
       },
     },
   ];
+
   const [uploadData, setUploadData] = useState(null);
   const [loading, setloading] = useState(false);
+  const [loadingId, setloadingId] = useState(false);
+
   const [data, setData] = useState([]);
+  const [dataId, setDataId] = useState([]);
+
   const [count, setCount] = useState(0);
+  const [countId, setCountId] = useState(0);
+
   const [countSipTrunk, setCountSipTrunk] = useState(0);
 
   const [page, setPage] = useState(1);
@@ -164,8 +194,55 @@ const RateDeck = ({ CUSTOMER = true }) => {
       setCount
     );
   };
-  // const { isItemLoading } = pollInProgressItems(data, getData);
+  useEffect(() => {
+    const checkPendingItems = () => {
+      const pendingItems = data.filter((item) => item.state !== "COMPLETED");
 
+      const newLoadingState = {};
+      pendingItems.forEach((item) => {
+        const createdDate = new Date(item.createdAt);
+        const currentTime = new Date();
+        const timeDifferenceInMinutes =
+          (currentTime - createdDate) / (1000 * 60);
+        if (timeDifferenceInMinutes < 20) {
+          newLoadingState[item.id] = true;
+        }
+      });
+      setLoaderDownload(newLoadingState);
+      if (pendingItems.length > 0) {
+        pendingItems.forEach(async (row) => {
+          const checkStatus = async () => {
+            const response = await APICALL(
+              API_TYPE.GET,
+              `${API_END_POINT.RATE_DECK}/${row.id}`,
+              setloadingId,
+              null,
+              setDataId,
+              setCountId
+            );
+            const createdDate = new Date(response.data.data.createdAt);
+            const currentTime = new Date();
+            const timeDifferenceInMinutes =
+              (currentTime - createdDate) / (1000 * 60);
+            if (response.data.data.state === "COMPLETED") {
+              delete newLoadingState[response.data.data.id];
+              setLoaderDownload(newLoadingState);
+            } else if (timeDifferenceInMinutes > 20) {
+              delete newLoadingState[response.data.data.id];
+              setLoaderDownload({ ...newLoadingState });
+            } else {
+              setTimeout(checkStatus, 5000);
+            }
+          };
+          checkStatus();
+        });
+      }
+    };
+
+    if (data && data.length > 0) {
+      checkPendingItems();
+    }
+  }, [data]);
   const handleSort = (column) => {
     if (orderBy === column) {
       setOrder((prev) => (prev === "asc" ? "desc" : "asc"));
@@ -216,10 +293,10 @@ const RateDeck = ({ CUSTOMER = true }) => {
     console.log(data);
   };
   useEffect(() => {
-    if(CUSTOMER===true){
+    if (CUSTOMER === true) {
       getSiptrunkData();
     }
-    }, []);
+  }, []);
   const getSiptrunkData = async () => {
     await APICALL(
       API_TYPE.GET,
@@ -227,7 +304,7 @@ const RateDeck = ({ CUSTOMER = true }) => {
       setloading,
       null,
       setSipTrunkData,
-      setCount
+      setCountSipTrunk
     );
   };
   return (

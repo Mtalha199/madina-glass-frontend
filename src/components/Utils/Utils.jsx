@@ -1,74 +1,49 @@
 import { useCallback, useEffect, useState } from "react";
 
-export const pollInProgressItems = (data, fetchFunction, interval = 3000) => {
-    console.log('pollInProgressItems',data)
-  const [pollingIds, setPollingIds] = useState({});
-  const [itemLoadingStates, setItemLoadingStates] = useState({});
-
-  // Start polling for an item
-  const startPolling = useCallback((id) => {
-    if (pollingIds[id]) return; // Already polling this item
-    
-    setItemLoadingStates(prev => ({ ...prev, [id]: true }));
-    
-    const timerId = setInterval(async () => {
-      try {
-        // Fetch the latest data for this specific item
-        const response = await fetchFunction(id);
-        
-        // If the status is no longer in_progress, stop polling
-        if (response && response.status !== 'in_progress') {
-          stopPolling(id);
+export const pollInProgressItems = (DATA,MAX_POLLING_TIME, fetchFunction, interval = 3000) => {
+      const checkPendingItems = () => {
+        if (!Array.isArray(DATA) || DATA.length === 0) return;
+        const pendingItems = DATA.filter((item) => item.state !== "COMPLETED");
+  
+        const newLoadingState = {};
+        pendingItems.forEach((item) => {
+          const createdDate = new Date(item.createdAt);
+          const currentTime = new Date();
+          const timeDifferenceInMinutes =
+            (currentTime - createdDate) / (1000 * 60);
+          if (timeDifferenceInMinutes < MAX_POLLING_TIME) {
+            newLoadingState[item.id] = true;
+          }
+        });
+        setLoaderDownload(newLoadingState);
+        if (pendingItems.length > 0) {
+          pendingItems.forEach(async (row) => {
+            const checkStatus = async () => {
+              const response = await APICALL(
+                API_TYPE.GET,
+                `${API_END_POINT.RATE_DECK}/${row.id}`,
+                setloadingId,
+                null,
+                setDataId,
+                setCountId
+              );
+              const createdDate = new Date(response.data.data.createdAt);
+              const currentTime = new Date();
+              const timeDifferenceInMinutes =
+                (currentTime - createdDate) / (1000 * 60);
+              if (response.data.data.state === "COMPLETED") {
+                delete newLoadingState[response.data.data.id];
+                setLoaderDownload(newLoadingState);
+              } else if (timeDifferenceInMinutes > 20) {
+                delete newLoadingState[response.data.data.id];
+                setLoaderDownload({ ...newLoadingState });
+              } else {
+                setTimeout(checkStatus, 5000);
+              }
+            };
+            checkStatus();
+          });
         }
-      } catch (error) {
-        console.error(`Error polling item ${id}:`, error);
-      }
-    }, interval);
-    
-    setPollingIds(prev => ({ ...prev, [id]: timerId }));
-  }, [pollingIds, fetchFunction, interval]);
-
-  // Stop polling for an item
-  const stopPolling = useCallback((id) => {
-    if (pollingIds[id]) {
-      clearInterval(pollingIds[id]);
-      setPollingIds(prev => {
-        const newState = { ...prev };
-        delete newState[id];
-        return newState;
-      });
-      
-      setItemLoadingStates(prev => {
-        const newState = { ...prev };
-        delete newState[id];
-        return newState;
-      });
-    }
-  }, [pollingIds]);
-
-  // Clean up all polling on unmount
-  useEffect(() => {
-    return () => {
-      Object.values(pollingIds).forEach(timerId => {
-        clearInterval(timerId);
-      });
-    };
-  }, [pollingIds]);
-
-  // Check data and start polling for in_progress items
-  useEffect(() => {
-    if (!data || !Array.isArray(data)) return;
-    
-    data.forEach(item => {
-      if (item.status !== 'COMPLETED' && !pollingIds[item.id]) {
-        startPolling(item.id);
-      }
-    });
-  }, [data, startPolling, pollingIds]);
-
-  return {
-    isItemLoading: (id) => !!itemLoadingStates[id],
-    startPolling,
-    stopPolling
-  };
+      };
+      checkPendingItems();
 };

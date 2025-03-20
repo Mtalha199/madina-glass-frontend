@@ -591,14 +591,22 @@ export const AddUser = z.object({
 
 export const RateDeckForm = z
   .object({
-    margin: z.coerce.number().min(1, { message: "Margin is required" }),
+    margin: z.preprocess(
+      (val) => (val === "" ? undefined : Number(val)),
+      z.number({ required_error: "Margin is required" })
+        .min(0.01, { message: "Margin must be greater than 0" })
+    ),
     file_name: z.string().min(1, { message: "File name is required" }),
-    min_profit: z.coerce
-      .number()
-      .min(1, { message: "Minimum profit is required" }),
-    max_profit: z.coerce
-      .number()
-      .min(1, { message: "Maximum profit is required" }),
+    min_profit:z.preprocess(
+      (val) => (val === "" ? undefined : Number(val)),
+      z.number({ required_error: "Minimum profit is required" })
+        .min(0.01, { message: "Minimum profit must be greater than 0" })
+    ),
+    max_profit:z.preprocess(
+      (val) => (val === "" ? undefined : Number(val)),
+      z.number({ required_error: "Maximum profit is required" })
+        .min(0.01, { message: "Maximum profit must be greater than 0" })
+    ),
     include_toll_free: z.boolean({
       required_error: "Include toll-free is required",
     }),
@@ -625,9 +633,11 @@ export const RateDeckForm = z
     }),
     // user_defined: z.boolean({ required_error: "User defined is required" }),
     build_off_which_place_carrier:z.coerce.number().min(1, { message: "Build off which place carrier is required" }),
-    max_devision: z.coerce
-      .number()
-      .min(1, { message: "Max deviation is required" }),
+    max_devision:z.preprocess(
+      (val) => (val === "" ? undefined : Number(val)),
+      z.number({ required_error: "Max deviation  is required" })
+        .min(0.01, { message: "Max deviation  must be greater than 0" })
+    ), 
     // effective_date: z.string().min(1, { message: "Effective date is required" }),
     // custom_for_one_account: z.boolean({ required_error: "Custom for one account is required" }),
     selectedCarriers: z
@@ -636,7 +646,7 @@ export const RateDeckForm = z
   })
   .superRefine((data, ctx) => {
     if (data.include_toll_free === true) {
-      if (data.toll_free_price === undefined || data.toll_free_price < 1) {
+      if (data.toll_free_price === undefined || data.toll_free_price < 0.01) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message:
