@@ -8,6 +8,7 @@ import {
   API_TYPE,
   COLUMN_TO_MAP_UPLOAD_RATE_DECK,
   DATA_VIEW_MODE,
+  RATE_DECK_STATE,
   SCREEN_PATH,
   TOAST_MESSAGES,
 } from "@/Constant";
@@ -105,7 +106,6 @@ const RateDeck = ({ CUSTOMER = true }) => {
       cell: ({ row }) => {
         const ID = row.getValue("id");
         const isLoading = loaderDownload[ID] || false;
-        // {isItemLoading(ID) &&  <p>Talha</p>}
         return (
           <div className="flex space-x-2">
             {isLoading ? (
@@ -194,54 +194,9 @@ const RateDeck = ({ CUSTOMER = true }) => {
       setCount
     );
   };
+
   useEffect(() => {
-    const checkPendingItems = () => {
-      const pendingItems = data.filter((item) => item.state !== "COMPLETED");
-
-      const newLoadingState = {};
-      pendingItems.forEach((item) => {
-        const createdDate = new Date(item.createdAt);
-        const currentTime = new Date();
-        const timeDifferenceInMinutes =
-          (currentTime - createdDate) / (1000 * 60);
-        if (timeDifferenceInMinutes < 20) {
-          newLoadingState[item.id] = true;
-        }
-      });
-      setLoaderDownload(newLoadingState);
-      if (pendingItems.length > 0) {
-        pendingItems.forEach(async (row) => {
-          const checkStatus = async () => {
-            const response = await APICALL(
-              API_TYPE.GET,
-              `${API_END_POINT.RATE_DECK}/${row.id}`,
-              setloadingId,
-              null,
-              setDataId,
-              setCountId
-            );
-            const createdDate = new Date(response.data.data.createdAt);
-            const currentTime = new Date();
-            const timeDifferenceInMinutes =
-              (currentTime - createdDate) / (1000 * 60);
-            if (response.data.data.state === "COMPLETED") {
-              delete newLoadingState[response.data.data.id];
-              setLoaderDownload(newLoadingState);
-            } else if (timeDifferenceInMinutes > 20) {
-              delete newLoadingState[response.data.data.id];
-              setLoaderDownload({ ...newLoadingState });
-            } else {
-              setTimeout(checkStatus, 5000);
-            }
-          };
-          checkStatus();
-        });
-      }
-    };
-
-    if (data && data.length > 0) {
-      checkPendingItems();
-    }
+    pollInProgressItems(data, 2, setLoaderDownload, 5000 ,`${API_END_POINT.RATE_DECK}` ,RATE_DECK_STATE.COMPLETED);
   }, [data]);
   const handleSort = (column) => {
     if (orderBy === column) {

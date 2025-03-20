@@ -638,3 +638,11 @@ export const COLUMN_TO_MAP_UPLOAD_RATE_DECK = [
     placeholder: "Select Indeterminate Rate column",
   },
 ];
+
+
+export const RATE_DECK_STATE ={
+  GENERATING : 'GENERATING',
+  INSERTING :'INSERTING',
+  COMPLETED : 'COMPLETED',
+  ERROR : 'ERROR'
+}
