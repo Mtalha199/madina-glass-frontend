@@ -588,7 +588,10 @@ export const AddUser = z.object({
   first_name: z.string().min(1, { message: "first name is required" }),
   last_name: z.string().min(1, { message: "last name is required" }),
 });
-
+export const AddRoleSchema = z.object({
+  role_name: z.string().min(1, { message: "Role name is required" }),
+  description:z.string().optional(),
+});
 export const RateDeckForm = z
   .object({
     margin: z.preprocess(

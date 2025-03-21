@@ -5,7 +5,7 @@ import HeaderCommon from "@/Commons/HeaderCommon";
 import SkeletonTable from "@/Commons/SkeletonTable";
 import TableContainer from "@/Commons/TableContainer";
 import { APICALL } from "@/components/Api/ApiCall";
-import { useAddGroup } from "@/components/Hooks/CustomHooks";
+import {  useAddRole } from "@/components/Hooks/CustomHooks";
 import { Button } from "@/components/ui/button";
 import DataTable from "@/components/ui/data-table";
 import { Form } from "@/components/ui/form";
@@ -14,7 +14,7 @@ import { Plus } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
 const Role = () => {
-  const form = useAddGroup();
+  const form = useAddRole();
   const columns = [
     {
       header: "Name",
@@ -30,7 +30,7 @@ const Role = () => {
               type="button"
               variant="secondary"
               onClick={() => {
-                form.setValue("group_name", row.getValue("company_name"));
+                form.setValue("role_name", row.getValue("name"));
                 setOpenSingle(true);
               }}
             >
@@ -65,11 +65,12 @@ const Role = () => {
   };
   async function onSubmit(data) {
     const payload={
-      name:data.group_name,
+      name:data.role_name,
+      description:data.description
     }
         const response = await APICALL(
           API_TYPE.POST,
-          API_END_POINT.GROUP_LIST,
+          API_END_POINT.ADD_ROLE,
           setloading,
           payload,
           null,
@@ -85,7 +86,7 @@ const Role = () => {
   const getData = async () => {
     await APICALL(
       API_TYPE.GET,
-      API_END_POINT.GROUP_LIST,
+      API_END_POINT.ROLE,
       setloading,
       { page, limit, orderBy, order, search },
       setData,
@@ -135,6 +136,7 @@ const Role = () => {
           isOpen={openSingle}
           onOpenChange={handleDrawerClose}
           onSave={() => form.handleSubmit(onSubmit)()}
+          loading={loading}
           trigger={
             <Button type="button">
               <Plus />
@@ -146,7 +148,14 @@ const Role = () => {
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <InputCommon
                 LABEL={"Role Name"}
-                NAME={"group_name"}
+                NAME={"role_name"}
+                PLACEHOLDER={"e.g., Jane Smith"}
+                TYPE={"text"}
+                CONTROL={form.control}
+              />
+                       <InputCommon
+                LABEL={"Description"}
+                NAME={"description"}
                 PLACEHOLDER={"e.g., Jane Smith"}
                 TYPE={"text"}
                 CONTROL={form.control}

@@ -35,6 +35,10 @@ export const API_END_POINT = {
   ASSIGN_RATE_DECK: "rate-deck/assign",
   APPROVED_RATE_DECK: "rate-deck/approve",
   UPLOAD_RATE_DECK: "rate-deck/upload",
+
+  // ---------------------------------RATE_DECKS-------------------------
+ADD_ROLE: "access-control/role",
+ROLE:"access-control/roles"
 };
 
 /* --------------------------------- TOAST_MESSAGES --------------------------------- */
@@ -545,6 +549,7 @@ export const POPULATE_INTERMINATE_AS = [
 export const ROUNDING_PRECISION = [
   { value: 6, label: "6" },
   { value: 5, label: "5" },
+  { value: 4, label: "4" },
   { value: 3, label: "3" },
   { value: 2, label: "2" },
   { value: 1, label: "1" },
