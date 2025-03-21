@@ -8,11 +8,12 @@ const TimeDiffrenceInMinutes = (createdDate) => {
 }
 export const pollInProgressItems = (
   DATA,
-  MAX_POLLING_TIME = 20,
   setLoaderDownload,
-  INTERVEL = 5000,
   API_END_POINT,
-  CONDITION_TO_FULLFILL
+  CONDITION_TO_FULLFILL,
+  MAX_POLLING_TIME = 20,
+  INTERVEL = 5000,
+
 ) => {
   const checkPendingItems = () => {
     if (!Array.isArray(DATA) || DATA.length === 0) return;

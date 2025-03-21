@@ -173,7 +173,7 @@ const RateDeck = ({ CUSTOMER = true }) => {
   };
 
   useEffect(() => {
-    pollInProgressItems(data, 30, setLoaderDownload, 10000 ,`${API_END_POINT.RATE_DECK}` ,RATE_DECK_STATE.COMPLETED);
+    pollInProgressItems(data,  setLoaderDownload ,`${API_END_POINT.RATE_DECK}` ,RATE_DECK_STATE.COMPLETED,30, 10000);
   }, [data]);
   const handleSort = (column) => {
     if (orderBy === column) {
