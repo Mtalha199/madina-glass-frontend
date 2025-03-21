@@ -222,7 +222,6 @@ const RateDeck = ({ CUSTOMER = true }) => {
   }
   const handleUploadComplete = (data) => {
     setUploadData(data);
-    console.log(data);
   };
   useEffect(() => {
     if (CUSTOMER === true) {

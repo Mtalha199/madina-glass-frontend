@@ -42,7 +42,7 @@ export const pollInProgressItems = (
             const  newTimeDiffrenceInMinutes = TimeDiffrenceInMinutes(response.data.data?.createdAt);
             if (response.data.data.state === CONDITION_TO_FULLFILL) {
               delete newLoadingState[response.data.data.id];
-              setLoaderDownload(...newLoadingState);
+              setLoaderDownload({ ...newLoadingState });
             } else if (newTimeDiffrenceInMinutes > MAX_POLLING_TIME) {
               delete newLoadingState[response.data.data.id];
               setLoaderDownload({ ...newLoadingState });

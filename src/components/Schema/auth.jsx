@@ -594,18 +594,18 @@ export const RateDeckForm = z
     margin: z.preprocess(
       (val) => (val === "" ? undefined : Number(val)),
       z.number({ required_error: "Margin is required" })
-        .min(0.01, { message: "Margin must be greater than 0" })
+        .min(0.0001, { message: "Margin must be greater than 0" })
     ),
     file_name: z.string().min(1, { message: "File name is required" }),
     min_profit:z.preprocess(
       (val) => (val === "" ? undefined : Number(val)),
       z.number({ required_error: "Minimum profit is required" })
-        .min(0.01, { message: "Minimum profit must be greater than 0" })
+        .min(0.0001, { message: "Minimum profit must be greater than 0" })
     ),
     max_profit:z.preprocess(
       (val) => (val === "" ? undefined : Number(val)),
       z.number({ required_error: "Maximum profit is required" })
-        .min(0.01, { message: "Maximum profit must be greater than 0" })
+        .min(0.0001, { message: "Maximum profit must be greater than 0" })
     ),
     include_toll_free: z.boolean({
       required_error: "Include toll-free is required",
