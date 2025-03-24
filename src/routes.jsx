@@ -26,6 +26,7 @@ import SpecificRateDeck from "./Pages/Customers/Rate decks/SpecificRateDeck";
 import Settings from "./Pages/Settings";
 import RateDeckCarrier from "./Pages/Carriers/Ratedeck";
 import RateDeckApproval from "./Commons/RateDeckCommons/RateDeckApprovel";
+import SpecificRole from "./components/Tabs/SettingTabs/Role/SpecificRole";
 
 const routes = [
   {
@@ -77,6 +78,8 @@ const routes = [
 
 
       { path: SCREEN_PATH.SETTINGS, element: <Settings /> },
+      { path: SCREEN_PATH.ROLE_LIST_UNIQUE, element: <SpecificRole /> },
+
 
     ],
   },

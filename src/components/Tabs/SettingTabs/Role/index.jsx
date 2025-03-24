@@ -5,46 +5,71 @@ import HeaderCommon from "@/Commons/HeaderCommon";
 import SkeletonTable from "@/Commons/SkeletonTable";
 import TableContainer from "@/Commons/TableContainer";
 import { APICALL } from "@/components/Api/ApiCall";
-import {  useAddRole } from "@/components/Hooks/CustomHooks";
+import { useAddRole } from "@/components/Hooks/CustomHooks";
 import { Button } from "@/components/ui/button";
 import DataTable from "@/components/ui/data-table";
 import { Form } from "@/components/ui/form";
 import { API_END_POINT, API_TYPE, TOAST_MESSAGES } from "@/Constant";
-import { Plus } from "lucide-react";
+import { ArrowLeft, Plus } from "lucide-react";
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import SpecificRole from "./SpecificRole";
 
 const Role = () => {
+  const navigate = useNavigate();
   const form = useAddRole();
+  const [selectedRole, setSelectedRole] = useState(null);
   const columns = [
     {
       header: "Name",
       accessorKey: "name",
-    },
-    {
-      header: "Actions",
       cell: ({ row }) => {
-        const ID = row.getValue("id");
+        const fullName = row.getValue("name");
+        const id = row.getValue("id");
+
+        const handleNavigation = () => {
+          setSelectedRole(id);
+        };
+
         return (
-          <div className="flex space-x-2">
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => {
-                form.setValue("role_name", row.getValue("name"));
-                setOpenSingle(true);
-              }}
-            >
-              Edit
-            </Button>
-            <DeleteConfirmationDialog onConfirm={() => handleDelete(ID)}>
-              <Button variant="destructive">Delete</Button>
-            </DeleteConfirmationDialog>
-          </div>
+          <span
+            className="text-primary hover:underline cursor-pointer"
+            onClick={handleNavigation}
+          >
+            {fullName}
+          </span>
         );
       },
     },
+    {
+      header: "Description",
+      accessorKey: "description",
+    },
+    // {
+    //   header: "Actions",
+    //   cell: ({ row }) => {
+    //     const ID = row.getValue("id");
+    //     return (
+    //       <div className="flex space-x-2">
+    //         <Button
+    //           type="button"
+    //           variant="secondary"
+    //           onClick={() => {
+    //             form.setValue("role_name", row.getValue("name"));
+    //             setOpenSingle(true);
+    //           }}
+    //         >
+    //           Edit
+    //         </Button>
+    //         <DeleteConfirmationDialog onConfirm={() => handleDelete(ID)}>
+    //           <Button variant="destructive">Delete</Button>
+    //         </DeleteConfirmationDialog>
+    //       </div>
+    //     );
+    //   },
+    // },
   ];
-  
+
   const [openSingle, setOpenSingle] = useState(false);
   const [loading, setloading] = useState(false);
   const [data, setData] = useState([]);
@@ -64,23 +89,23 @@ const Role = () => {
     setOpenSingle(!openSingle);
   };
   async function onSubmit(data) {
-    const payload={
-      name:data.role_name,
-      description:data.description
+    const payload = {
+      name: data.role_name,
+      description: data.description,
+    };
+    const response = await APICALL(
+      API_TYPE.POST,
+      API_END_POINT.ADD_ROLE,
+      setloading,
+      payload,
+      null,
+      null,
+      TOAST_MESSAGES.ROLE_ADDED
+    );
+    if (response !== undefined) {
+      setOpenSingle(false);
+      getData();
     }
-        const response = await APICALL(
-          API_TYPE.POST,
-          API_END_POINT.ADD_ROLE,
-          setloading,
-          payload,
-          null,
-          null,
-          TOAST_MESSAGES.GROUP_ADDED
-        );
-        if (response !== undefined) {
-          setOpenSingle(false);
-          getData();
-        }
   }
 
   const getData = async () => {
@@ -128,66 +153,84 @@ const Role = () => {
   }, [page, limit, orderBy, order, search]);
   return (
     <>
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Roles</h1>
-        <CommonDrawer
-          title="Add Group"
-          description="Please enter a file name and save to create a new group."
-          isOpen={openSingle}
-          onOpenChange={handleDrawerClose}
-          onSave={() => form.handleSubmit(onSubmit)()}
-          loading={loading}
-          trigger={
-            <Button type="button">
-              <Plus />
-              Add Role
-            </Button>
-          }
-        >
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)}>
-              <InputCommon
-                LABEL={"Role Name"}
-                NAME={"role_name"}
-                PLACEHOLDER={"e.g., Jane Smith"}
-                TYPE={"text"}
-                CONTROL={form.control}
+      {!selectedRole ? (
+        <div>
+          <div className="flex justify-between items-center">
+            <h1 className="text-2xl font-bold">Roles</h1>
+            <CommonDrawer
+              title="Add Group"
+              description="Please enter a file name and save to create a new group."
+              isOpen={openSingle}
+              onOpenChange={handleDrawerClose}
+              onSave={() => form.handleSubmit(onSubmit)()}
+              loading={loading}
+              trigger={
+                <Button type="button">
+                  <Plus />
+                  Add Role
+                </Button>
+              }
+            >
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)}>
+                  <InputCommon
+                    LABEL={"Role Name"}
+                    NAME={"role_name"}
+                    PLACEHOLDER={"e.g., Jane Smith"}
+                    TYPE={"text"}
+                    CONTROL={form.control}
+                  />
+                  <InputCommon
+                    LABEL={"Description"}
+                    NAME={"description"}
+                    PLACEHOLDER={"e.g., Jane Smith"}
+                    TYPE={"text"}
+                    CONTROL={form.control}
+                  />
+                </form>
+              </Form>
+            </CommonDrawer>
+          </div>
+          {loading ? (
+            <SkeletonTable ROWS={10} COLUMNS={3} />
+          ) : (
+            <>
+              <TableContainer
+                SEARCH={search}
+                COLUMNS={columns}
+                onSearch={handleSearch}
+                VISIBILE_COLUMN_CHANGE={handleVisibleColumnsChange}
+                INITIAL_VISIBLE_COLUMNS={visibleColumns}
               />
-                       <InputCommon
-                LABEL={"Description"}
-                NAME={"description"}
-                PLACEHOLDER={"e.g., Jane Smith"}
-                TYPE={"text"}
-                CONTROL={form.control}
+              <DataTable
+                data={data}
+                columns={columns?.filter((col) =>
+                  visibleColumns.includes(col?.accessorKey)
+                )}
+                COUNT={count}
+                PAGE={page}
+                SET_PAGE={setPage}
+                LIMIT={limit}
+                SET_LIMIT={setLimit}
+                HANDLE_SORT={handleSort}
               />
-            </form>
-          </Form>
-        </CommonDrawer>
-      </div>
-      {loading ? (
-        <SkeletonTable ROWS={10} COLUMNS={3} />
+            </>
+          )}
+        </div>
       ) : (
-        <>
-          <TableContainer
-            SEARCH={search}
-            COLUMNS={columns}
-            onSearch={handleSearch}
-            VISIBILE_COLUMN_CHANGE={handleVisibleColumnsChange}
-            INITIAL_VISIBLE_COLUMNS={visibleColumns}
-          />
-          <DataTable
-            data={data}
-            columns={columns?.filter((col) =>
-              visibleColumns.includes(col?.accessorKey)
-            )}
-            COUNT={count}
-            PAGE={page}
-            SET_PAGE={setPage}
-            LIMIT={limit}
-            SET_LIMIT={setLimit}
-            HANDLE_SORT={handleSort}
-          />
-        </>
+        <div>
+          <div className="flex items-center">
+            <Button
+              variant="ghost"
+              onClick={() => setSelectedRole(null)}
+              className="mb-4"
+            >
+              <ArrowLeft />
+              Back to Roles
+            </Button>
+          </div>
+          <SpecificRole ID={selectedRole} />
+        </div>
       )}
     </>
   );

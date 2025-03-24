@@ -36,9 +36,12 @@ export const API_END_POINT = {
   APPROVED_RATE_DECK: "rate-deck/approve",
   UPLOAD_RATE_DECK: "rate-deck/upload",
 
-  // ---------------------------------RATE_DECKS-------------------------
+  // ---------------------------------PERMISSIONS-------------------------
 ADD_ROLE: "access-control/role",
-ROLE:"access-control/roles"
+ROLE:"access-control/roles",
+PERMISSION:"access-control/role/{id}/permissions",
+ASSIGN_PERMISSION:"access-control/role/assign-permission"
+
 };
 
 /* --------------------------------- TOAST_MESSAGES --------------------------------- */
@@ -66,6 +69,8 @@ export const TOAST_MESSAGES = {
 
   RATE_DECK_ASSIGN: "Rate deck assign successfully",
   RATE_DECK_UPLOAD: "Rate deck uploaded successfully",
+
+  ROLE_ADDED: "Role added successfully",
 };
 
 export const API_TYPE = {
@@ -113,6 +118,8 @@ export const SCREEN_PATH = {
   RATE_DECK_CARRIER: "carrier/rate-deck",
 
   SETTINGS: "/settings",
+  ROLE_LIST_UNIQUE: "/role/:id",
+
 };
 // ----------------------------------------NAVIGATION----------------------------------
 import {
