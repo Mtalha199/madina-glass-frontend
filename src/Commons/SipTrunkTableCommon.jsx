@@ -117,7 +117,7 @@ const SipTrunkCommonTable = ({ id,CARRIER=false }) => {
   const getData = async () => {
     const endpoint = id
     ? `${API_END_POINT.SIP_TRUNK_LIST}?user_id=${id}`
-    : CARRIER ? `${API_END_POINT.SIP_TRUNK_LIST }?carrier=1`:  `${API_END_POINT.SIP_TRUNK_LIST}?carrier=0`;
+    : CARRIER ? `${API_END_POINT.CARRIER_SIP_TRUNK }`:  `${API_END_POINT.CUSTOMER_SIP_TRUNK}`;
     await APICALL(
       API_TYPE.GET,
       endpoint,

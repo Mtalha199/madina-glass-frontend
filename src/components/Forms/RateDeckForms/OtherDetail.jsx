@@ -12,6 +12,9 @@ import {
   API_TYPE,
   BUILD_OFF_PLACE_CARRIER,
   DATA_VIEW_MODE,
+  HAS_PERMISSION,
+  PARENT_MODULE_NAME,
+  PERMISSIONS,
 } from "@/Constant";
 import { APICALL } from "@/components/Api/ApiCall";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -375,26 +378,31 @@ const OtherDetail = ({ form, MODE, DATA }) => {
 
       <div className="col-span-2 flex justify-end mt-4 mb-4">
         <div className="space-x-2">
-          {MODE === "view" && (
-            <>
-              {edit ? (
-                <>
-                  <Button
-                    variant="secondary"
-                    type="button"
-                    onClick={() => setEdit(!edit)}
-                  >
-                    Cancel
+          {HAS_PERMISSION(
+            PARENT_MODULE_NAME.CUSTOMER,
+            PERMISSIONS.CUSTOMER.RATE_DECK.NAME,
+            PERMISSIONS.CUSTOMER.RATE_DECK.ACTIONS.CUSTOMER_RATE_DECK_UPDATE
+          ) &&
+            MODE === "view" && (
+              <>
+                {edit ? (
+                  <>
+                    <Button
+                      variant="secondary"
+                      type="button"
+                      onClick={() => setEdit(!edit)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button type="submit">Save</Button>
+                  </>
+                ) : (
+                  <Button type="button" onClick={() => setEdit(true)}>
+                    Edit
                   </Button>
-                  <Button type="submit">Save</Button>
-                </>
-              ) : (
-                <Button type="button" onClick={() => setEdit(true)}>
-                  Edit
-                </Button>
-              )}
-            </>
-          )}
+                )}
+              </>
+            )}
         </div>
       </div>
     </div>

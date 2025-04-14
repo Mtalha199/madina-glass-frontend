@@ -10,9 +10,12 @@ import {
   BILLING_TYPE_OPTIONS,
   DATA_VIEW_MODE,
   DIGIT_USED,
+  HAS_PERMISSION,
+  PARENT_MODULE_NAME,
+  PERMISSIONS,
   PRICING_ROUNDING_METHOD,
 } from "@/Constant";
-import {  Server } from "lucide-react";
+import { Server } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useFormContext } from "react-hook-form";
 import AssignRateDeck from "@/Commons/RateDeckCommons/AssignRateDeck";
@@ -24,19 +27,18 @@ function PricingInfoForm({ MODE, DATA, form, COMPANY_NAME, TRUNK_ID }) {
   const [rateDeckData, setRateDeckData] = useState([]);
   const [count, setCount] = useState(0);
   useEffect(() => {
-      getData();
+    getData();
   }, []);
   const getData = async () => {
     await APICALL(
       API_TYPE.GET,
-      API_END_POINT.ALL_RATE_DECK,
+      API_END_POINT.CUSTOMER_RATE_DECK_ALL,
       setloading,
       null,
       setRateDeckData,
       setCount
     );
   };
-  
 
   useEffect(() => {
     if (DATA) {
@@ -60,7 +62,11 @@ function PricingInfoForm({ MODE, DATA, form, COMPANY_NAME, TRUNK_ID }) {
     }
   }, [DATA, setValue]);
 
-  return (
+  return HAS_PERMISSION(
+    PARENT_MODULE_NAME.CUSTOMER,
+    PERMISSIONS.CUSTOMER.SIP_TRUNK.NAME,
+    PERMISSIONS.CUSTOMER.SIP_TRUNK.ACTIONS.CUSTOMER_SIP_TRUNK_LIST
+  ) ? (
     <div className="">
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4 border-t mt-4 pt-4 ">
         <div className="col-span-1 md:col-span-5 lg:col-span-1 gap-4">
@@ -69,6 +75,7 @@ function PricingInfoForm({ MODE, DATA, form, COMPANY_NAME, TRUNK_ID }) {
             Specify the pricing info detail to add.
           </p>
         </div>
+
         <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
           {SelectAndView({
             LABEL: "Billing Type",
@@ -83,18 +90,22 @@ function PricingInfoForm({ MODE, DATA, form, COMPANY_NAME, TRUNK_ID }) {
             FORM: form,
           })}
         </div>
+
         {MODE === DATA_VIEW_MODE.VIEW && (
           <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
-            <AssignRateDeck COMPANY_NAME={COMPANY_NAME} TRUNK_ID={TRUNK_ID} rateDeckData={rateDeckData}   />
+            <AssignRateDeck
+              COMPANY_NAME={COMPANY_NAME}
+              TRUNK_ID={TRUNK_ID}
+              rateDeckData={rateDeckData}
+            />
           </div>
         )}
       </div>
 
+      {/* Second grid */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4 space-y-4 ">
         <div className="hidden lg:block lg:col-span-1"></div>
         <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
-          {/* <Label>Billing Increment</Label> */}
-
           {SelectAndView({
             LABEL: "Initial",
             NAME: "initial",
@@ -123,6 +134,8 @@ function PricingInfoForm({ MODE, DATA, form, COMPANY_NAME, TRUNK_ID }) {
           })}
         </div>
       </div>
+
+      {/* Third grid */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4 space-y-4 mb-4">
         <div className="hidden lg:block lg:col-span-1"></div>
         <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
@@ -157,6 +170,8 @@ function PricingInfoForm({ MODE, DATA, form, COMPANY_NAME, TRUNK_ID }) {
           })}
         </div>
       </div>
+
+      {/* Fourth grid */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4 space-y-4 mt-2 mb-2">
         <div className="hidden lg:block lg:col-span-1"></div>
         <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
@@ -188,6 +203,8 @@ function PricingInfoForm({ MODE, DATA, form, COMPANY_NAME, TRUNK_ID }) {
           })}
         </div>
       </div>
+
+      {/* Fifth grid */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4 space-y-4 ">
         <div className="hidden lg:block lg:col-span-1"></div>
         <div className="col-span-1 md:col-span-1 lg:col-span-1 gap-4">
@@ -212,7 +229,7 @@ function PricingInfoForm({ MODE, DATA, form, COMPANY_NAME, TRUNK_ID }) {
         </div>
         <div className="col-span-1 md:col-span-1 lg:col-span-1 gap-4">
           {CheckboxFieldAndView({
-            LABEL: "  Allow 555",
+            LABEL: "Allow 555",
             NAME: "allow555",
             VALUE: DATA?.allow555,
             MODE: MODE,
@@ -221,6 +238,8 @@ function PricingInfoForm({ MODE, DATA, form, COMPANY_NAME, TRUNK_ID }) {
           })}
         </div>
       </div>
+
+      {/* Sixth grid */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4 space-y-4 ">
         <div className="hidden lg:block lg:col-span-1"></div>
         <div className="col-span-1 md:col-span-1 lg:col-span-1 gap-4">
@@ -254,6 +273,8 @@ function PricingInfoForm({ MODE, DATA, form, COMPANY_NAME, TRUNK_ID }) {
           })}
         </div>
       </div>
+
+      {/* Buttons */}
       <div className="col-span-2 flex justify-end mt-4 mb-4">
         <div className="space-x-2">
           {MODE === "view" && (
@@ -269,17 +290,22 @@ function PricingInfoForm({ MODE, DATA, form, COMPANY_NAME, TRUNK_ID }) {
                   </Button>
                   <Button type="submit">Save</Button>
                 </>
-              ) : (
+              ) : HAS_PERMISSION(
+                  PARENT_MODULE_NAME.CUSTOMER,
+                  PERMISSIONS.CUSTOMER.SIP_TRUNK.NAME,
+                  PERMISSIONS.CUSTOMER.SIP_TRUNK.ACTIONS
+                    .CUSTOMER_SIP_TRUNK_PRICING_INFO_UPDATE
+                ) ? (
                 <Button type="button" onClick={() => setEdit(true)}>
                   Edit
                 </Button>
-              )}
+              ) : null}
             </>
           )}
         </div>
       </div>
     </div>
-  );
+  ) : null;
 }
 
 export default PricingInfoForm;

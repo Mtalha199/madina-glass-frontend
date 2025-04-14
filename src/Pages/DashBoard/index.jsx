@@ -11,6 +11,7 @@ function Dashboard() {
       <Skeleton className="h-8 w-[75rem]" />
       <Skeleton className="h-8 w-[60rem]" />
     </div>
+
   </div>
 
   );

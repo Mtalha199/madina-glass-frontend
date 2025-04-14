@@ -1,7 +1,15 @@
+import AccessDeniedSection from "@/Commons/AccessDeniedSection";
 import TabsCommon from "@/Commons/TabsCommon";
 import { APICALL } from "@/components/Api/ApiCall";
 import { ROUTING_TABS } from "@/components/Tabs/TabConfig";
-import { API_END_POINT, API_TYPE, DATA_VIEW_MODE } from "@/Constant";
+import {
+  API_END_POINT,
+  API_TYPE,
+  DATA_VIEW_MODE,
+  HAS_PERMISSION,
+  PARENT_MODULE_NAME,
+  PERMISSIONS,
+} from "@/Constant";
 import React, { useEffect, useState } from "react";
 
 const Routing = ({ form, MODE, trunkId, GET_ROUTING }) => {
@@ -29,9 +37,14 @@ const Routing = ({ form, MODE, trunkId, GET_ROUTING }) => {
   }, [MODE]);
 
   const getAlreadyRouting = async () => {
+    // const hasPermission = HAS_PERMISSION(
+    //   PERMISSIONS.CUSTOMER.SIP_TRUNK.NAME,
+    //   PERMISSIONS.CUSTOMER.SIP_TRUNK.ACTIONS.CUSTOMER_SIP_TRUNK_ROUTING_VIEW
+    // );
+    // if (!hasPermission) return;
     await APICALL(
       API_TYPE.GET,
-      `${API_END_POINT.ADD_ROUTING}/${trunkId}`,
+      `${API_END_POINT.CUSTOMER_SIP_TRUNK_ROUTING}/${trunkId}`,
       setLoading,
       null,
       setRoutingData,
@@ -60,8 +73,20 @@ const Routing = ({ form, MODE, trunkId, GET_ROUTING }) => {
         </p>
       </div>
       <div className="col-span-4 md:col-span-4 lg:col-span-4 gap-4">
-        {defaultTab && (
-          <TabsCommon TABS={modifiedRoutingTabs} DEFAULT_TAB={defaultTab} />
+        { HAS_PERMISSION(
+          PARENT_MODULE_NAME.CUSTOMER,
+
+          PERMISSIONS.CUSTOMER.SIP_TRUNK.NAME,
+          PERMISSIONS.CUSTOMER.SIP_TRUNK.ACTIONS
+            .CUSTOMER_SIP_TRUNK_ROUTING_VIEW
+        ) ? (
+          defaultTab && (
+            <TabsCommon TABS={modifiedRoutingTabs} DEFAULT_TAB={defaultTab} />
+          )
+        
+        ) : (
+          <AccessDeniedSection />
+   
         )}
       </div>
     </div>

@@ -1,6 +1,6 @@
 import Login from "./Auth/Login";
 import PublicLayout from "./components/Layouts/PublicLayout";
-import { SCREEN_PATH } from "./Constant";
+import { HAS_PERMISSION, PARENT_MODULE_NAME, PERMISSIONS, SCREEN_PATH } from "./Constant";
 import SignUp from "./Auth/SignUp";
 import ForgotPassword from "./Auth/ForgotPassword";
 import ResetPassword from "./Auth/ResetPassword";
@@ -27,7 +27,13 @@ import Settings from "./Pages/Settings";
 import RateDeckCarrier from "./Pages/Carriers/Ratedeck";
 import RateDeckApproval from "./Commons/RateDeckCommons/RateDeckApprovel";
 import SpecificRole from "./components/Tabs/SettingTabs/Role/SpecificRole";
+import { Navigate } from "react-router-dom";
+import AccessDenied from "./Commons/AccesDenied";
+import PageNotFound from "./Commons/PageNotfound";
 
+const WITH_PERMISSION = (Component,PARENT_MODULE, MODULE, ACTION) => {
+  return HAS_PERMISSION(PARENT_MODULE,MODULE, ACTION) ? <Component /> :<Navigate to={SCREEN_PATH.ACCESS_DENIED} />;
+};
 const routes = [
   {
     path: "/",
@@ -38,6 +44,11 @@ const routes = [
       { path: SCREEN_PATH.FORGOT_PASSWORD, element: <ForgotPassword /> },
       { path: SCREEN_PATH.RESET_PASSWORD, element: <ResetPassword /> },
       { path: SCREEN_PATH.RATE_DECK_APPROVEL, element: <RateDeckApproval /> },
+
+      {
+        path: "*",
+        element: <PageNotFound />,
+      },
 
     ],
   },
@@ -51,34 +62,35 @@ const routes = [
     children: [
       { path: SCREEN_PATH.DASHBOARD, element: <Dashboard /> },
 
-      { path: SCREEN_PATH.CUSTOMER_LIST, element: <CustomersList /> },
-      { path: SCREEN_PATH.CUSTOMER_LIST_UNIQUE, element: <SpecificCustomer /> },
-      { path: SCREEN_PATH.ADD_NEW_CUSTOMER, element: <AddCustomer /> },
+      { path: SCREEN_PATH.CUSTOMER_LIST, element: WITH_PERMISSION(CustomersList,PARENT_MODULE_NAME.CUSTOMER, PERMISSIONS.CUSTOMER.LIST.NAME, PERMISSIONS.CUSTOMER.LIST.ACTIONS.CUSTOMER_LIST) },
+      { path: SCREEN_PATH.CUSTOMER_LIST_UNIQUE, element:WITH_PERMISSION(SpecificCustomer,PARENT_MODULE_NAME.CUSTOMER, PERMISSIONS.CUSTOMER.LIST.NAME, PERMISSIONS.CUSTOMER.LIST.ACTIONS.CUSTOMER_VIEW) },
+      { path: SCREEN_PATH.ADD_NEW_CUSTOMER, element:WITH_PERMISSION(AddCustomer,PARENT_MODULE_NAME.CUSTOMER, PERMISSIONS.CUSTOMER.LIST.NAME, PERMISSIONS.CUSTOMER.LIST.ACTIONS.CUSTOMER_CREATE)},
 
       { path: SCREEN_PATH.PAYMENT_LIST_CUSTOMER, element: <CustomerPayment /> },
 
-      { path: SCREEN_PATH.RATE_DECK_LIST_CUSTOMER, element: <RateDeckCustomer /> },
-      { path: SCREEN_PATH.ADD_NEW_RATE_DECK_GENERATE, element: <GenerateRateDecks /> },
-      { path: SCREEN_PATH.RATE_DECK_GENERATE_VIEW, element: <SpecificRateDeck /> },
+      { path: SCREEN_PATH.RATE_DECK_LIST_CUSTOMER, element:WITH_PERMISSION(RateDeckCustomer,PARENT_MODULE_NAME.CUSTOMER, PERMISSIONS.CUSTOMER.RATE_DECK.NAME, PERMISSIONS.CUSTOMER.RATE_DECK.ACTIONS.CUSTOMER_RATE_DECK_LIST) },
+      { path: SCREEN_PATH.ADD_NEW_RATE_DECK_GENERATE, element: WITH_PERMISSION(GenerateRateDecks,PARENT_MODULE_NAME.CUSTOMER, PERMISSIONS.CUSTOMER.RATE_DECK.NAME, PERMISSIONS.CUSTOMER.RATE_DECK.ACTIONS.CUSTOMER_RATE_DECK_CREATE)},
+      { path: SCREEN_PATH.RATE_DECK_GENERATE_VIEW, element:WITH_PERMISSION(SpecificRateDeck,PARENT_MODULE_NAME.CUSTOMER, PERMISSIONS.CUSTOMER.RATE_DECK.NAME, PERMISSIONS.CUSTOMER.RATE_DECK.ACTIONS.CUSTOMER_RATE_DECK_VIEW)  },
 
 
-      { path: SCREEN_PATH.SIP_TRUNK_LIST, element: <SipTrunkList /> },
-      { path: SCREEN_PATH.ADD_NEW_SIP_TRUNK, element: <AddSipTrunk /> },
-      { path: SCREEN_PATH.SIP_TRUNK_LIST_UNIQUE, element: <SpecificSipTrunk /> },
+      { path: SCREEN_PATH.SIP_TRUNK_LIST, element:WITH_PERMISSION(SipTrunkList,PARENT_MODULE_NAME.CUSTOMER, PERMISSIONS.CUSTOMER.SIP_TRUNK.NAME, PERMISSIONS.CUSTOMER.SIP_TRUNK.ACTIONS.CUSTOMER_SIP_TRUNK_LIST) },
+      { path: SCREEN_PATH.ADD_NEW_SIP_TRUNK, element:WITH_PERMISSION(AddSipTrunk,PARENT_MODULE_NAME.CUSTOMER, PERMISSIONS.CUSTOMER.SIP_TRUNK.NAME, PERMISSIONS.CUSTOMER.SIP_TRUNK.ACTIONS.CUSTOMER_SIP_TRUNK_CREATE)},
+      { path: SCREEN_PATH.SIP_TRUNK_LIST_UNIQUE, element:WITH_PERMISSION(SpecificSipTrunk,PARENT_MODULE_NAME.CUSTOMER, PERMISSIONS.CUSTOMER.SIP_TRUNK.NAME, PERMISSIONS.CUSTOMER.SIP_TRUNK.ACTIONS.CUSTOMER_SIP_TRUNK_VIEW)},
 
-      { path: SCREEN_PATH.CARRIERS_LIST, element: <CarriersList /> },
-      { path: SCREEN_PATH.CARRIERS_LIST_UNIQUE, element: <SpecificCarrier /> },
-      { path: SCREEN_PATH.ADD_NEW_CARRIER, element: <AddCarrier /> },
+      { path: SCREEN_PATH.CARRIERS_LIST, element:WITH_PERMISSION(CarriersList,PARENT_MODULE_NAME.CARRIER, PERMISSIONS.CARRIER.LIST.NAME, PERMISSIONS.CARRIER.LIST.ACTIONS.CARRIER_LIST) },
+      { path: SCREEN_PATH.CARRIERS_LIST_UNIQUE, element: WITH_PERMISSION(SpecificCarrier,PARENT_MODULE_NAME.CARRIER, PERMISSIONS.CARRIER.LIST.NAME, PERMISSIONS.CARRIER.LIST.ACTIONS.CARRIER_VIEW) },
+      { path: SCREEN_PATH.ADD_NEW_CARRIER, element:WITH_PERMISSION(AddCarrier,PARENT_MODULE_NAME.CARRIER, PERMISSIONS.CARRIER.LIST.NAME, PERMISSIONS.CARRIER.LIST.ACTIONS.CARRIER_CREATE) },
 
-      { path: SCREEN_PATH.SIP_TRUNK_LIST_CARRIER, element: <SipTrunkListCarrier /> },
-      { path: SCREEN_PATH.ADD_NEW_SIP_TRUNK_CARRIER, element: <AddSipTrunkCarrier /> },
-      { path: SCREEN_PATH.SIP_TRUNK_LIST_UNIQUE_CARRIER, element: <SpecificSipTrunkCarrier /> },
+      { path: SCREEN_PATH.SIP_TRUNK_LIST_CARRIER, element: WITH_PERMISSION(SipTrunkListCarrier,PARENT_MODULE_NAME.CARRIER, PERMISSIONS.CARRIER.SIP_TRUNK.NAME, PERMISSIONS.CARRIER.SIP_TRUNK.ACTIONS.CARRIER_SIP_TRUNK_LIST)},
+      { path: SCREEN_PATH.ADD_NEW_SIP_TRUNK_CARRIER, element:WITH_PERMISSION(AddSipTrunkCarrier,PARENT_MODULE_NAME.CARRIER, PERMISSIONS.CARRIER.SIP_TRUNK.NAME, PERMISSIONS.CARRIER.SIP_TRUNK.ACTIONS.CARRIER_SIP_TRUNK_CREATE)},
+      { path: SCREEN_PATH.SIP_TRUNK_LIST_UNIQUE_CARRIER, element:WITH_PERMISSION(SpecificSipTrunkCarrier,PARENT_MODULE_NAME.CARRIER, PERMISSIONS.CARRIER.SIP_TRUNK.NAME, PERMISSIONS.CARRIER.SIP_TRUNK.ACTIONS.CARRIER_SIP_TRUNK_VIEW) },
       
-      { path: SCREEN_PATH.RATE_DECK_CARRIER, element: <RateDeckCarrier /> },
+      { path: SCREEN_PATH.RATE_DECK_CARRIER, element:WITH_PERMISSION(RateDeckCarrier,PARENT_MODULE_NAME.CARRIER, PERMISSIONS.CARRIER.RATE_DECK.NAME, PERMISSIONS.CARRIER.RATE_DECK.ACTIONS.CARRIER_RATE_DECK_LIST)},
 
 
       { path: SCREEN_PATH.SETTINGS, element: <Settings /> },
       { path: SCREEN_PATH.ROLE_LIST_UNIQUE, element: <SpecificRole /> },
+      { path: SCREEN_PATH.ACCESS_DENIED, element: <AccessDenied /> },
 
 
     ],

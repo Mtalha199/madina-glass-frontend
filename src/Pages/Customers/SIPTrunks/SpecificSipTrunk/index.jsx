@@ -8,6 +8,8 @@ import {
   API_END_POINT,
   API_TYPE,
   DATA_VIEW_MODE,
+  HAS_PERMISSION,
+  PERMISSIONS,
   SCREEN_PATH,
   TOAST_MESSAGES,
 } from "@/Constant";
@@ -26,6 +28,7 @@ import IpWhiteListingForm from "@/components/Forms/SipTrunkForms/IpWhiteListingF
 import StirAndShaken from "@/components/Forms/SipTrunkForms/StirAndShaken";
 import PricingInfoForm from "@/components/Forms/SipTrunkForms/PricingInfoForm";
 import Routing from "@/components/Forms/SipTrunkForms/Routing";
+import AccessDenied from "@/Commons/AccesDenied";
 export default function SpecificSipTrunk() {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -47,20 +50,29 @@ export default function SpecificSipTrunk() {
   const getData = async () => {
     await APICALL(
       API_TYPE.GET,
-      `${API_END_POINT.VIEW_SIP_TRUNK}/${id}`,
+      `${API_END_POINT.CUSTOMER_SIP_TRUNK}/${id}`,
       setloading,
       null,
       setData,
       setCount
     );
-    await APICALL(
-      API_TYPE.GET,
-      `${API_END_POINT.VIEW_IP_WHITE_LISTING}/${id}`,
-      setloading,
-      null,
-      setIPWhiteListingData,
-      setCount
-    );
+    {
+      HAS_PERMISSION(
+        PARENT_MODULE_NAME.CUSTOMER,
+
+        PERMISSIONS.CUSTOMER.SIP_TRUNK.NAME,
+        PERMISSIONS.CUSTOMER.SIP_TRUNK.ACTIONS.CUSTOMER_SIP_TRUNK_IP_AUTH_VIEW
+      ) &&
+      await APICALL(
+        API_TYPE.GET,
+        `${API_END_POINT.CUSTOMER_SIP_TRUNK_IP_AUTH}/${id}`,
+        setloading,
+        null,
+        setIPWhiteListingData,
+        setCount
+      );
+    }
+
   };
   async function onSubmit(data) {
     const payload = {
@@ -85,7 +97,7 @@ export default function SpecificSipTrunk() {
 
     const response = await APICALL(
       API_TYPE.PUT,
-      `${API_END_POINT.ADD_NEW_SIP_TRUNK}/${id}`,
+      `${API_END_POINT.CUSTOMER_SIP_TRUNK}/${id}`,
       setloading,
       payload,
       null,
@@ -128,7 +140,7 @@ export default function SpecificSipTrunk() {
         );
         const apiResponse = await APICALL(
           API_TYPE.POST,
-          API_END_POINT.ADD_IP_WHITE_LISTING,
+          API_END_POINT.CUSTOMER_SIP_TRUNK_IP_AUTH,
           setloading,
           ipWhiteListingPayload,
           null,
@@ -152,7 +164,7 @@ export default function SpecificSipTrunk() {
     const { id, ...payloadData } = updatedFieldValues;
     const response = await APICALL(
       API_TYPE.PUT,
-      `${API_END_POINT.ADD_IP_WHITE_LISTING}/${updatedFieldValues.id}`,
+      `${API_END_POINT.CUSTOMER_SIP_TRUNK_IP_AUTH}/${updatedFieldValues.id}`,
       setloading,
       payloadData,
       null,
@@ -168,7 +180,7 @@ export default function SpecificSipTrunk() {
     const updatedFieldValues = currentFormValues.ipEntries[index];
     const response = await APICALL(
       API_TYPE.DELETE,
-      `${API_END_POINT.ADD_IP_WHITE_LISTING}/${updatedFieldValues.id}`,
+      `${API_END_POINT.CUSTOMER_SIP_TRUNK_IP_AUTH}/${updatedFieldValues.id}`,
       setloading,
       null,
       null,
@@ -202,7 +214,7 @@ export default function SpecificSipTrunk() {
     };
     const response = await APICALL(
       API_TYPE.PUT,
-      `${API_END_POINT.ADD_PRICING_INFO}/${id}`,
+      `${API_END_POINT.CUSTOMER_SIP_TRUNK_PRICING_INFO}/${id}`,
       setloading,
       pricingInfoPayload,
       null,

@@ -36,7 +36,7 @@ const SpecificRateDeck = () => {
   const getData = async () => {
     await APICALL(
       API_TYPE.GET,
-      `${API_END_POINT.RATE_DECK}/${id}`,
+      `${API_END_POINT.CUSTOMER_RATE_DECK}/${id}`,
       setLoading,
       null,
       setData,
@@ -99,7 +99,7 @@ const SpecificRateDeck = () => {
           className="mb-4"
         >
           <ArrowLeft />
-          Customers List
+          Rate Deck List
         </Button>
         {loading ? (
           <SkeletonCardLayout ROWS={10} COLUMNS={3} />

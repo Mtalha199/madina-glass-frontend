@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Link, useNavigate } from "react-router-dom";
 import { APICALL } from "@/components/Api/ApiCall";
-import { API_END_POINT, API_TYPE, SCREEN_PATH } from "@/Constant";
+import { API_END_POINT, API_TYPE, HAS_PERMISSION, PARENT_MODULE_NAME, PERMISSIONS, SCREEN_PATH } from "@/Constant";
 import SkeletonTable from "@/Commons/SkeletonTable";
 import TableContainer from "@/Commons/TableContainer";
 import DataTable from "@/components/ui/data-table";
@@ -14,9 +14,9 @@ export default function CustomersList() {
   const columns = [
     {
       header: "Name",
-      accessorKey: "fullName",
+      accessorKey: "username",
       cell: ({ row }) => {
-        const fullName = row.getValue("company_name");
+        const fullName = row.getValue("username");
         const id = row.getValue("id");
         const status = row.getValue("is_active");
   
@@ -101,17 +101,22 @@ export default function CustomersList() {
   const handleVisibleColumnsChange = (newVisibleColumns) => {
     setVisibleColumns(newVisibleColumns);
   };
+  const canViewDashboard = HAS_PERMISSION("List", "View");
+  console.log("canViewDashboard", canViewDashboard);
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Customers List</h1>
-
-        <Link
-          to={SCREEN_PATH.ADD_NEW_CUSTOMER}
-          className="text-primary hover:underline"
-        >
-          <Button>Add New Customer</Button>
-        </Link>
+        {
+          HAS_PERMISSION(PARENT_MODULE_NAME.CUSTOMER,PERMISSIONS.CUSTOMER.LIST.NAME, PERMISSIONS.CUSTOMER.LIST.ACTIONS.CUSTOMER_CREATE) && (
+            <Link
+              to={SCREEN_PATH.ADD_NEW_CUSTOMER}
+              className="text-primary hover:underline"
+            >
+              <Button>Add New Customer</Button>
+            </Link>
+          )
+        }
       </div>
       {loading ? (
         <SkeletonTable ROWS={10} COLUMNS={3} />

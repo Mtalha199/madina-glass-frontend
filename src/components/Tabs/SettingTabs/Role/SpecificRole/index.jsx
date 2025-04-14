@@ -2,17 +2,17 @@ import CommonDrawer from "@/Commons/DrawerCommon";
 import { APICALL } from "@/components/Api/ApiCall";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { API_END_POINT, API_TYPE } from "@/Constant";
+import { API_END_POINT, API_TYPE, TOAST_MESSAGES } from "@/Constant";
 import React, { useEffect, useState } from "react";
 
 const SpecificRole = ({ ID }) => {
   const [loading, setLoading] = useState(false);
-  const [originalData, setOriginalData] = useState([]); // Original data from API
-  const [workingData, setWorkingData] = useState([]);  // Working copy for modifications
+  const [originalData, setOriginalData] = useState([]);
+  const [workingData, setWorkingData] = useState([]);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [selectedSubmenu, setSelectedSubmenu] = useState(null);
-  const [changedPermissionIds, setChangedPermissionIds] = useState(new Set()); // Use Set for unique IDs
-    console.log("changedPermissionIds",changedPermissionIds)
+  const [changedPermissionIds, setChangedPermissionIds] = useState(new Set());
+
   useEffect(() => {
     getData();
   }, []);
@@ -25,34 +25,50 @@ const SpecificRole = ({ ID }) => {
       null,
       (data) => {
         setOriginalData(data);
-        setWorkingData(JSON.parse(JSON.stringify(data))); // Deep copy
+        setWorkingData(JSON.parse(JSON.stringify(data)));
       },
       () => {}
     );
   };
-console.log("workingData",workingData)
+
   const handleModuleCheckboxChange = (moduleId, checked) => {
     setWorkingData((prevData) => {
       const updatedData = prevData.map((module) => {
         if (module.id === moduleId) {
-          const changedIds = module.sub_menu
-            .flatMap((submenu) => submenu.permissions)
-            .filter((perm) => perm.access !== checked)
-            .map((perm) => perm.id);
-          
+          let changedIds = [];
+          if (module.sub_menu?.length > 0) {
+            changedIds = module.sub_menu
+              .flatMap((submenu) => submenu.permissions)
+              .filter((perm) => perm.access !== checked)
+              .map((perm) => perm.id);
+          } else if (module.permissions?.length > 0) {
+            changedIds = module.permissions
+              .filter((perm) => perm.access !== checked)
+              .map((perm) => perm.id);
+          }
+
           setChangedPermissionIds((prev) => new Set([...prev, ...changedIds]));
-          
+
           return {
             ...module,
             access: checked,
-            sub_menu: module.sub_menu.map((submenu) => ({
-              ...submenu,
-              access: checked,
-              permissions: submenu.permissions.map((perm) => ({
-                ...perm,
-                access: checked,
-              })),
-            })),
+            ...(module.sub_menu?.length > 0
+              ? {
+                  sub_menu: module.sub_menu.map((submenu) => ({
+                    ...submenu,
+                    access: checked,
+                    permissions: submenu.permissions.map((perm) => ({
+                      ...perm,
+                      access: checked,
+                    })),
+                  })),
+                }
+              : {
+                  permissions: module.permissions?.map((perm) => ({
+                    ...perm,
+                    access: checked,
+                  })),
+                }),
           };
         }
         return module;
@@ -62,7 +78,7 @@ console.log("workingData",workingData)
   };
 
   const handleSubmenuClick = (submenu) => {
-    setSelectedSubmenu({ ...submenu }); // Create a copy
+    setSelectedSubmenu({ ...submenu });
     setOpenDrawer(true);
   };
 
@@ -85,7 +101,7 @@ console.log("workingData",workingData)
       }));
 
       setChangedPermissionIds((prev) => new Set([...prev, ...changedIds]));
-      
+
       setWorkingData((prevData) =>
         prevData.map((module) => ({
           ...module,
@@ -99,38 +115,60 @@ console.log("workingData",workingData)
     });
   };
 
-  const handlePermissionChange = (permissionId, checked) => {
-    setSelectedSubmenu((prev) => {
-      const updatedPermissions = prev.permissions.map((perm) =>
-        perm.id === permissionId ? { ...perm, access: checked } : perm
-      );
-      
-      const allSelected = updatedPermissions.every((perm) => perm.access);
-      const allUnselected = updatedPermissions.every((perm) => !perm.access);
-      const hasAnyPermissionChecked = updatedPermissions.some((perm) => perm.access);
+  const handlePermissionChange = (permissionId, checked, isModuleLevel = false) => {
+    if (isModuleLevel) {
+      setWorkingData((prevData) => {
+        const updatedData = prevData.map((module) => {
+          if (module.permissions?.some((perm) => perm.id === permissionId)) {
+            const updatedPermissions = module.permissions.map((perm) =>
+              perm.id === permissionId ? { ...perm, access: checked } : perm
+            );
+            const allSelected = updatedPermissions.every((perm) => perm.access);
 
-      const permission = prev.permissions.find((perm) => perm.id === permissionId);
-      if (permission.access !== checked) {
-        setChangedPermissionIds((prev) => new Set([...prev, permissionId]));
-      }
+            if (module.permissions.find((perm) => perm.id === permissionId).access !== checked) {
+              setChangedPermissionIds((prev) => new Set([...prev, permissionId]));
+            }
 
-      const updatedSubmenu = {
-        ...prev,
-        access: allSelected ? true : allUnselected ? false : hasAnyPermissionChecked,
-        permissions: updatedPermissions,
-      };
+            return {
+              ...module,
+              access: allSelected,
+              permissions: updatedPermissions,
+            };
+          }
+          return module;
+        });
+        return updatedData;
+      });
+    } else {
+      setSelectedSubmenu((prev) => {
+        const updatedPermissions = prev.permissions.map((perm) =>
+          perm.id === permissionId ? { ...perm, access: checked } : perm
+        );
+        const allSelected = updatedPermissions.every((perm) => perm.access);
 
-      setWorkingData((prevData) =>
-        prevData.map((module) => ({
-          ...module,
-          sub_menu: module.sub_menu.map((submenu) =>
-            submenu.id === prev.id ? updatedSubmenu : submenu
-          ),
-        }))
-      );
+        const permission = prev.permissions.find((perm) => perm.id === permissionId);
+        if (permission.access !== checked) {
+          setChangedPermissionIds((prev) => new Set([...prev, permissionId]));
+        }
 
-      return updatedSubmenu;
-    });
+        const updatedSubmenu = {
+          ...prev,
+          access: allSelected,
+          permissions: updatedPermissions,
+        };
+
+        setWorkingData((prevData) =>
+          prevData.map((module) => ({
+            ...module,
+            sub_menu: module.sub_menu.map((submenu) =>
+              submenu.id === prev.id ? updatedSubmenu : submenu
+            ),
+          }))
+        );
+
+        return updatedSubmenu;
+      });
+    }
   };
 
   const handleDrawerSave = () => {
@@ -155,33 +193,39 @@ console.log("workingData",workingData)
           access: getPermissionAccess(permission_id),
         })),
       };
-
-      console.log("Payload to be sent:", payload);
-
-     const response= await APICALL(
+      const response = await APICALL(
         API_TYPE.POST,
         `${API_END_POINT.ASSIGN_PERMISSION}`,
         setLoading,
         payload,
         () => {},
         () => {},
+        TOAST_MESSAGES.PERMISSION_UPDATED
       );
-      if(response!==undefined){
+      if (response !== undefined) {
         getData();
         setChangedPermissionIds(new Set());
-      } 
+      }
     }
   };
 
-  // Helper function to get current access state of a permission
   const getPermissionAccess = (permissionId) => {
     for (const module of workingData) {
-      for (const submenu of module.sub_menu) {
-        const permission = submenu.permissions.find((perm) => perm.id === permissionId);
+      if (module.sub_menu?.length > 0) {
+        for (const submenu of module.sub_menu) {
+          const permission = submenu.permissions.find(
+            (perm) => perm.id === permissionId
+          );
+          if (permission) return permission.access;
+        }
+      } else if (module.permissions?.length > 0) {
+        const permission = module.permissions.find(
+          (perm) => perm.id === permissionId
+        );
         if (permission) return permission.access;
       }
     }
-    return false; // Default if not found
+    return false;
   };
 
   return (
@@ -201,7 +245,7 @@ console.log("workingData",workingData)
             </div>
             <div className="col-span-1 md:col-span-5 lg:col-span-4">
               <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                {module.sub_menu.length > 0 ? (
+                {module.sub_menu?.length > 0 ? (
                   module.sub_menu.slice(0, 5).map((submenu) => (
                     <Button
                       key={submenu.id}
@@ -211,10 +255,24 @@ console.log("workingData",workingData)
                       {submenu.name}
                     </Button>
                   ))
+                ) : module.permissions?.length > 0 ? (
+                  module.permissions.map((permission) => (
+                    <div key={permission.id} className="flex items-center space-x-2">
+                      <Checkbox
+                        checked={permission.access}
+                        onCheckedChange={(checked) =>
+                          handlePermissionChange(permission.id, checked, true)
+                        }
+                      />
+                      <label className="text-sm font-medium">
+                        {permission.action}
+                      </label>
+                    </div>
+                  ))
                 ) : (
-                  <p className="text-gray-500">No submenus available</p>
+                  <p className="text-gray-500">No permissions available</p>
                 )}
-                {module.sub_menu.length > 5 && (
+                {module.sub_menu?.length > 5 && (
                   <div className="col-span-full mt-4">
                     <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                       {module.sub_menu.slice(5).map((submenu) => (
@@ -253,18 +311,17 @@ console.log("workingData",workingData)
             <div className="flex items-center space-x-2">
               <Checkbox
                 checked={selectedSubmenu.access}
-                onCheckedChange={(checked) => handleSubMenu(selectedSubmenu.id, checked)}
+                onCheckedChange={(checked) =>
+                  handleSubMenu(selectedSubmenu.id, checked)
+                }
               />
               <label className="text-sm font-medium">
-                {selectedSubmenu.name} (Submenu Access)
+                {selectedSubmenu.name} (All)
               </label>
             </div>
             {selectedSubmenu.permissions.length > 0 ? (
               selectedSubmenu.permissions.map((permission) => (
-                <div
-                  key={permission.id}
-                  className="flex items-center space-x-2"
-                >
+                <div key={permission.id} className="flex items-center space-x-2">
                   <Checkbox
                     checked={permission.access}
                     onCheckedChange={(checked) =>

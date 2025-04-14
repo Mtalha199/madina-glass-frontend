@@ -21,6 +21,9 @@ import {
   API_END_POINT,
   API_TYPE,
   DATA_VIEW_MODE,
+  HAS_PERMISSION,
+  PARENT_MODULE_NAME,
+  PERMISSIONS,
   SCREEN_PATH,
   TOAST_MESSAGES,
 } from "@/Constant";
@@ -64,7 +67,7 @@ export const AddSipTrunk = () => {
 
     const response = await APICALL(
       API_TYPE.POST,
-      API_END_POINT.ADD_NEW_SIP_TRUNK,
+      API_END_POINT.CUSTOMER_SIP_TRUNK,
       setLoading,
       payload,
       null,
@@ -100,7 +103,7 @@ export const AddSipTrunk = () => {
     );
     await APICALL(
       API_TYPE.POST,
-      API_END_POINT.ADD_IP_WHITE_LISTING,
+      API_END_POINT.CUSTOMER_SIP_TRUNK_IP_AUTH,
       setLoading,
       payload1,
       null,
@@ -108,23 +111,21 @@ export const AddSipTrunk = () => {
       TOAST_MESSAGES.IP_WHITE_LISTING_ADDED
     );
   }
-  async function onSubmitRouting(data) {
-console.log(data)
-  }
+  async function onSubmitRouting(data) {}
   async function onSubmitStirShaken(data) {
-  const AllNumbers = data.stirShakenData.map(item => ({
-    number:item.phoneNumber,
-    attest: item.attestationType,
-    notes: item.notes
-  }));
-const stirShakenPayload={
-  number:AllNumbers,
-  default_stir_shaken:data.default_action,
-  trunk_id:trunkId
-}
+    const AllNumbers = data.stirShakenData.map((item) => ({
+      number: item.phoneNumber,
+      attest: item.attestationType,
+      notes: item.notes,
+    }));
+    const stirShakenPayload = {
+      number: AllNumbers,
+      default_stir_shaken: data.default_action,
+      trunk_id: trunkId,
+    };
     await APICALL(
       API_TYPE.POST,
-      API_END_POINT.ADD_STIR_SHAKEN,
+      API_END_POINT.CUSTOMER_SIP_TRUNK_STIR_SHAKEN,
       setLoading,
       stirShakenPayload,
       null,
@@ -133,35 +134,33 @@ const stirShakenPayload={
     );
   }
   async function onSubmitPricingInfo(data) {
-
-    
-  const pricingInfoPayload={
-    billing_type: data.billing_type,
-    billing_increment: data.billing_increment,
-    initial: data.initial,
-    subsequent: data.subsequent,
-    price_cap: data.price_cap,
-    price_protection: data.price_protection,
-    override_carrier_price_protection: data.override_carrier_price_protection,
-    digits_used: data.digits_used,
-    rounding_method: data.rounding_method,
-    outbound_media_ip_block: data.outbound_media_ip_block,
-    inbound_media_ip_block: data.inbound_media_ip_block,
-    allow555: data.allow555,
-    use_global_404_blacklist: data.use_global_404_blacklist,
-    call_extend: data.call_extend,
-    override_call_extending: data.override_call_extending,
+    const pricingInfoPayload = {
+      billing_type: data.billing_type,
+      billing_increment: data.billing_increment,
+      initial: data.initial,
+      subsequent: data.subsequent,
+      price_cap: data.price_cap,
+      price_protection: data.price_protection,
+      override_carrier_price_protection: data.override_carrier_price_protection,
+      digits_used: data.digits_used,
+      rounding_method: data.rounding_method,
+      outbound_media_ip_block: data.outbound_media_ip_block,
+      inbound_media_ip_block: data.inbound_media_ip_block,
+      allow555: data.allow555,
+      use_global_404_blacklist: data.use_global_404_blacklist,
+      call_extend: data.call_extend,
+      override_call_extending: data.override_call_extending,
+    };
+    await APICALL(
+      API_TYPE.PUT,
+      `${API_END_POINT.CUSTOMER_SIP_TRUNK_PRICING_INFO}/${trunkId}`,
+      setLoading,
+      pricingInfoPayload,
+      null,
+      null,
+      TOAST_MESSAGES.PRICING_INFO_ADDED
+    );
   }
-      await APICALL(
-        API_TYPE.PUT,
-        `${API_END_POINT.ADD_PRICING_INFO}/${trunkId}`,
-        setLoading,
-        pricingInfoPayload,
-        null,
-        null,
-        TOAST_MESSAGES.PRICING_INFO_ADDED
-      );
-    }
   return (
     <>
       <div className="p-6">
@@ -219,25 +218,38 @@ const stirShakenPayload={
                   form={formIpWhiteListing}
                   MODE={DATA_VIEW_MODE.ADD}
                 />
-                <div className="col-span-2 flex justify-end mt-4">
-                  <Button
-                    type="submit"
-                    disabled={trunkId === null}
-                    className=""
-                  >
-                    Save
-                  </Button>
-                </div>
+                {HAS_PERMISSION(
+          PARENT_MODULE_NAME.CUSTOMER,
+
+                  PERMISSIONS.CUSTOMER.SIP_TRUNK.NAME,
+                  PERMISSIONS.CUSTOMER.SIP_TRUNK.ACTIONS
+                    .CUSTOMER_SIP_TRUNK_IP_AUTH_CREATE
+                ) && (
+                  <div className="col-span-2 flex justify-end mt-4">
+                    <Button
+                      type="submit"
+                      disabled={trunkId === null}
+                      className=""
+                    >
+                      Save
+                    </Button>
+                  </div>
+                )}
               </form>
             </Form>
             <Form {...formStirShaken}>
-              <form
-                onSubmit={formStirShaken.handleSubmit(
-                  onSubmitStirShaken
-                )}
-              >
-                <StirAndShaken form={formStirShaken} MODE={DATA_VIEW_MODE.ADD} TRUNK_ID={trunkId} />
-                <div className="col-span-2 flex justify-end mt-4">
+              <form onSubmit={formStirShaken.handleSubmit(onSubmitStirShaken)}>
+                <StirAndShaken
+                  form={formStirShaken}
+                  MODE={DATA_VIEW_MODE.ADD}
+                  TRUNK_ID={trunkId}
+                />
+                {/* {HAS_PERMISSION(
+                  PERMISSIONS.CUSTOMER.SIP_TRUNK.NAME,
+                  PERMISSIONS.CUSTOMER.SIP_TRUNK.ACTIONS
+                    .CUSTOMER_SIP_TRUNK_STIR_SHAKEN_CREATE
+                ) && (
+                  <div className="col-span-2 flex justify-end mt-4">
                   <Button
                     type="submit"
                     disabled={trunkId === null}
@@ -246,31 +258,42 @@ const stirShakenPayload={
                     Save
                   </Button>
                 </div>
+                )} */}
               </form>
             </Form>
             <Form {...routingListing}>
-              <form
-                onSubmit={routingListing.handleSubmit(onSubmitRouting)}
-              >
-                <Routing form={form} MODE={DATA_VIEW_MODE.ADD} trunkId={trunkId} />
-      
+              <form onSubmit={routingListing.handleSubmit(onSubmitRouting)}>
+                <Routing
+                  form={form}
+                  MODE={DATA_VIEW_MODE.ADD}
+                  trunkId={trunkId}
+                />
               </form>
             </Form>
             <Form {...formPricingInfo}>
               <form
-                onSubmit={formPricingInfo.handleSubmit(
-                  onSubmitPricingInfo
-                )}
+                onSubmit={formPricingInfo.handleSubmit(onSubmitPricingInfo)}
               >
-                <PricingInfoForm form={formPricingInfo} MODE={DATA_VIEW_MODE.ADD} />
+                <PricingInfoForm
+                  form={formPricingInfo}
+                  MODE={DATA_VIEW_MODE.ADD}
+                />
                 <div className="col-span-2 flex justify-end mt-4">
-                  <Button
-                    type="submit"
-                    // disabled={trunkId === null}
-                    className=""
-                  >
-                    Save
-                  </Button>
+                  {HAS_PERMISSION(
+          PARENT_MODULE_NAME.CUSTOMER,
+
+                    PERMISSIONS.CUSTOMER.SIP_TRUNK.NAME,
+                    PERMISSIONS.CUSTOMER.SIP_TRUNK.ACTIONS
+                      .CUSTOMER_SIP_TRUNK_PRICING_INFO_CREATE
+                  ) && (
+                    <Button
+                      type="submit"
+                      // disabled={trunkId === null}
+                      className=""
+                    >
+                      Save
+                    </Button>
+                  )}
                 </div>
               </form>
             </Form>

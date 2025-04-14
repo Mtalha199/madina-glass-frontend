@@ -7,7 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Form } from "@/components/ui/form";
 import { Edit } from "lucide-react";
 import { APICALL } from "@/components/Api/ApiCall";
-import { API_END_POINT, API_TYPE, ROUTING_TABS, TOAST_MESSAGES } from "@/Constant";
+import { API_END_POINT, API_TYPE, HAS_PERMISSION, PERMISSIONS, ROUTING_TABS, TOAST_MESSAGES } from "@/Constant";
 import { toast } from "@/hooks/use-toast";
 
 const Percentage = ({trunkId ,GET_ROUTING=false}) => {
@@ -60,7 +60,7 @@ useEffect(() => {
   const getAlreadyRouting = async () => {
     await APICALL(
       API_TYPE.GET,
-      `${API_END_POINT.ADD_ROUTING}/${trunkId}`,
+      `${API_END_POINT.CUSTOMER_SIP_TRUNK_ROUTING}/${trunkId}`,
       setLoading,
       null,
       setroutingData,
@@ -197,7 +197,7 @@ useEffect(() => {
 
     await APICALL(
         API_TYPE.PUT,
-        `${API_END_POINT.ADD_ROUTING}/${trunkId}`,
+        `${API_END_POINT.CUSTOMER_SIP_TRUNK_ROUTING}/${trunkId}`,
         setLoading,
         payload,
         null,
@@ -249,13 +249,25 @@ useEffect(() => {
         </div>
       ))}
       <div className="col-span-2 flex justify-end mt-4">
+        {
+      HAS_PERMISSION(
+        PARENT_MODULE_NAME.CUSTOMER,
+
+        PERMISSIONS.CUSTOMER.SIP_TRUNK.NAME,
+        PERMISSIONS.CUSTOMER.SIP_TRUNK.ACTIONS
+          .CUSTOMER_SIP_TRUNK_ROUTING_UPDATE
+      ) && (  
+        
         <Button
           type="button"
           onClick={handleSaveAll}
           disabled={trunkId==null}
         >
           Save
-        </Button>
+        </Button> 
+      )
+        }
+
       </div>
       <CommonDrawer
         title={`Edit Trunk`}

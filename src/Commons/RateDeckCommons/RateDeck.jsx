@@ -8,6 +8,9 @@ import {
   API_TYPE,
   COLUMN_TO_MAP_UPLOAD_RATE_DECK,
   DATA_VIEW_MODE,
+  HAS_PERMISSION,
+  PARENT_MODULE_NAME,
+  PERMISSIONS,
   RATE_DECK_STATE,
   SCREEN_PATH,
   TOAST_MESSAGES,
@@ -69,13 +72,17 @@ const RateDeck = ({ CUSTOMER = true }) => {
       cell: ({ row }) => {
         const fullName = row.getValue("file_name");
         const id = row.getValue("id");
-        return (
+    
+        return CUSTOMER ? (
           <Link to={`/customer/rate-deck/${id}`}>
             <span className="text-primary hover:underline">{fullName}</span>
           </Link>
+        ) : (
+          <span>{fullName}</span>
         );
       },
     },
+    
     { header: "Effective Date", accessorKey: "min_profit" },
     {
       header: "Actions",
@@ -85,28 +92,48 @@ const RateDeck = ({ CUSTOMER = true }) => {
         const isLoading = loaderDownload[ID] || false;
         return (
           <div className="flex space-x-2">
-            {isLoading ? (
+            {(CUSTOMER
+              ? HAS_PERMISSION(
+                  PARENT_MODULE_NAME.CUSTOMER,
+                  PERMISSIONS.CUSTOMER.RATE_DECK.NAME,
+                  PERMISSIONS.CUSTOMER.RATE_DECK.ACTIONS
+                    .CUSTOMER_RATE_DECK_DOWNLOAD
+                )
+              : HAS_PERMISSION(
+                  PARENT_MODULE_NAME.CARRIER,
+                  PERMISSIONS.CARRIER.RATE_DECK.NAME,
+                  PERMISSIONS.CARRIER.RATE_DECK.ACTIONS
+                    .CARRIER_RATE_DECK_DOWNLOAD
+                )) && (
               <>
-                <Button variant="outline" size="sm">
-                  <Loader size={20} LOADING={false} /> Download
-                </Button>
+                {isLoading ? (
+                  <Button variant="outline" size="sm">
+                    <Loader size={20} LOADING={false} /> Download
+                  </Button>
+                ) : (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleDownload(ID)}
+                  >
+                    <Download className="mr-2 h-4 w-4" /> Download
+                  </Button>
+                )}
               </>
-            ) : (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleDownload(ID)}
-              >
-                <Download className="mr-2 h-4 w-4" /> Download
-              </Button>
             )}
-            {CUSTOMER && (
-              <AssignRateDeck
-                SIP_TRUNK_IN_RATE_DECK={false}
-                TRUNK_ID={ID}
-                sipTrunkData={siptrunkData}
-              />
-            )}
+
+            {CUSTOMER &&
+              HAS_PERMISSION(
+                PARENT_MODULE_NAME.CUSTOMER,
+                PERMISSIONS.CUSTOMER.RATE_DECK.NAME,
+                PERMISSIONS.CUSTOMER.RATE_DECK.ACTIONS.CUSTOMER_RATE_DECK_ASSIGN
+              ) && (
+                <AssignRateDeck
+                  SIP_TRUNK_IN_RATE_DECK={false}
+                  TRUNK_ID={ID}
+                  sipTrunkData={siptrunkData}
+                />
+              )}
           </div>
         );
       },
@@ -160,8 +187,8 @@ const RateDeck = ({ CUSTOMER = true }) => {
   }, [page, limit, orderBy, order, search]);
   const getData = async () => {
     const API_END = CUSTOMER
-      ? `${API_END_POINT.RATE_DECK}?carrier=0`
-      : `${API_END_POINT.RATE_DECK}?carrier=1`;
+      ? `${API_END_POINT.CUSTOMER_RATE_DECK}`
+      : `${API_END_POINT.CARRIER_RATE_DECK}`;
     await APICALL(
       API_TYPE.GET,
       API_END,
@@ -173,7 +200,14 @@ const RateDeck = ({ CUSTOMER = true }) => {
   };
 
   useEffect(() => {
-    pollInProgressItems(data,  setLoaderDownload ,`${API_END_POINT.RATE_DECK}` ,RATE_DECK_STATE.COMPLETED,30, 10000);
+    pollInProgressItems(
+      data,
+      setLoaderDownload,
+      `${API_END_POINT.RATE_DECK}`,
+      RATE_DECK_STATE.COMPLETED,
+      30,
+      10000
+    );
   }, [data]);
   const handleSort = (column) => {
     if (orderBy === column) {
@@ -244,102 +278,212 @@ const RateDeck = ({ CUSTOMER = true }) => {
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl font-bold">Rate Decks</h1>
           <div className="flex space-x-2">
-            {CUSTOMER && (
-              <Link to={SCREEN_PATH.ADD_NEW_RATE_DECK_GENERATE}>
-                <Button>
-                  <Plus className=" h-4 w-4" />
-                  Generate Rate Deck
-                </Button>
-              </Link>
+            {CUSTOMER &&
+              HAS_PERMISSION(
+                PARENT_MODULE_NAME.CUSTOMER,
+                PERMISSIONS.CUSTOMER.RATE_DECK.NAME,
+                PERMISSIONS.CUSTOMER.RATE_DECK.ACTIONS.CUSTOMER_RATE_DECK_CREATE
+              ) && (
+                <Link to={SCREEN_PATH.ADD_NEW_RATE_DECK_GENERATE}>
+                  <Button>
+                    <Plus className=" h-4 w-4" />
+                    Generate Rate Deck
+                  </Button>
+                </Link>
+              )}
+            {/* {CUSTOMER && HAS_PERMISSION(PERMISSIONS.CUSTOMER.RATE_DECK.NAME, PERMISSIONS.CUSTOMER.RATE_DECK.ACTIONS.CUSTOMER_RATE_DECK_CREATE) && (
+     <CommonDrawer
+     title="Upload File"
+     description="Please upload file and choose the header to map"
+     isOpen={open}
+     onOpenChange={handleDrawerCloseBulk}
+     onSave={() => form.handleSubmit(onSubmitBulk)()}
+     loading={loading}
+     trigger={
+       <Button type="button">
+         <Plus className="h-4 w-4" />
+         Upload Rate Deck
+       </Button>
+     }
+   >
+     <Form {...form}>
+       <form onSubmit={form.handleSubmit(onSubmitBulk)}>
+         <CommonFileUpload
+           columnMappings={COLUMN_TO_MAP_UPLOAD_RATE_DECK}
+           onComplete={handleUploadComplete}
+         />
+         {CUSTOMER === false && (
+           <>
+             <div className="mt-4">
+               {SelectAndView({
+                 LABEL: "Sip Trunk",
+                 NAME: "sip_trunk_id",
+                 PLACEHOLDER: "Select Sip trunk",
+                 ICON: <Server />,
+                 OPTIONS: siptrunkData?.flatMap((item) =>
+                   item?.sip_trunks.map((newItem) => ({
+                     value: String(newItem?.id),
+                     label: newItem?.trunk_name,
+                   }))
+                 ),
+                 IS_REQUIRED: true,
+                 MODE: DATA_VIEW_MODE.ADD,
+                 EDIT: false,
+                 FORM: form,
+               })}
+             </div>
+             <div className="mt-4">
+               <FormField
+                 control={form.control}
+                 name="effective_date"
+                 render={({ field }) => (
+                   <FormItem className="flex flex-col">
+                     <FormLabel>Effective Date</FormLabel>
+                     <Popover>
+                       <PopoverTrigger asChild>
+                         <FormControl>
+                           <Button
+                             variant={"outline"}
+                             className={cn(
+                               "w-full pl-3 text-left font-normal",
+                               !field.value && "text-muted-foreground"
+                             )}
+                           >
+                             {field.value ? (
+                               format(field.value, "PPP")
+                             ) : (
+                               <span>Select effective date</span>
+                             )}
+                             <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                           </Button>
+                         </FormControl>
+                       </PopoverTrigger>
+                       <PopoverContent
+                         className="w-auto p-0"
+                         align="start"
+                       >
+                         <Calendar
+                           mode="single"
+                           selected={field.value}
+                           onSelect={field.onChange}
+                           initialFocus
+                         />
+                       </PopoverContent>
+                     </Popover>
+                     <FormMessage />
+                   </FormItem>
+                 )}
+               />
+             </div>
+           </>
+         )}
+       </form>
+     </Form>
+   </CommonDrawer>
+            )
+            } */}
+            {(CUSTOMER
+              ? HAS_PERMISSION(
+                  PARENT_MODULE_NAME.CUSTOMER,
+                  PERMISSIONS.CUSTOMER.RATE_DECK.NAME,
+                  PERMISSIONS.CUSTOMER.RATE_DECK.ACTIONS
+                    .CUSTOMER_RATE_DECK_UPLOAD
+                )
+              : HAS_PERMISSION(
+                  PARENT_MODULE_NAME.CARRIER,
+                  PERMISSIONS.CARRIER.RATE_DECK.NAME,
+                  PERMISSIONS.CARRIER.RATE_DECK.ACTIONS.CARRIER_RATE_DECK_UPLOAD
+                )) && (
+              <CommonDrawer
+                title="Upload File"
+                description="Please upload file and choose the header to map"
+                isOpen={open}
+                onOpenChange={handleDrawerCloseBulk}
+                onSave={() => form.handleSubmit(onSubmitBulk)()}
+                loading={loading}
+                trigger={
+                  <Button type="button">
+                    <Plus className="h-4 w-4" />
+                    {CUSTOMER ? "Upload Rate Deck" : "Upload Carrier Rate Deck"}
+                  </Button>
+                }
+              >
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmitBulk)}>
+                    <CommonFileUpload
+                      columnMappings={COLUMN_TO_MAP_UPLOAD_RATE_DECK}
+                      onComplete={handleUploadComplete}
+                    />
+                    {CUSTOMER === false && (
+                      <>
+                        <div className="mt-4">
+                          {SelectAndView({
+                            LABEL: "Sip Trunk",
+                            NAME: "sip_trunk_id",
+                            PLACEHOLDER: "Select Sip trunk",
+                            ICON: <Server />,
+                            OPTIONS: siptrunkData?.flatMap((item) =>
+                              item?.sip_trunks.map((newItem) => ({
+                                value: String(newItem?.id),
+                                label: newItem?.trunk_name,
+                              }))
+                            ),
+                            IS_REQUIRED: true,
+                            MODE: DATA_VIEW_MODE.ADD,
+                            EDIT: false,
+                            FORM: form,
+                          })}
+                        </div>
+                        <div className="mt-4">
+                          <FormField
+                            control={form.control}
+                            name="effective_date"
+                            render={({ field }) => (
+                              <FormItem className="flex flex-col">
+                                <FormLabel>Effective Date</FormLabel>
+                                <Popover>
+                                  <PopoverTrigger asChild>
+                                    <FormControl>
+                                      <Button
+                                        variant={"outline"}
+                                        className={cn(
+                                          "w-full pl-3 text-left font-normal",
+                                          !field.value &&
+                                            "text-muted-foreground"
+                                        )}
+                                      >
+                                        {field.value ? (
+                                          format(field.value, "PPP")
+                                        ) : (
+                                          <span>Select effective date</span>
+                                        )}
+                                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                      </Button>
+                                    </FormControl>
+                                  </PopoverTrigger>
+                                  <PopoverContent
+                                    className="w-auto p-0"
+                                    align="start"
+                                  >
+                                    <Calendar
+                                      mode="single"
+                                      selected={field.value}
+                                      onSelect={field.onChange}
+                                      initialFocus
+                                    />
+                                  </PopoverContent>
+                                </Popover>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </>
+                    )}
+                  </form>
+                </Form>
+              </CommonDrawer>
             )}
-            <CommonDrawer
-              title="Upload File"
-              description="Please upload file and choose the header to map"
-              isOpen={open}
-              onOpenChange={handleDrawerCloseBulk}
-              onSave={() => form.handleSubmit(onSubmitBulk)()}
-              loading={loading}
-              trigger={
-                <Button type="button">
-                  <Plus className="h-4 w-4" />
-                  Upload Rate Deck
-                </Button>
-              }
-            >
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmitBulk)}>
-                  <CommonFileUpload
-                    columnMappings={COLUMN_TO_MAP_UPLOAD_RATE_DECK}
-                    onComplete={handleUploadComplete}
-                  />
-                  {CUSTOMER === false && (
-                    <>
-                      <div className="mt-4">
-                        {SelectAndView({
-                          LABEL: "Sip Trunk",
-                          NAME: "sip_trunk_id",
-                          PLACEHOLDER: "Select Sip trunk",
-                          ICON: <Server />,
-                          OPTIONS: siptrunkData?.flatMap((item) =>
-                            item?.sip_trunks.map((newItem) => ({
-                              value: String(newItem?.id),
-                              label: newItem?.trunk_name,
-                            }))
-                          ),
-                          IS_REQUIRED: true,
-                          MODE: DATA_VIEW_MODE.ADD,
-                          EDIT: false,
-                          FORM: form,
-                        })}
-                      </div>
-                      <div className="mt-4">
-                        <FormField
-                          control={form.control}
-                          name="effective_date"
-                          render={({ field }) => (
-                            <FormItem className="flex flex-col">
-                              <FormLabel>Effective Date</FormLabel>
-                              <Popover>
-                                <PopoverTrigger asChild>
-                                  <FormControl>
-                                    <Button
-                                      variant={"outline"}
-                                      className={cn(
-                                        "w-full pl-3 text-left font-normal",
-                                        !field.value && "text-muted-foreground"
-                                      )}
-                                    >
-                                      {field.value ? (
-                                        format(field.value, "PPP")
-                                      ) : (
-                                        <span>Select effective date</span>
-                                      )}
-                                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                    </Button>
-                                  </FormControl>
-                                </PopoverTrigger>
-                                <PopoverContent
-                                  className="w-auto p-0"
-                                  align="start"
-                                >
-                                  <Calendar
-                                    mode="single"
-                                    selected={field.value}
-                                    onSelect={field.onChange}
-                                    initialFocus
-                                  />
-                                </PopoverContent>
-                              </Popover>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                    </>
-                  )}
-                </form>
-              </Form>
-            </CommonDrawer>
           </div>
         </div>
         {loading ? (
