@@ -169,24 +169,46 @@ import {
   Settings2,
   FileSpreadsheet,
 } from "lucide-react";
-const storedPermissions = localStorage.getItem(AUTHENTICATION_VALUE.PERMISSION);
-const permissions = JSON.parse(storedPermissions);
-const sideBar = permissions
-  ?.filter(item => item?.access === true)
-  ?.map((item) => ({
-    title: item?.name,
-    url: item?.route,
-    icon: ICONS[item?.route],
-    items:
-      item?.sub_menu?.length > 0
-        ? item.sub_menu
-            .filter(subItem => subItem?.access === true)
-            .map((subItem) => ({
-              title: subItem?.name,
-              url: subItem?.route,
-            }))
-        : [],
-  }));
+// const storedPermissions = localStorage.getItem(AUTHENTICATION_VALUE.PERMISSION);
+// const permissions = JSON.parse(storedPermissions);
+// const sideBar = permissions
+//   ?.filter(item => item?.access === true)
+//   ?.map((item) => ({
+//     title: item?.name,
+//     url: item?.route,
+//     icon: ICONS[item?.route],
+//     items:
+//       item?.sub_menu?.length > 0
+//         ? item.sub_menu
+//             .filter(subItem => subItem?.access === true)
+//             .map((subItem) => ({
+//               title: subItem?.name,
+//               url: subItem?.route,
+//             }))
+//         : [],
+//   }));
+export const getSidebarItems = () => {
+  const storedPermissions = localStorage.getItem(AUTHENTICATION_VALUE.PERMISSION);
+  const permissions = JSON.parse(storedPermissions);
+
+  return permissions
+    ?.filter(item => item?.access === true)
+    ?.map((item) => ({
+      title: item?.name,
+      url: item?.route,
+      icon: ICONS[item?.route],
+      items:
+        item?.sub_menu?.length > 0
+          ? item.sub_menu
+              .filter(subItem => subItem?.access === true)
+              .map((subItem) => ({
+                title: subItem?.name,
+                url: subItem?.route,
+              }))
+          : [],
+    })) || [];
+};
+
 export const NAVIGATION = {
   user: {
     name: "shadcn",
@@ -399,7 +421,7 @@ export const NAVIGATION = {
   //     items: [],
   //   },
   // ],
-  navMain: sideBar,
+  navMain: getSidebarItems(),
   projects: [
     // {
     //   name: "Number Reputation",
@@ -791,6 +813,8 @@ CUSTOMER_LIST_VIEW:"customer:list:view",
 //   return false;
 // };
 export const HAS_PERMISSION = (PARENT_MODULE, MODULE_NAME, ACTION) => {
+  const storedPermissions = localStorage.getItem(AUTHENTICATION_VALUE.PERMISSION);
+const permissions = JSON.parse(storedPermissions);
   if (!permissions || !Array.isArray(permissions)) {
     return false;
   }
