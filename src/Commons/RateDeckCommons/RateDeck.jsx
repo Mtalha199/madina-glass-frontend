@@ -58,7 +58,7 @@ const RateDeck = ({ CUSTOMER = true }) => {
   const handleDownload = async (id) => {
     setLoaderDownload((prev) => ({ ...prev, [id]: true }));
     await DOWNLOADFILE(
-      `${API_END_POINT.RATE_DECK}/download/internal/${id}`,
+      `${CUSTOMER ? API_END_POINT.CUSTOMER_RATE_DECK_DOWNLOAD_INTERNEL :API_END_POINT.CARRIER_RATE_DECK_DOWNLOAD_INTERNEL  }/${id}`,
       "Rate deck",
       setloadingDownload,
       "CSV file download successfully"
@@ -242,7 +242,7 @@ const RateDeck = ({ CUSTOMER = true }) => {
     }
     const response = await APICALL(
       API_TYPE.POST,
-      API_END_POINT.UPLOAD_RATE_DECK,
+      `${CUSTOMER ? API_END_POINT.CUSTOMER_RATE_DECK : API_END_POINT.CARRIER_RATE_DECK}`,
       setloading,
       formData,
       null,

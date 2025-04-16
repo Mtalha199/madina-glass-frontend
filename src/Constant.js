@@ -29,12 +29,14 @@ export const API_END_POINT = {
   // --------------------------------------------------CUSTOMER_RATE_DECK-----------------------------------
 CUSTOMER_RATE_DECK: "customer/rate-deck",
 CUSTOMER_RATE_DECK_ALL: "customer/rate-deck/names",
+CUSTOMER_RATE_DECK_DOWNLOAD_INTERNEL: "customer/rate-deck/download/internal",
 
 
 
 // -----------------------------------------------------CARRIER_RATE_DECK--------------------------------------
 CARRIER_RATE_DECK: "carrier/rate-deck",
 CARRIER_RATE_DECK_ALL: "customer/rate-deck/names",
+CARRIER_RATE_DECK_DOWNLOAD_INTERNEL: "carrier/rate-deck/download/internal",
 
 
   ADD_STIR_SHAKEN: "siptrunk/stir-shaken",
