@@ -34,6 +34,9 @@ import {
   API_END_POINT,
   API_TYPE,
   BLOCK_MATCHING_SRC_DST,
+  HAS_PERMISSION,
+  PARENT_MODULE_NAME,
+  PERMISSIONS,
   TRUNK_TYPE_OPTIONS,
   TRUNK_TYPE_STATUS_OPTIONS,
   VERIFY_CALL_TOKEN,
@@ -326,7 +329,12 @@ export const BasicDetailFormCarrier = ({ form, MODE, DATA, ID }) => {
         </div>
         <div className="col-span-2 flex justify-end mt-4 mb-4">
           <div className="space-x-2">
-            {MODE === "view" && (
+            {MODE === "view" && HAS_PERMISSION(
+                        PARENT_MODULE_NAME.CARRIER,
+                        PERMISSIONS.CARRIER.SIP_TRUNK.NAME,
+                        PERMISSIONS.CARRIER.SIP_TRUNK.ACTIONS
+                          .CARRIER_SIP_TRUNK_UPDATE
+                      ) &&  (
               <>
                 {edit ? (
                   <>

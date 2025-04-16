@@ -49,7 +49,7 @@ export default function SpecificSipTrunkCarrier() {
   const getData = async () => {
     await APICALL(
       API_TYPE.GET,
-      `${API_END_POINT.VIEW_SIP_TRUNK}/${id}`,
+      `${API_END_POINT.CARRIER_SIP_TRUNK}/${id}`,
       setloading,
       null,
       setData,
@@ -57,7 +57,7 @@ export default function SpecificSipTrunkCarrier() {
     );
     await APICALL(
       API_TYPE.GET,
-      `${API_END_POINT.VIEW_IP_WHITE_LISTING}/${id}`,
+      `${API_END_POINT.CARRIER_SIP_TRUNK_IP_AUTH}/${id}`,
       setloading,
       null,
       setIPWhiteListingData,

@@ -26,6 +26,7 @@ export const API_END_POINT = {
 
 // --------------------------------------------------CARRIER_SIP_TRUNK-------------------------------------
   CARRIER_SIP_TRUNK: "carrier/siptrunk",
+  CARRIER_SIP_TRUNK_IP_AUTH:"carrier/siptrunk/ip-auth",
   // --------------------------------------------------CUSTOMER_RATE_DECK-----------------------------------
 CUSTOMER_RATE_DECK: "customer/rate-deck",
 CUSTOMER_RATE_DECK_ALL: "customer/rate-deck/names",
@@ -935,6 +936,12 @@ export const PERMISSIONS = {
        
           CARRIER_SIP_TRUNK_UPDATE: "carrier:siptrunk:update",
           CARRIER_SIP_TRUNK_DELETE: "carrier:siptrunk:delete",
+
+          // ------------------------------------------CARRIER_SIP_TRUNK_IP_AUTH-------------------------------------
+          CARRIER_SIP_TRUNK_IP_AUTH_VIEW:"carrier:siptrunk:ipauth:list",
+          CARRIER_SIP_TRUNK_IP_AUTH_CREATE:"carrier:siptrunk:ipauth:create",
+          CARRIER_SIP_TRUNK_IP_AUTH_UPDATE:"carrier:siptrunk:ipauth:update",  
+          CARRIER_SIP_TRUNK_IP_AUTH_DELETE:"carrier:siptrunk:ipauth:delete",
         },
       },
       RATE_DECK: {

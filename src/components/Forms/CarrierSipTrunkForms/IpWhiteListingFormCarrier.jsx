@@ -1,7 +1,13 @@
 import { useEffect, useState } from "react";
 import { useFieldArray } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { TRUNK_TYPE_STATUS_OPTIONS } from "@/Constant";
+import {
+  DATA_VIEW_MODE,
+  HAS_PERMISSION,
+  PARENT_MODULE_NAME,
+  PERMISSIONS,
+  TRUNK_TYPE_STATUS_OPTIONS,
+} from "@/Constant";
 import { Plus, X, Edit, Trash, Save, ArrowLeft } from "lucide-react";
 import { InputCommon, SwitchCommon } from "@/Commons/FormCommons";
 import {
@@ -13,6 +19,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import DeleteConfirmationDialog from "@/Commons/DeleteConfirmationCommon";
+import AccessDeniedSection from "@/Commons/AccessDeniedSection";
 
 const IpWhiteListingFormCarrier = ({
   form,
@@ -187,20 +194,41 @@ const IpWhiteListingFormCarrier = ({
               Specify the SIP trunk detail to add.
             </p>
           </div>
-          <div className="flex space-x-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={onAddEntry}
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Add Another Entry
-            </Button>
-          </div>
+          {HAS_PERMISSION(
+            PARENT_MODULE_NAME.CARRIER,
+            PERMISSIONS.CARRIER.SIP_TRUNK.NAME,
+            PERMISSIONS.CARRIER.SIP_TRUNK.ACTIONS
+              .CARRIER_SIP_TRUNK_IP_AUTH_CREATE
+          ) && (
+            <div className="flex space-x-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={onAddEntry}
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Add Another Entry
+              </Button>
+            </div>
+          )}
         </div>
-
-        {fields.length > 0 && (
+        {MODE === DATA_VIEW_MODE.VIEW &&
+        !HAS_PERMISSION(
+          PARENT_MODULE_NAME.CARRIER,
+          PERMISSIONS.CARRIER.SIP_TRUNK.NAME,
+          PERMISSIONS.CARRIER.SIP_TRUNK.ACTIONS.CARRIER_SIP_TRUNK_IP_AUTH_VIEW
+        ) ? (
+          <AccessDeniedSection />
+        ) : MODE === DATA_VIEW_MODE.ADD &&
+          !HAS_PERMISSION(
+            PARENT_MODULE_NAME.CARRIER,
+            PERMISSIONS.CARRIER.SIP_TRUNK.NAME,
+            PERMISSIONS.CARRIER.SIP_TRUNK.ACTIONS
+              .CARRIER_SIP_TRUNK_IP_AUTH_CREATE
+          ) ? (
+          <AccessDeniedSection />
+        ) :fields.length > 0 ? (
           <div className="overflow-x-auto grid grid-cols-1 md:grid-cols-5 gap-4 space-y-4 ">
             <div className="hidden lg:block lg:col-span-1"></div>
             <div className="col-span-1 md:col-span-4 lg:col-span-4 gap-4 border rounded-md">
@@ -254,20 +282,36 @@ const IpWhiteListingFormCarrier = ({
                         </TableCell>
                         <TableCell className="w-[100px]">
                           <div className="flex space-x-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => onEdit(index)}
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <DeleteConfirmationDialog
-                              onConfirm={() => handleDelete(index)}
-                            >
-                              <Button variant="destructive">
-                                <Trash />
+                          {HAS_PERMISSION(
+                              PARENT_MODULE_NAME.CARRIER,
+
+                              PERMISSIONS.CARRIER.SIP_TRUNK.NAME,
+                              PERMISSIONS.CARRIER.SIP_TRUNK.ACTIONS
+                                .CARRIER_SIP_TRUNK_IP_AUTH_UPDATE
+                            ) && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => onEdit(index)}
+                              >
+                                <Edit className="h-4 w-4" />
                               </Button>
-                            </DeleteConfirmationDialog>
+                            )}
+                            {HAS_PERMISSION(
+                              PARENT_MODULE_NAME.CARRIER,
+
+                              PERMISSIONS.CARRIER.SIP_TRUNK.NAME,
+                              PERMISSIONS.CARRIER.SIP_TRUNK.ACTIONS
+                                .CARRIER_SIP_TRUNK_IP_AUTH_DELETE
+                            ) && (
+                              <DeleteConfirmationDialog
+                                onConfirm={() => handleDelete(index)}
+                              >
+                                <Button variant="destructive">
+                                  <Trash />
+                                </Button>
+                              </DeleteConfirmationDialog>
+                            )}
                           </div>
                         </TableCell>
                       </TableRow>
@@ -277,7 +321,7 @@ const IpWhiteListingFormCarrier = ({
               </Table>
             </div>
           </div>
-        )}
+        ) : null}
 
         {MODE === "view" && newEntries.length > 0 && (
           <div className="flex justify-end border-t pt-4">

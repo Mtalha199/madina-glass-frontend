@@ -21,6 +21,9 @@ import {
   API_END_POINT,
   API_TYPE,
   DATA_VIEW_MODE,
+  HAS_PERMISSION,
+  PARENT_MODULE_NAME,
+  PERMISSIONS,
   SCREEN_PATH,
   TOAST_MESSAGES,
 } from "@/Constant";
@@ -157,16 +160,27 @@ export const AddSipTrunkCarrier = () => {
                   onSubmitIpWhiteListing
                 )}
               >
-                <IpWhiteListingFormCarrier form={formIpWhiteListing} MODE={DATA_VIEW_MODE.ADD} />
-                <div className="col-span-2 flex justify-end mt-4">
-                  <Button
-                    type="submit"
-                    disabled={trunkId === null}
-                    className=""
-                  >
-                    Save
-                  </Button>
-                </div>
+                <IpWhiteListingFormCarrier
+                  form={formIpWhiteListing}
+                  MODE={DATA_VIEW_MODE.ADD}
+                />
+                {HAS_PERMISSION(
+                  PARENT_MODULE_NAME.CARRIER,
+
+                  PERMISSIONS.CARRIER.SIP_TRUNK.NAME,
+                  PERMISSIONS.CARRIER.SIP_TRUNK.ACTIONS
+                    .CARRIER_SIP_TRUNK_IP_AUTH_CREATE
+                ) && (
+                  <div className="col-span-2 flex justify-end mt-4">
+                    <Button
+                      type="submit"
+                      disabled={trunkId === null}
+                      className=""
+                    >
+                      Save
+                    </Button>
+                  </div>
+                )}
               </form>
             </Form>
           </>
