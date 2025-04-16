@@ -42,22 +42,22 @@ export const ROUTING_TABS = [
 ];
 
 export const SETTING_TABS = [
-  { value: "user", label: "User", component: <UserSetting /> },
+  // { value: "user", label: "User", component: <UserSetting /> },
   { value: "groups", label: "Groups", component: <Groups /> },
   { value: "payments", label: "Role", component: <Role /> },
-  {
-    value: "notifications",
-    label: "Notifications",
-    component: <Notifications />,
-  },
-  {
-    value: "global-black-list",
-    label: "Global Black list",
-    component: <GlobalBlackList />,
-  },
-  {
-    value: "system-settings",
-    label: "System Settings",
-    component: <SystemSettings />,
-  },
+  // {
+  //   value: "notifications",
+  //   label: "Notifications",
+  //   component: <Notifications />,
+  // },
+  // {
+  //   value: "global-black-list",
+  //   label: "Global Black list",
+  //   component: <GlobalBlackList />,
+  // },
+  // {
+  //   value: "system-settings",
+  //   label: "System Settings",
+  //   component: <SystemSettings />,
+  // },
 ];
