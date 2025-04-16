@@ -40,9 +40,20 @@ export function NavMain({items}) {
                 <CollapsibleTrigger asChild>
                   <SidebarMenuButton tooltip={item.title}>
                     {item.icon && <item.icon  className={`${isActive ? "text-primary h-4" : "h-4"}`}/>}
-                  <Link to={item.url}>
-                    <span className="w-full px-2 py-2 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">{item.title}</span>
-                    </Link>
+                  {/* <Link to={item.url}> */}
+                    {/* <span className="w-full px-2 py-2 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">{item.title}</span> */}
+                    {/* </Link> */}
+                      {item.url ? (
+                        <Link to={item.url}>
+                      <span className="w-full px-2 py-2 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    {item.title}
+                  </span>
+                  </Link>
+                      ) : (
+                        <span className="w-full px-2 py-2 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                          {item.title}
+                        </span>
+                      )}
                     <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                   </SidebarMenuButton>
                 </CollapsibleTrigger>
