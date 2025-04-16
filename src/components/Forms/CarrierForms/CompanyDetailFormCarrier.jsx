@@ -14,6 +14,7 @@ import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useFormContext } from "react-hook-form";
 import { CustomerViewCommon } from "@/Commons/CustomerViewCommon";
+import { HAS_PERMISSION, PARENT_MODULE_NAME, PERMISSIONS } from "@/Constant";
 
 const CompanyDetailFormCarrier = ({ form, MODE, DATA }) => {
   const [edit, setEdit] = useState(false);
@@ -159,29 +160,34 @@ const CompanyDetailFormCarrier = ({ form, MODE, DATA }) => {
           </div>
         </div>
         <div className="col-span-2 flex justify-end mt-4 mb-4">
-          <div className="space-x-2">
-            {MODE === "view" && (
-              <>
-                {edit ? (
-                  <>
-                    <Button
-                      variant="secondary"
-                      type="button"
-                      onClick={() => setEdit(!edit)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button type="submit">Save</Button>
-                  </> 
-                ) : (
-                  <Button type="button" onClick={() => setEdit(true)}>
-                    Edit
-                  </Button>
-                )}
-              </>
-            )}
-          </div>
-        </div>
+  <div className="space-x-2">
+    {HAS_PERMISSION(
+      PARENT_MODULE_NAME.CARRIER,
+      PERMISSIONS.CARRIER.LIST.NAME,
+      PERMISSIONS.CARRIER.LIST.ACTIONS.CARRIER_UPDATE
+    ) && MODE === "view" && (
+      <>
+        {edit ? (
+          <>
+            <Button
+              variant="secondary"
+              type="button"
+              onClick={() => setEdit(!edit)}
+            >
+              Cancel
+            </Button>
+            <Button type="submit">Save</Button>
+          </>
+        ) : (
+          <Button type="button" onClick={() => setEdit(true)}>
+            Edit
+          </Button>
+        )}
+      </>
+    )}
+  </div>
+</div>
+
       </div>
     </>
   );

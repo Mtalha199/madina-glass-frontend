@@ -6,12 +6,17 @@ import { Badge } from "@/components/ui/badge";
 import { Link, useNavigate } from "react-router-dom";
 import HeaderCommon from "@/Commons/HeaderCommon";
 import { APICALL } from "@/components/Api/ApiCall";
-import { API_END_POINT, API_TYPE, SCREEN_PATH } from "@/Constant";
+import {
+  API_END_POINT,
+  API_TYPE,
+  HAS_PERMISSION,
+  PARENT_MODULE_NAME,
+  PERMISSIONS,
+  SCREEN_PATH,
+} from "@/Constant";
 import SkeletonTable from "@/Commons/SkeletonTable";
 import TableContainer from "@/Commons/TableContainer";
 import DataTable from "@/components/ui/data-table";
-
-
 
 export default function CarriersList() {
   const columns = [
@@ -53,14 +58,13 @@ export default function CarriersList() {
     },
     { header: "User Name", accessorKey: "username" },
     { header: "Sip Trunks", accessorKey: "sip_trunks" },
-  
+
     { header: "Balance", accessorKey: "balance" },
-  
   ];
   const navigate = useNavigate();
 
   const [loading, setloading] = useState(false);
-    const [data,setData]= useState([]);
+  const [data, setData] = useState([]);
   const [count, setCount] = useState(0);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
@@ -108,35 +112,43 @@ export default function CarriersList() {
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Carriers List</h1>
-        
-        <Link to={SCREEN_PATH.ADD_NEW_CARRIER} className="text-primary hover:underline">
-          <Button>Add New Carrier</Button>
-        </Link>
+        {HAS_PERMISSION(
+          PARENT_MODULE_NAME.CARRIER,
+          PERMISSIONS.CARRIER.LIST.NAME,
+          PERMISSIONS.CARRIER.LIST.ACTIONS.CARRIER_CREATE
+        ) && (
+          <Link
+            to={SCREEN_PATH.ADD_NEW_CARRIER}
+            className="text-primary hover:underline"
+          >
+            <Button>Add New Carrier</Button>
+          </Link>
+        )}
       </div>
       {loading ? (
         <SkeletonTable ROWS={10} COLUMNS={3} />
       ) : (
         <>
-        <TableContainer
-        SEARCH={search}
-        COLUMNS={columns}
-        onSearch={handleSearch}
-        VISIBILE_COLUMN_CHANGE={handleVisibleColumnsChange}
-        INITIAL_VISIBLE_COLUMNS={visibleColumns}
-      />
-      <DataTable
-        data={data}
-        columns={columns?.filter((col) =>
-          visibleColumns.includes(col?.accessorKey)
-        )}
-        COUNT={count}
-        PAGE={page}
-        SET_PAGE={setPage}
-        LIMIT={limit}
-        SET_LIMIT={setLimit}
-        HANDLE_SORT={handleSort}
-      />
-      </>
+          <TableContainer
+            SEARCH={search}
+            COLUMNS={columns}
+            onSearch={handleSearch}
+            VISIBILE_COLUMN_CHANGE={handleVisibleColumnsChange}
+            INITIAL_VISIBLE_COLUMNS={visibleColumns}
+          />
+          <DataTable
+            data={data}
+            columns={columns?.filter((col) =>
+              visibleColumns.includes(col?.accessorKey)
+            )}
+            COUNT={count}
+            PAGE={page}
+            SET_PAGE={setPage}
+            LIMIT={limit}
+            SET_LIMIT={setLimit}
+            HANDLE_SORT={handleSort}
+          />
+        </>
       )}
     </div>
   );

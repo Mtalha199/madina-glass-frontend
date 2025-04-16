@@ -3,25 +3,45 @@ import { User, Mail, Phone } from "lucide-react";
 import { faSkype } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { CustomerViewCommon } from "@/Commons/CustomerViewCommon";
-import { InputCommon } from "@/Commons/FormCommons";  // Ensure this is the correct import
+import { InputCommon } from "@/Commons/FormCommons"; // Ensure this is the correct import
 import { useFormContext } from "react-hook-form";
 import { Button } from "@/components/ui/button";
+import { HAS_PERMISSION, PARENT_MODULE_NAME, PERMISSIONS } from "@/Constant";
 
-
-const PrimaryContactDetailFormCarrier = ({ form, MODE,DATA }) => {
-    const { setValue } = useFormContext();
-    const [edit, setEdit] = useState(false);
+const PrimaryContactDetailFormCarrier = ({ form, MODE, DATA }) => {
+  const { setValue } = useFormContext();
+  const [edit, setEdit] = useState(false);
   useEffect(() => {
     if (DATA?.account) {
-      setValue("primary_contact_email", DATA.account.primary_contact_email || "");
-      setValue("primary_contact_mobile", DATA.account.primary_contact_mobile || "");
-      setValue("primary_contact_phone", DATA.account.primary_contact_phone || "");
-      setValue("primary_contact_skype", DATA.account.primary_contact_skype || "");
+      setValue(
+        "primary_contact_email",
+        DATA.account.primary_contact_email || ""
+      );
+      setValue(
+        "primary_contact_mobile",
+        DATA.account.primary_contact_mobile || ""
+      );
+      setValue(
+        "primary_contact_phone",
+        DATA.account.primary_contact_phone || ""
+      );
+      setValue(
+        "primary_contact_skype",
+        DATA.account.primary_contact_skype || ""
+      );
       setValue("primary_contact_name", DATA.account.primary_contact_name || "");
-
     }
-  }, [ DATA, setValue]);
-  const renderField = ({ label, name, type, placeholder, icon, value, form, isRequired = false }) => {
+  }, [DATA, setValue]);
+  const renderField = ({
+    label,
+    name,
+    type,
+    placeholder,
+    icon,
+    value,
+    form,
+    isRequired = false,
+  }) => {
     return (
       <>
         {MODE === "view" && !edit ? (
@@ -45,7 +65,7 @@ const PrimaryContactDetailFormCarrier = ({ form, MODE,DATA }) => {
       </>
     );
   };
-  
+
   return (
     <div className="border-b">
       <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mt-4">
@@ -72,7 +92,7 @@ const PrimaryContactDetailFormCarrier = ({ form, MODE,DATA }) => {
 
       <div className="grid grid-cols-1 md:grid-cols-5 gap-6 space-y-4">
         <div className="hidden lg:block lg:col-span-1"></div>
-        
+
         {/* Email */}
         <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
           {renderField({
@@ -103,7 +123,7 @@ const PrimaryContactDetailFormCarrier = ({ form, MODE,DATA }) => {
 
       <div className="grid grid-cols-1 md:grid-cols-5 gap-6 space-y-4 mb-4">
         <div className="hidden lg:block lg:col-span-1"></div>
-        
+
         {/* Phone Number */}
         <div className="col-span-1 md:col-span-2 lg:col-span-1 gap-4">
           {renderField({
@@ -130,30 +150,35 @@ const PrimaryContactDetailFormCarrier = ({ form, MODE,DATA }) => {
           })}
         </div>
       </div>
-           <div className="col-span-2 flex justify-end mt-4 mb-4">
-                <div className="space-x-2">
-                  {MODE === "view" && (
-                    <>
-                      {edit ? (
-                        <>
-                          <Button
-                            variant="secondary"
-                            type="button"
-                            onClick={() => setEdit(!edit)}
-                          >
-                            Cancel
-                          </Button>
-                          <Button type="submit">Save</Button>
-                        </>
-                      ) : (
-                        <Button type="button" onClick={() => setEdit(true)}>
-                          Edit
-                        </Button>
-                      )}
-                    </>
-                  )}
-                </div>
-              </div>
+      <div className="col-span-2 flex justify-end mt-4 mb-4">
+        <div className="space-x-2">
+          {HAS_PERMISSION(
+            PARENT_MODULE_NAME.CARRIER,
+            PERMISSIONS.CARRIER.LIST.NAME,
+            PERMISSIONS.CARRIER.LIST.ACTIONS.CARRIER_UPDATE
+          ) &&
+            MODE === "view" && (
+              <>
+                {edit ? (
+                  <>
+                    <Button
+                      variant="secondary"
+                      type="button"
+                      onClick={() => setEdit(!edit)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button type="submit">Save</Button>
+                  </>
+                ) : (
+                  <Button type="button" onClick={() => setEdit(true)}>
+                    Edit
+                  </Button>
+                )}
+              </>
+            )}
+        </div>
+      </div>
     </div>
   );
 };

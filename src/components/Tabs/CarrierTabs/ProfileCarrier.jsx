@@ -85,7 +85,7 @@ export const ProfileCarrier = () => {
   const getData = async () => {
     await APICALL(
       API_TYPE.GET,
-      `${API_END_POINT.CUSTOMER_LIST}/${id}`,
+      `${API_END_POINT.CARRIERS}/${id}`,
       setloading,
       null,
       setData,
