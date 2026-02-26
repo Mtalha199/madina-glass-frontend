@@ -1,0 +1,16 @@
+{
+  "[project]/Downloads/madina-glass-frontend/node_modules/react-leaflet/lib/index.js [app-client] (ecmascript, next/dynamic entry)": {
+    "id": "[project]/Downloads/madina-glass-frontend/node_modules/react-leaflet/lib/index.js [app-client] (ecmascript, next/dynamic entry)",
+    "files": [
+      "static/chunks/2d6e1_4b447fad._.js",
+      "static/chunks/2d6e1_react-leaflet_lib_index_7e38597d.js"
+    ]
+  },
+  "[project]/Downloads/madina-glass-frontend/src/components/features/MapController.tsx [app-client] (ecmascript, next/dynamic entry)": {
+    "id": "[project]/Downloads/madina-glass-frontend/src/components/features/MapController.tsx [app-client] (ecmascript, next/dynamic entry)",
+    "files": [
+      "static/chunks/Downloads_madina-glass-frontend_34a88573._.js",
+      "static/chunks/6c7f9_madina-glass-frontend_src_components_features_MapController_tsx_0abaa920._.js"
+    ]
+  }
+}
