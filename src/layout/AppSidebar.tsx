@@ -57,22 +57,22 @@ const navItems: NavItem[] = [
   },
 
   // 
-  {
-    icon: <VehicleIcon />,
-    name: "Vehicle",
-    subItems: [
-      {
-        name: "Tracking",
-        path: "/admin/vehicle/trackings",
-        permission: "vehicle.view",
-      },
-      {
-        name: "Upgrade Requests",
-        path: "/admin/vehicle/upgrade",
-        permission: "upgradeRequest.view"
-      },
-    ],
-  },
+  // {
+  //   icon: <VehicleIcon />,
+  //   name: "Vehicle",
+  //   subItems: [
+  //     {
+  //       name: "Tracking",
+  //       path: "/admin/vehicle/trackings",
+  //       permission: "vehicle.view",
+  //     },
+  //     {
+  //       name: "Upgrade Requests",
+  //       path: "/admin/vehicle/upgrade",
+  //       permission: "upgradeRequest.view"
+  //     },
+  //   ],
+  // },
   // 
 
 
@@ -89,48 +89,48 @@ const navItems: NavItem[] = [
   //   permission: "upgradeRequest.view",
   // },
  
-  {
-    icon: <BoxIcon />,
-    name: "Vessels",
-    subItems: [
-      {
-        name: "Allocate Vessel",
-        path: "/admin/vessels/allocate",
-      },
-      {
-        name: "Vessels",
-        path: "/admin/vessels",
-      },
-    ],
-  },
-   {
-    icon: <UserCircleIcon />,
-    name: "Users",
-    path: "/admin/users",
-    permission: "user.view",
-  },
+  // {
+  //   icon: <BoxIcon />,
+  //   name: "Vessels",
+  //   subItems: [
+  //     {
+  //       name: "Allocate Vessel",
+  //       path: "/admin/vessels/allocate",
+  //     },
+  //     {
+  //       name: "Vessels",
+  //       path: "/admin/vessels",
+  //     },
+  //   ],
+  // },
+  //  {
+  //   icon: <UserCircleIcon />,
+  //   name: "Users",
+  //   path: "/admin/users",
+  //   permission: "user.view",
+  // },
   {
     icon: <ListIcon />,
     name: "Teams",
     path: "/admin/teams",
     permission: "adminUser.view",
   },
-  {
-    icon: <CrmIcon />,
-    name: "Crm",
-    subItems: [
-      {
-        name: "Cold Prospects",
-        path: "/admin/crm/coldprospects",
-        permission: "vehicle.view",
-      },
-      // {
-      //   name: "Upgrade Requests",
-      //   path: "/admin/vehicle/upgrade",
-      //   permission: "upgradeRequest.view"
-      // },
-    ],
-  },
+  // {
+  //   icon: <CrmIcon />,
+  //   name: "Crm",
+  //   subItems: [
+  //     {
+  //       name: "Cold Prospects",
+  //       path: "/admin/crm/coldprospects",
+  //       permission: "vehicle.view",
+  //     },
+  //     // {
+  //     //   name: "Upgrade Requests",
+  //     //   path: "/admin/vehicle/upgrade",
+  //     //   permission: "upgradeRequest.view"
+  //     // },
+  //   ],
+  // },
 
   {
     icon: <DocsIcon />,
