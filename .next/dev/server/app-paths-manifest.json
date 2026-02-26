@@ -4,6 +4,7 @@
   "/admin/dashboard/page": "app/admin/dashboard/page.js",
   "/admin/dashboard/roles/page": "app/admin/dashboard/roles/page.js",
   "/admin/profile/page": "app/admin/profile/page.js",
+  "/admin/profile/settings/page": "app/admin/profile/settings/page.js",
   "/admin/settings/terms/page": "app/admin/settings/terms/page.js",
   "/admin/teams/page": "app/admin/teams/page.js",
   "/admin/users/page": "app/admin/users/page.js",
