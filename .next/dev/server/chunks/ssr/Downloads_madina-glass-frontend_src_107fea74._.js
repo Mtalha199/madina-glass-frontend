@@ -425,7 +425,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$Downloads$2f$madina$2d$glass
 ;
 // Helper function to get the base URL without /api/v1 for static assets
 const getBaseUrl = ()=>{
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+    const apiUrl = ("TURBOPACK compile-time value", "http://localhost:3010/api/v1/") || "http://localhost:3001";
     // Remove /api/v1 if present, static files are served at root level
     return apiUrl.replace(/\/api\/v1$/, '');
 };

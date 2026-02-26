@@ -264,7 +264,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$Downloads$2f$madina$2d$glass
 var __TURBOPACK__imported__module__$5b$project$5d2f$Downloads$2f$madina$2d$glass$2d$frontend$2f$src$2f$lib$2f$storage$2f$index$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/Downloads/madina-glass-frontend/src/lib/storage/index.ts [app-ssr] (ecmascript)");
 ;
 ;
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const API_BASE_URL = ("TURBOPACK compile-time value", "http://localhost:3010/api/v1/") || "http://localhost:3001";
 const apiClient = __TURBOPACK__imported__module__$5b$project$5d2f$Downloads$2f$madina$2d$glass$2d$frontend$2f$node_modules$2f$axios$2f$lib$2f$axios$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"].create({
     baseURL: API_BASE_URL,
     headers: {
@@ -303,7 +303,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$Downloads$2f$madina$2d$glass
 ;
 const authApi = {
     login: async (credentials)=>{
-        const response = await __TURBOPACK__imported__module__$5b$project$5d2f$Downloads$2f$madina$2d$glass$2d$frontend$2f$src$2f$lib$2f$api$2f$config$2f$index$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"].post("/auth/admin/login", credentials);
+        const response = await __TURBOPACK__imported__module__$5b$project$5d2f$Downloads$2f$madina$2d$glass$2d$frontend$2f$src$2f$lib$2f$api$2f$config$2f$index$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"].post("/auth/login", credentials);
         return response.data;
     },
     logout: ()=>{
