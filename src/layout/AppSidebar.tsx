@@ -89,48 +89,51 @@ const navItems: NavItem[] = [
   //   permission: "upgradeRequest.view",
   // },
  
-  // {
-  //   icon: <BoxIcon />,
-  //   name: "Vessels",
-  //   subItems: [
-  //     {
-  //       name: "Allocate Vessel",
-  //       path: "/admin/vessels/allocate",
-  //     },
-  //     {
-  //       name: "Vessels",
-  //       path: "/admin/vessels",
-  //     },
-  //   ],
-  // },
-  //  {
-  //   icon: <UserCircleIcon />,
-  //   name: "Users",
-  //   path: "/admin/users",
-  //   permission: "user.view",
-  // },
+  {
+    icon: <BoxIcon />,
+    name: "Inventory",
+    subItems: [
+      {
+        name: "Glass",
+        path: "/admin/vessels/allocate",
+      },
+      {
+        name: "Aluminium",
+        path: "/admin/vessels",
+      },
+    ],
+  },
+   {
+    icon: <UserCircleIcon />,
+    name: "Customers",
+    path: "/admin/users",
+    permission: "user.view",
+  },
   {
     icon: <ListIcon />,
     name: "Teams",
     path: "/admin/teams",
     permission: "adminUser.view",
   },
-  // {
-  //   icon: <CrmIcon />,
-  //   name: "Crm",
-  //   subItems: [
-  //     {
-  //       name: "Cold Prospects",
-  //       path: "/admin/crm/coldprospects",
-  //       permission: "vehicle.view",
-  //     },
-  //     // {
-  //     //   name: "Upgrade Requests",
-  //     //   path: "/admin/vehicle/upgrade",
-  //     //   permission: "upgradeRequest.view"
-  //     // },
-  //   ],
-  // },
+  {
+    icon: <CrmIcon />,
+    name: "Invoices",
+    path: "/admin/invoice",
+    permission: "adminUser.view",
+
+    // subItems: [
+    //   {
+    //     name: "Cold Prospects",
+    //     path: "/admin/crm/coldprospects",
+    //     permission: "vehicle.view",
+    //   },
+      // {
+      //   name: "Upgrade Requests",
+      //   path: "/admin/vehicle/upgrade",
+      //   permission: "upgradeRequest.view"
+      // },
+    // ],
+  },
 
   {
     icon: <DocsIcon />,

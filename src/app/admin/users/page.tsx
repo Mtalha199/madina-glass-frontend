@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import React from "react";
 import PageHeader from "@/components/common/PageHeader";
-import UsersContent from "@/components/users/UsersContent";
+import CustomersContent from "@/components/Customers/CustomersContent";
 
 export const metadata: Metadata = {
   title: "Users | BFZ Track ",
@@ -12,13 +12,13 @@ export default function UsersPage() {
   return (
     <div>
       <PageHeader
-        title="Users"
+        title="Customers"
         breadcrumbs={[
           { label: "Dashboard", href: "/admin/dashboard" },
-          { label: "Users" },
+          { label: "Customers" },
         ]}
       />
-      <UsersContent />
+      <CustomersContent />
     </div>
   );
 }
