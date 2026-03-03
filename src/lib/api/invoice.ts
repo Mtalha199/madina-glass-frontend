@@ -3,6 +3,7 @@
 import apiClient from "./config";
 
 export interface InvoiceItem {
+  SerialNum?: string;
   itemName: string;
   jobDescription?: string;
   width: number;
@@ -14,14 +15,18 @@ export interface InvoiceItem {
 }
 
 export interface CreateInvoiceRequest {
+  invoiceType?: "CUSTOMER" | "LABOUR";
+  customerType: "CUSTOMER" | "WALKIN";
   name: string;
   phone: string;
   address?: string;
   driverName?: string;
   cutterName?: string;
   fitterName?: string;
+  remarks?: string;
   items: InvoiceItem[];
   carriage: number;
+  discountPercent?: number;
   discount: number;
   paidAmount: number;
 }

@@ -1,14 +1,18 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Modal } from "../ui/modal";
 import Button from "../ui/button/Button";
 import { Loader } from "lucide-react";
 import { invoicesApi } from "@/lib/api/invoice";
 
-
-export default function ViewInvoiceModal({ isOpen, onClose, invoiceId }) {
+export default function ViewInvoiceModal({ isOpen, onClose, invoiceId }: any) {
   const [invoice, setInvoice] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [ledgerLoading, setLedgerLoading] = useState(false);
+  const [ledgerError, setLedgerError] = useState<string | null>(null);
+  const [ledgerRows, setLedgerRows] = useState<any[]>([]);
+  const [printMode, setPrintMode] = useState<"CUSTOMER" | "LABOUR">("CUSTOMER");
+  const [showPrintOptions, setShowPrintOptions] = useState(false);
 
   useEffect(() => {
     if (isOpen && invoiceId) {
@@ -20,106 +24,345 @@ export default function ViewInvoiceModal({ isOpen, onClose, invoiceId }) {
     }
   }, [isOpen, invoiceId]);
 
-  if (loading) return <Modal isOpen={isOpen} onClose={onClose}><Loader /></Modal>;
+  useEffect(() => {
+    if (isOpen) {
+      setPrintMode("CUSTOMER");
+      setShowPrintOptions(false);
+    }
+  }, [isOpen, invoiceId]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const phone = String(invoice?.customer?.phone || invoice?.phone || "").trim();
+    if (!phone) {
+      setLedgerRows([]);
+      setLedgerError(null);
+      return;
+    }
+
+    setLedgerLoading(true);
+    setLedgerError(null);
+
+    invoicesApi
+      .getCustomerHistory(phone)
+      .then((res) => {
+        const payload = res?.data || res;
+        const invoices = Array.isArray(payload) ? payload : payload?.invoices || [];
+        const sorted = [...invoices].sort(
+          (a: any, b: any) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        );
+
+        let running = 0;
+        const prepared = sorted.map((inv: any) => {
+          const debit = Number(inv.billValue || 0);
+          const credit = Number(inv.paidAmount || 0);
+          running += debit - credit;
+          return {
+            ...inv,
+            debit,
+            credit,
+            running,
+          };
+        });
+
+        setLedgerRows(prepared);
+      })
+      .catch(() => {
+        setLedgerRows([]);
+        setLedgerError("Unable to load customer ledger history.");
+      })
+      .finally(() => setLedgerLoading(false));
+  }, [isOpen, invoice?.customer?.phone, invoice?.phone]);
+
+  const isLabourView = printMode === "LABOUR";
+
+  const subTotal = useMemo(() => {
+    if (!invoice?.items) return 0;
+    return invoice.items.reduce((acc: number, item: any) => acc + Number(item.value || 0), 0);
+  }, [invoice]);
+
+  const discountPercent = useMemo(() => {
+    if (isLabourView) return 0;
+    if (invoice?.discountPercent !== undefined && invoice?.discountPercent !== null) return Number(invoice.discountPercent) || 0;
+    if (!subTotal) return 0;
+    return Number((((Number(invoice?.discount || 0) / subTotal) * 100) || 0).toFixed(2));
+  }, [invoice, subTotal, isLabourView]);
+
+  const billValue = Number(invoice?.billValue || 0);
+  const paidAmount = Number(invoice?.paidAmount || 0);
+  const net = Number((billValue - paidAmount).toFixed(2)); // +ve means customer owes, -ve means customer in plus
+
+  const handlePrint = (mode: "CUSTOMER" | "LABOUR") => {
+    setPrintMode(mode);
+    setShowPrintOptions(false);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const invoiceNode = document.getElementById("printable-invoice");
+        if (!invoiceNode) return;
+
+        const printWindow = window.open("", "_blank", "noopener,noreferrer,width=1100,height=800");
+        if (!printWindow) {
+          window.print();
+          return;
+        }
+
+        const copiedStyles = Array.from(document.querySelectorAll('style, link[rel="stylesheet"]'))
+          .map((node) => node.outerHTML)
+          .join("\n");
+
+        printWindow.document.open();
+        printWindow.document.write(`
+          <!doctype html>
+          <html>
+            <head>
+              <meta charset="utf-8" />
+              <meta name="viewport" content="width=device-width,initial-scale=1" />
+              <title>Invoice Print</title>
+              ${copiedStyles}
+              <style>
+                @page { size: auto; margin: 12mm; }
+                html, body { background: #fff !important; }
+                body { margin: 0; padding: 0; }
+                .print\\:hidden { display: none !important; }
+              </style>
+            </head>
+            <body>
+              ${invoiceNode.outerHTML}
+            </body>
+          </html>
+        `);
+        printWindow.document.close();
+        printWindow.focus();
+
+        setTimeout(() => {
+          printWindow.print();
+          printWindow.close();
+        }, 250);
+      });
+    });
+  };
+
+  if (loading) {
+    return (
+      <Modal isOpen={isOpen} onClose={onClose} className="max-w-[960px]">
+        <div className="p-8 flex items-center justify-center min-h-[220px]"><Loader className="animate-spin" /></div>
+      </Modal>
+    );
+  }
+
+  if (!invoice) return null;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="max-w-[900px]">
-      <div className="p-8 bg-white dark:bg-gray-900 rounded-3xl" id="printable-invoice">
-        {/* Top Header */}
-        <div className="flex justify-between items-start border-b pb-6 border-gray-100 dark:border-gray-800">
-          <div>
-            <h1 className="text-3xl font-bold text-brand-500 uppercase tracking-tighter">Madina Glass</h1>
-            <p className="text-sm text-gray-500">Aluminium & Glass Works Specialist</p>
+    <Modal isOpen={isOpen} onClose={onClose} className="max-w-[980px] m-4 max-h-[95vh] overflow-y-auto">
+      <div
+        className="p-8 bg-gradient-to-br from-white via-slate-50 to-white dark:from-gray-900 dark:via-gray-900 dark:to-gray-950 rounded-3xl"
+        id="printable-invoice"
+      >
+        <div className="rounded-2xl border border-slate-200 dark:border-gray-800 p-6 bg-white/90 dark:bg-gray-900/80 shadow-sm">
+          <div className="flex justify-between items-start border-b pb-6 border-gray-100 dark:border-gray-800">
+            <div>
+              <h1 className="text-3xl font-black tracking-tight text-brand-500 uppercase">Madina Glass</h1>
+              <p className="text-sm text-gray-500">Aluminium & Glass Works Specialist</p>
+              <span className="inline-block mt-3 px-3 py-1 rounded-full text-xs font-bold bg-brand-50 text-brand-600 dark:bg-brand-500/20 dark:text-brand-300">
+                {printMode} INVOICE VIEW
+              </span>
+            </div>
+            <div className="text-right">
+              <h2 className="text-xl font-bold text-gray-800 dark:text-white">{invoice.invoiceNumber}</h2>
+              <p className="text-sm text-gray-500">{new Date(invoice.createdAt).toLocaleDateString()}</p>
+              {!isLabourView && (
+                <span
+                  className={`inline-block mt-2 px-3 py-1 rounded-full text-xs font-bold ${
+                    net > 0 ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"
+                  }`}
+                >
+                  {net > 0 ? "DUE" : net < 0 ? "CUSTOMER IN PLUS" : "SETTLED"}
+                </span>
+              )}
+            </div>
           </div>
-          <div className="text-right">
-            <h2 className="text-xl font-bold text-gray-800 dark:text-white">{invoice.invoiceNumber}</h2>
-            <p className="text-sm text-gray-500">{new Date(invoice.createdAt).toLocaleDateString()}</p>
-            <span className={`inline-block mt-2 px-3 py-1 rounded-full text-xs font-bold ${invoice.balance <= 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-              {invoice.balance <= 0 ? 'PAID' : 'UNPAID'}
-            </span>
-          </div>
-        </div>
 
-        {/* Customer & Staff Details */}
-        <div className="grid grid-cols-2 gap-8 my-8 text-sm">
-          <div>
-            <h4 className="text-gray-400 uppercase font-semibold text-xs mb-2">Bill To:</h4>
-            <p className="font-bold text-lg">{invoice.customer?.name}</p>
-            <p className="text-gray-600">{invoice.customer?.phone}</p>
-            <p className="text-gray-600 italic">{invoice.address || "No delivery address"}</p>
+          <div className="grid grid-cols-2 gap-8 my-8 text-sm">
+            <div>
+              <h4 className="text-gray-400 uppercase font-semibold text-xs mb-2">Bill To:</h4>
+              <p className="font-bold text-lg">{invoice.customer?.name}</p>
+              <p className="text-gray-600">{invoice.customer?.phone}</p>
+              <p className="text-gray-600 italic">{invoice.address || "No delivery address"}</p>
+            </div>
+            <div className="grid grid-cols-2 gap-4 bg-gray-50 dark:bg-white/5 p-4 rounded-2xl">
+              <div>
+                <p className="text-gray-400 text-xs">Cutter</p>
+                <p className="font-medium">{invoice.cutterName || "—"}</p>
+              </div>
+              <div>
+                <p className="text-gray-400 text-xs">Driver</p>
+                <p className="font-medium">{invoice.driverName || "—"}</p>
+              </div>
+              <div>
+                <p className="text-gray-400 text-xs">Fitter</p>
+                <p className="font-medium">{invoice.fitterName || "—"}</p>
+              </div>
+              <div>
+                <p className="text-gray-400 text-xs">Generated By</p>
+                <p className="font-medium text-brand-500">{invoice.admin?.name || "Admin"}</p>
+              </div>
+            </div>
           </div>
-          <div className="grid grid-cols-2 gap-4 bg-gray-50 dark:bg-white/5 p-4 rounded-2xl">
-            <div>
-              <p className="text-gray-400 text-xs">Cutter</p>
-              <p className="font-medium">{invoice.cutterName || "—"}</p>
-            </div>
-            <div>
-              <p className="text-gray-400 text-xs">Driver</p>
-              <p className="font-medium">{invoice.driverName || "—"}</p>
-            </div>
-            <div>
-              <p className="text-gray-400 text-xs">Generated By</p>
-              <p className="font-medium text-brand-500">{invoice.admin?.name || "Admin"}</p>
-            </div>
-          </div>
-        </div>
 
-        {/* Items Table */}
-        <table className="w-full text-left mb-8">
-          <thead>
-            <tr className="border-b dark:border-gray-800 text-xs text-gray-400 uppercase">
-              <th className="py-3">Item Description</th>
-              <th className="py-3">Size (WxH)</th>
-              <th className="py-3">Qty</th>
-              <th className="py-3">Total Sqft</th>
-              <th className="py-3">Rate</th>
-              <th className="py-3 text-right">Value</th>
-            </tr>
-          </thead>
-          <tbody className="text-sm">
-            {invoice.items?.map((item: any, i: number) => (
-              <tr key={i} className="border-b border-gray-50 dark:border-gray-800">
-                <td className="py-4 font-medium">{item.itemName}</td>
-                <td className="py-4 text-gray-500">{item.width}" × {item.height}"</td>
-                <td className="py-4">{item.qtyPcs}</td>
-                <td className="py-4 font-mono">{item.totalSqft}</td>
-                <td className="py-4">Rs. {item.rate}</td>
-                <td className="py-4 text-right font-bold">Rs. {item.value.toLocaleString()}</td>
+          {!isLabourView && (
+            <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="rounded-lg bg-red-50 dark:bg-red-500/10 p-3 text-sm border border-red-100 dark:border-red-500/20">
+                <p className="text-xs text-gray-500">Debit (Bill)</p>
+                <p className="font-semibold text-red-600">Rs. {billValue.toLocaleString()}</p>
+              </div>
+              <div className="rounded-lg bg-green-50 dark:bg-green-500/10 p-3 text-sm border border-green-100 dark:border-green-500/20">
+                <p className="text-xs text-gray-500">Credit (Paid)</p>
+                <p className="font-semibold text-green-600">Rs. {paidAmount.toLocaleString()}</p>
+              </div>
+              <div className="rounded-lg bg-brand-50 dark:bg-brand-500/10 p-3 text-sm border border-brand-100 dark:border-brand-500/20">
+                <p className="text-xs text-gray-500">Net Status</p>
+                <p className="font-semibold text-brand-500">
+                  {net > 0 ? `Customer Owes: Rs. ${net.toLocaleString()}` : net < 0 ? `Customer In Plus: Rs. ${Math.abs(net).toLocaleString()}` : "Settled"}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {!isLabourView && (
+            <div className="mb-8 rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+              <div className="px-4 py-3 bg-gray-50 dark:bg-gray-800 flex items-center justify-between">
+                <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-200">Customer Ledger (Debit/Credit)</h4>
+                {ledgerLoading && <span className="text-xs text-gray-500">Loading...</span>}
+              </div>
+
+              {ledgerError && <p className="p-4 text-sm text-red-600">{ledgerError}</p>}
+
+              {!ledgerError && !ledgerLoading && ledgerRows.length === 0 && (
+                <p className="p-4 text-sm text-gray-500">No customer history found.</p>
+              )}
+
+              {!ledgerError && !ledgerLoading && ledgerRows.length > 0 && (
+                <div className="max-h-60 overflow-auto">
+                  <table className="w-full text-sm">
+                    <thead className="sticky top-0 bg-white dark:bg-gray-900 z-10">
+                      <tr className="text-xs uppercase text-gray-500 border-b border-gray-100 dark:border-gray-800">
+                        <th className="px-3 py-2 text-left">Date</th>
+                        <th className="px-3 py-2 text-left">Ref</th>
+                        <th className="px-3 py-2 text-right">Debit</th>
+                        <th className="px-3 py-2 text-right">Credit</th>
+                        <th className="px-3 py-2 text-right">Running Balance</th>
+                        <th className="px-3 py-2 text-right">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {ledgerRows.map((row: any) => (
+                        <tr key={row.id} className="border-b border-gray-100 dark:border-gray-800">
+                          <td className="px-3 py-2">{new Date(row.createdAt).toLocaleDateString()}</td>
+                          <td className="px-3 py-2 font-medium">{row.invoiceNumber || `INV-${row.id}`}</td>
+                          <td className="px-3 py-2 text-right text-red-600">Rs. {row.debit.toLocaleString()}</td>
+                          <td className="px-3 py-2 text-right text-green-600">Rs. {row.credit.toLocaleString()}</td>
+                          <td className="px-3 py-2 text-right font-semibold">Rs. {Math.abs(Number(row.running || 0)).toLocaleString()}</td>
+                          <td className={`px-3 py-2 text-right text-xs font-semibold ${row.running > 0 ? "text-red-600" : row.running < 0 ? "text-green-600" : "text-gray-500"}`}>
+                            {row.running > 0 ? "Due" : row.running < 0 ? "Plus" : "Settled"}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          )}
+
+          <table className="w-full text-left mb-8 rounded-xl overflow-hidden border border-gray-100 dark:border-gray-800">
+            <thead>
+              <tr className="bg-gray-50 dark:bg-gray-800 text-xs text-gray-500 uppercase">
+                <th className="py-3 px-3">Serial #</th>
+                <th className="py-3 px-3">Item Description</th>
+                <th className="py-3 px-3">Size (WxH)</th>
+                <th className="py-3 px-3">Std Size</th>
+                <th className="py-3 px-3">Qty</th>
+                <th className="py-3 px-3">Sqft</th>
+                {!isLabourView && <th className="py-3 px-3">Rate</th>}
+                {!isLabourView && <th className="py-3 px-3 text-right">Value</th>}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="text-sm">
+              {invoice.items?.map((item: any, i: number) => (
+                <tr key={i} className="border-t border-gray-100 dark:border-gray-800">
+                  <td className="py-3 px-3 font-mono">{item.SerialNum || "—"}</td>
+                  <td className="py-3 px-3 font-medium">{item.itemName}</td>
+                  <td className="py-3 px-3 text-gray-500">{item.width}" × {item.height}"</td>
+                  <td className="py-3 px-3 text-gray-500">{item.standardSize || (item.SWidth && item.SHeight ? `${item.SWidth} x ${item.SHeight}` : "—")}</td>
+                  <td className="py-3 px-3">{item.qtyPcs}</td>
+                  <td className="py-3 px-3 font-mono">{item.totalSqft}</td>
+                  {!isLabourView && <td className="py-3 px-3">Rs. {Number(item.rate || 0).toLocaleString()}</td>}
+                  {!isLabourView && <td className="py-3 px-3 text-right font-bold">Rs. {Number(item.value || 0).toLocaleString()}</td>}
+                </tr>
+              ))}
+            </tbody>
+          </table>
 
-        {/* Summary */}
-        <div className="flex justify-end">
-          <div className="w-64 space-y-3">
-            <div className="flex justify-between text-gray-500">
-              <span>Carriage:</span>
-              <span>Rs. {invoice.carriage}</span>
+          {!isLabourView && (
+            <div className="flex justify-end">
+              <div className="w-72 space-y-3 rounded-2xl bg-gray-50 dark:bg-white/5 p-4 border border-gray-100 dark:border-gray-800">
+                <div className="flex justify-between text-gray-500">
+                  <span>Sub-Total</span>
+                  <span>Rs. {subTotal.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-gray-500">
+                  <span>Discount ({discountPercent.toFixed(2)}%)</span>
+                  <span>- Rs. {Number(invoice.discount || 0).toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-gray-500">
+                  <span>Carriage</span>
+                  <span>Rs. {Number(invoice.carriage || 0).toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-xl font-bold pt-3 border-t border-gray-200 dark:border-gray-700">
+                  <span>Total</span>
+                  <span className="text-brand-500">Rs. {billValue.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-sm text-green-600 font-medium">
+                  <span>Paid</span>
+                  <span>Rs. {paidAmount.toLocaleString()}</span>
+                </div>
+                <div
+                  className={`flex justify-between p-3 rounded-xl font-bold ${
+                    net > 0 ? "bg-red-50 text-red-600" : "bg-green-50 text-green-600"
+                  }`}
+                >
+                  <span>{net > 0 ? "Balance Due" : net < 0 ? "Customer Plus" : "Balance"}</span>
+                  <span>Rs. {Math.abs(net).toLocaleString()}</span>
+                </div>
+              </div>
             </div>
-            <div className="flex justify-between text-red-500">
-              <span>Discount:</span>
-              <span>- Rs. {invoice.discount}</span>
-            </div>
-            <div className="flex justify-between text-xl font-bold pt-3 border-t">
-              <span>Total:</span>
-              <span className="text-brand-500">Rs. {invoice.billValue.toLocaleString()}</span>
-            </div>
-            <div className="flex justify-between text-sm text-green-600 font-medium">
-              <span>Paid:</span>
-              <span>Rs. {invoice.paidAmount}</span>
-            </div>
-            <div className={`flex justify-between p-3 rounded-xl font-bold ${invoice.balance > 0 ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'}`}>
-              <span>Balance:</span>
-              <span>Rs. {invoice.balance.toLocaleString()}</span>
-            </div>
+          )}
+
+          <div className="flex justify-end gap-3 mt-8 pt-6 border-t print:hidden relative">
+            <Button variant="outline" onClick={onClose}>Close</Button>
+            <Button onClick={() => setShowPrintOptions((prev) => !prev)} className="bg-brand-500 text-white">
+              Print Invoice
+            </Button>
+            {showPrintOptions && (
+              <div className="absolute right-0 top-12 z-20 w-56 rounded-xl border border-gray-200 bg-white shadow-lg p-2 dark:bg-gray-900 dark:border-gray-700">
+                <button
+                  type="button"
+                  onClick={() => handlePrint("CUSTOMER")}
+                  className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-sm"
+                >
+                  Print Customer Invoice
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handlePrint("LABOUR")}
+                  className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-sm"
+                >
+                  Print Labour Invoice
+                </button>
+              </div>
+            )}
           </div>
-        </div>
-
-        {/* Action Buttons (Excluded from print) */}
-        <div className="flex justify-end gap-3 mt-8 pt-6 border-t print:hidden">
-          <Button variant="outline" onClick={onClose}>Close</Button>
-          <Button onClick={() => window.print()} className="bg-brand-500 text-white">Print Invoice</Button>
         </div>
       </div>
     </Modal>
