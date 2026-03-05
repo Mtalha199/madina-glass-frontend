@@ -6,6 +6,7 @@ import Input from "../form/input/InputField";
 import Label from "../form/Label";
 import Select from "../form/Select";
 import { invoicesApi } from "@/lib/api/invoice";
+import { customersApi } from "@/lib/api/customer";
 import { TrashIcon } from "lucide-react";
 
 const THICKNESS_OPTIONS = ["3", "4", "5", "6", "8", "12"];
@@ -21,6 +22,12 @@ const COLORED_SHADE_OPTIONS = [
   "REFLECTIVE BLUE",
   "REFLECTIVE GREEN",
 ];
+
+const DEFAULT_TERMS = `Terms & Conditions:
+1. Goods once sold will not be returned.
+2. Please check size and quality at delivery time.
+3. Payment must be cleared as per commitment.
+4. Breakage after delivery is customer responsibility.`;
 
 const MARKET_SIZE_CLASSES = {
   CLEAR_3MM: [6, 9, 12, 15, 18, 21, 24, 30, 36, 42, 48, 54, 60, 72, 84],
@@ -73,13 +80,27 @@ const recalcItem = (item: any, isLabour: boolean) => {
   const height = Number(item.height || 0);
   const qtyPcs = Number(item.qtyPcs || 0);
   const rate = isLabour ? 0 : Number(item.rate || 0);
-  const totalSqft = Number((((width * height) / 144) * qtyPcs).toFixed(2));
+  const sizes = getMarketSizeClass(String(item.glassThickness), String(item.glassType));
+  const autoSWidth = getRoundedMarketSize(width, sizes);
+  const autoSHeight = getRoundedMarketSize(height, sizes);
+  const isStdManual = Boolean(item.isStdManual);
+  const stdWidth = isStdManual ? Number(item.SWidth || 0) : Number(autoSWidth || 0);
+  const stdHeight = isStdManual ? Number(item.SHeight || 0) : Number(autoSHeight || 0);
+  const calcWidth = stdWidth || width;
+  const calcHeight = stdHeight || height;
+  const totalSqft = Number((((calcWidth * calcHeight) / 144) * qtyPcs).toFixed(2));
   const value = Number((totalSqft * rate).toFixed(2));
   const itemName = buildItemName(String(item.glassThickness), String(item.glassType), String(item.glassShade));
-  const standardSize = getStandardSizeForActual(width, height, String(item.glassThickness), String(item.glassType));
+  const standardSize =
+    stdWidth && stdHeight
+      ? `${stdWidth}" x ${stdHeight}"`
+      : getStandardSizeForActual(width, height, String(item.glassThickness), String(item.glassType));
 
   return {
     ...item,
+    SWidth: stdWidth || undefined,
+    SHeight: stdHeight || undefined,
+    isStdManual,
     rate,
     totalSqft,
     value,
@@ -96,6 +117,9 @@ const createDefaultItem = () => ({
   glassShade: "CLEAR",
   width: 0,
   height: 0,
+  SWidth: undefined,
+  SHeight: undefined,
+  isStdManual: false,
   qtyPcs: 1,
   rate: 0,
   totalSqft: 0,
@@ -103,28 +127,88 @@ const createDefaultItem = () => ({
   standardSize: "—",
 });
 
-export default function CreateInvoiceModal({ isOpen, onClose, onSuccess }: any) {
+export default function CreateInvoiceModal({ isOpen, onClose, onSuccess, presetCustomerType, lockCustomerType = false }: any) {
   const [loading, setLoading] = useState(false);
+  const [customersLoading, setCustomersLoading] = useState(false);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [historyError, setHistoryError] = useState<string | null>(null);
+  const [customers, setCustomers] = useState<any[]>([]);
   const [customerLedger, setCustomerLedger] = useState<any[]>([]);
+  const [customerLookup, setCustomerLookup] = useState("");
 
   const [items, setItems] = useState<any[]>([createDefaultItem()]);
 
   const [formData, setFormData] = useState<any>({
-    customerType: "WALKIN",
+    customerType: presetCustomerType || "WALKIN",
+    customerId: undefined,
     name: "",
     phone: "",
+    address: "",
     driverName: "",
     cutterName: "",
     fitterName: "",
     carriage: 0,
     discountPercent: 0,
     paidAmount: 0,
-    remarks: "",
+    remarks: DEFAULT_TERMS,
   });
 
   const isLabourInvoice = false;
+
+  useEffect(() => {
+    if (!isOpen || !presetCustomerType) return;
+    setFormData((prev: any) => ({
+      ...prev,
+      customerType: presetCustomerType,
+      customerId: presetCustomerType === "CUSTOMER" ? prev.customerId : undefined,
+    }));
+    if (presetCustomerType === "WALKIN") {
+      setCustomerLookup("");
+    }
+  }, [isOpen, presetCustomerType]);
+
+  const applyCustomerSelection = (rawCustomerId: string | number) => {
+    const customerId = Number(rawCustomerId || 0);
+    if (!customerId) {
+      setFormData((prev: any) => ({ ...prev, customerId: undefined }));
+      return;
+    }
+
+    const selected = customers.find((c: any) => Number(c.id) === customerId);
+    if (selected) {
+      setCustomerLookup(`${selected.id} - ${selected.name} (${selected.phone})`);
+    }
+    setFormData((prev: any) => ({
+      ...prev,
+      customerId,
+      name: selected?.name || prev.name,
+      phone: selected?.phone || prev.phone,
+      address: selected?.address || prev.address,
+    }));
+  };
+
+  const handleCustomerLookupChange = (value: string) => {
+    setCustomerLookup(value);
+    const idMatch = value.trim().match(/^(\d+)/);
+    const customerId = Number(idMatch?.[1] || 0);
+    if (!customerId) {
+      setFormData((prev: any) => ({ ...prev, customerId: undefined }));
+      return;
+    }
+    applyCustomerSelection(customerId);
+  };
+
+  useEffect(() => {
+    if (!isOpen || formData.customerType !== "CUSTOMER") return;
+    setCustomersLoading(true);
+    customersApi
+      .getCustomers()
+      .then((res) => {
+        setCustomers(res?.data || res || []);
+      })
+      .catch(() => setCustomers([]))
+      .finally(() => setCustomersLoading(false));
+  }, [isOpen, formData.customerType]);
 
   useEffect(() => {
     if (!isOpen || formData.customerType !== "CUSTOMER") {
@@ -134,10 +218,11 @@ export default function CreateInvoiceModal({ isOpen, onClose, onSuccess }: any) 
       return;
     }
 
-    const phone = formData.phone.trim();
-    if (!phone) {
+    const hasCustomerId = Number(formData.customerId) > 0;
+    const phone = String(formData.phone || "").trim();
+    if (!hasCustomerId && !phone) {
       setCustomerLedger([]);
-      setHistoryError("Enter phone to load customer statement.");
+      setHistoryError("Select customer ID or enter phone to load statement.");
       return;
     }
 
@@ -146,7 +231,9 @@ export default function CreateInvoiceModal({ isOpen, onClose, onSuccess }: any) 
 
     const timeoutId = setTimeout(async () => {
       try {
-        const res = await invoicesApi.getCustomerHistory(phone);
+        const res = hasCustomerId
+          ? await invoicesApi.getCustomerHistoryById(Number(formData.customerId))
+          : await invoicesApi.getCustomerHistory(phone);
         const payload = res?.data || res;
         const invoices = Array.isArray(payload) ? payload : payload?.invoices || [];
         setCustomerLedger(invoices);
@@ -159,7 +246,7 @@ export default function CreateInvoiceModal({ isOpen, onClose, onSuccess }: any) 
     }, 400);
 
     return () => clearTimeout(timeoutId);
-  }, [formData.customerType, formData.phone, isOpen]);
+  }, [formData.customerType, formData.customerId, formData.phone, isOpen]);
 
   const summary = useMemo(() => {
     const subTotal = items.reduce((acc, item) => acc + (Number(item.value) || 0), 0);
@@ -197,6 +284,12 @@ export default function CreateInvoiceModal({ isOpen, onClose, onSuccess }: any) 
     if (field === "glassType") {
       updated.glassShade = val === "CLEAR" ? "CLEAR" : COLORED_SHADE_OPTIONS[0];
     }
+    if (field === "SWidth" || field === "SHeight") {
+      updated.isStdManual = true;
+    }
+    if (field === "glassThickness" || field === "glassType") {
+      updated.isStdManual = false;
+    }
 
     newItems[index] = recalcItem(updated, isLabourInvoice);
     setItems(newItems);
@@ -228,19 +321,25 @@ export default function CreateInvoiceModal({ isOpen, onClose, onSuccess }: any) 
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
+    if (!String(formData.name || "").trim() || !String(formData.phone || "").trim()) {
+      alert("Customer name and phone number are required.");
+      return;
+    }
     setLoading(true);
 
     try {
       const normalizedItems = items.map((item) => {
         const normalized = recalcItem(item, false);
+        const { isStdManual, ...safeItem } = normalized;
         return {
-          ...normalized,
-          SerialNum: String(normalized.SerialNum || "").trim(),
+          ...safeItem,
+          SerialNum: String(safeItem.SerialNum || "").trim(),
         };
       });
 
       const payload = {
         ...formData,
+        customerId: formData.customerId ? Number(formData.customerId) : undefined,
         discountPercent: summary.discountPercent,
         discount: summary.discountAmount,
         carriage: Number(formData.carriage) || 0,
@@ -272,18 +371,49 @@ export default function CreateInvoiceModal({ isOpen, onClose, onSuccess }: any) 
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-              <Label>Customer Type</Label>
-              <Select
-                options={[
-                  { value: "CUSTOMER", label: "CUSTOMER" },
-                  { value: "WALKIN", label: "WALKIN" },
-                ]}
-                value={formData.customerType}
-                onChange={(value) => setFormData({ ...formData, customerType: value })}
-                placeholder="Select customer type"
-              />
-            </div>
+            {!lockCustomerType ? (
+              <div>
+                <Label>Customer Type</Label>
+                <Select
+                  options={[
+                    { value: "CUSTOMER", label: "PERMANANT CUSTOMER" },
+                    { value: "WALKIN", label: "WALK-IN CUSTOMER" },
+                  ]}
+                  value={formData.customerType}
+                  onChange={(value) => {
+                    if (value === "WALKIN") setCustomerLookup("");
+                    setFormData({
+                      ...formData,
+                      customerType: value,
+                      customerId: value === "CUSTOMER" ? formData.customerId : undefined,
+                    });
+                  }}
+                  placeholder="Select customer type"
+                />
+              </div>
+            ) : (
+              <div>
+                <Label>Customer Type</Label>
+                <Input value={formData.customerType} disabled />
+              </div>
+            )}
+
+            {formData.customerType === "CUSTOMER" && (
+              <div>
+                <Label>Customer (Existing / New)</Label>
+                <Input
+                  placeholder={customersLoading ? "Loading customers..." : "Type ID or choose customer"}
+                  value={customerLookup}
+                  onChange={(e) => handleCustomerLookupChange(e.target.value)}
+                  list="customer-existing-options"
+                />
+                <datalist id="customer-existing-options">
+                  {customers.map((c: any) => (
+                    <option key={c.id} value={`${c.id} - ${c.name} (${c.phone})`} />
+                  ))}
+                </datalist>
+              </div>
+            )}
 
             <div>
               <Label>Customer Name</Label>
@@ -293,6 +423,11 @@ export default function CreateInvoiceModal({ isOpen, onClose, onSuccess }: any) 
             <div>
               <Label>Phone</Label>
               <Input value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} required />
+            </div>
+
+            <div>
+              <Label>Address</Label>
+              <Input value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} />
             </div>
 
             <div>
@@ -323,7 +458,7 @@ export default function CreateInvoiceModal({ isOpen, onClose, onSuccess }: any) 
               {!historyError && !historyLoading && (
                 <>
                   {customerLedger.length === 0 ? (
-                    <p className="text-xs text-gray-500">No previous records found for this phone number.</p>
+                    <p className="text-xs text-gray-500">No previous records found for this customer.</p>
                   ) : (
                     <div className="max-h-56 overflow-auto border rounded-lg">
                       <table className="w-full text-xs">
@@ -380,7 +515,8 @@ export default function CreateInvoiceModal({ isOpen, onClose, onSuccess }: any) 
           </div>
 
           <div className="border rounded-xl overflow-hidden">
-            <table className="w-full text-sm">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm min-w-[1100px]">
               <thead className="bg-gray-50 dark:bg-gray-800 text-gray-600">
                 <tr>
                   <th className="p-3">Serial #</th>
@@ -389,6 +525,8 @@ export default function CreateInvoiceModal({ isOpen, onClose, onSuccess }: any) 
                   <th className="p-3">Color</th>
                   <th className="p-3">W (in)</th>
                   <th className="p-3">H (in)</th>
+                  <th className="p-3">Std W</th>
+                  <th className="p-3">Std H</th>
                   <th className="p-3">Std Size</th>
                   <th className="p-3">Pcs</th>
                   <th className="p-3">Sqft</th>
@@ -464,6 +602,24 @@ export default function CreateInvoiceModal({ isOpen, onClose, onSuccess }: any) 
                         onChange={(e) => updateItem(idx, "height", e.target.value)}
                       />
                     </td>
+                    <td className="p-2">
+                      <input
+                        type="number"
+                        className="w-16 border rounded p-1"
+                        value={item.SWidth ?? ""}
+                        onChange={(e) => updateItem(idx, "SWidth", e.target.value)}
+                        placeholder="Auto"
+                      />
+                    </td>
+                    <td className="p-2">
+                      <input
+                        type="number"
+                        className="w-16 border rounded p-1"
+                        value={item.SHeight ?? ""}
+                        onChange={(e) => updateItem(idx, "SHeight", e.target.value)}
+                        placeholder="Auto"
+                      />
+                    </td>
                     <td className="p-2 text-center text-xs font-medium">{item.standardSize || "—"}</td>
                     <td className="p-2">
                       <input
@@ -497,7 +653,8 @@ export default function CreateInvoiceModal({ isOpen, onClose, onSuccess }: any) 
                   </tr>
                 ))}
               </tbody>
-            </table>
+              </table>
+            </div>
           </div>
 
           <Button type="button" variant="outline" size="sm" onClick={addItem}>

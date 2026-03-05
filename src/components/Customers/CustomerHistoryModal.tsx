@@ -6,16 +6,23 @@ import Button from "../ui/button/Button";
 import Badge from "../ui/badge/Badge";
 import { customersApi } from "@/lib/api/customer";
 import { Loader } from "lucide-react";
+import { invoicesApi } from "@/lib/api/invoice";
 
 export default function CustomerHistoryModal({ isOpen, onClose, customerId }) {
   const [data, setData] = useState<any>(null);
+  const [ledgerRows, setLedgerRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (isOpen && customerId) {
       setLoading(true);
-      customersApi.getCustomerById(customerId).then((res) => {
-        setData(res.data || res);
+      Promise.all([
+        customersApi.getCustomerById(customerId),
+        invoicesApi.getCustomerLedger(customerId),
+      ]).then(([customerRes, ledgerRes]) => {
+        setData(customerRes.data || customerRes);
+        const ledgerPayload = ledgerRes?.data || ledgerRes;
+        setLedgerRows(ledgerPayload?.rows || []);
         setLoading(false);
       });
     }
@@ -63,6 +70,38 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId }) {
                   </div>
                 </div>
               ))}
+            </div>
+
+            <h4 className="text-lg font-semibold mt-8 mb-4 text-brand-500">Payment & Transaction Ledger</h4>
+            <div className="rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+              <div className="max-h-72 overflow-auto">
+                <table className="w-full text-sm">
+                  <thead className="sticky top-0 bg-gray-50 dark:bg-gray-800 z-10">
+                    <tr className="text-xs uppercase text-gray-500 border-b border-gray-100 dark:border-gray-700">
+                      <th className="px-3 py-2 text-left">Date</th>
+                      <th className="px-3 py-2 text-left">Type</th>
+                      <th className="px-3 py-2 text-left">Ref</th>
+                      <th className="px-3 py-2 text-left">Method</th>
+                      <th className="px-3 py-2 text-right">Debit</th>
+                      <th className="px-3 py-2 text-right">Credit</th>
+                      <th className="px-3 py-2 text-right">Running</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {ledgerRows.map((row: any, idx: number) => (
+                      <tr key={`${row.type || "ROW"}-${row.invoiceId || row.paymentId || row.ref || idx}-${idx}`} className="border-b border-gray-100 dark:border-gray-800">
+                        <td className="px-3 py-2">{new Date(row.date || row.createdAt).toLocaleDateString()}</td>
+                        <td className="px-3 py-2 text-xs">{row.type?.replace("_", " ") || "—"}</td>
+                        <td className="px-3 py-2">{row.ref || "—"}</td>
+                        <td className="px-3 py-2 text-xs">{row.method || "—"}</td>
+                        <td className="px-3 py-2 text-right text-red-600">Rs. {Number(row.debit || 0).toLocaleString()}</td>
+                        <td className="px-3 py-2 text-right text-green-600">Rs. {Number(row.credit || 0).toLocaleString()}</td>
+                        <td className="px-3 py-2 text-right font-semibold">Rs. {Math.abs(Number(row.runningBalance || 0)).toLocaleString()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </>
         )}
