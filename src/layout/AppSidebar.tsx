@@ -103,10 +103,26 @@ const navItems: NavItem[] = [
       },
     ],
   },
-   {
+  {
     icon: <UserCircleIcon />,
     name: "Customers",
-    path: "/admin/users",
+    subItems: [
+      {
+        name: "All Customers",
+        path: "/admin/users",
+        permission: "user.view",
+      },
+      {
+        name: "Permanent Customers",
+        path: "/admin/users/permanent",
+        permission: "user.view",
+      },
+      {
+        name: "Walk-In Customers",
+        path: "/admin/users/walkin",
+        permission: "user.view",
+      },
+    ],
     permission: "user.view",
   },
   {
@@ -121,18 +137,23 @@ const navItems: NavItem[] = [
     path: "/admin/invoice",
     permission: "adminUser.view",
 
-    // subItems: [
-    //   {
-    //     name: "Cold Prospects",
-    //     path: "/admin/crm/coldprospects",
-    //     permission: "vehicle.view",
-    //   },
-      // {
-      //   name: "Upgrade Requests",
-      //   path: "/admin/vehicle/upgrade",
-      //   permission: "upgradeRequest.view"
-      // },
-    // ],
+    subItems: [
+      {
+        name: "All Invoices",
+        path: "/admin/invoice",
+        permission: "adminUser.view",
+      },
+      {
+        name: "Customer Invoices",
+        path: "/admin/invoice/customer",
+        permission: "adminUser.view",
+      },
+      {
+        name: "WalkIn Invoices",
+        path: "/admin/invoice/walkin",
+        permission: "adminUser.view"
+      },
+    ],
   },
 
   {

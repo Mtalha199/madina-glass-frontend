@@ -9,7 +9,13 @@ import Badge from "../ui/badge/Badge"; // Assuming you have a Badge component
 import { invoicesApi } from "@/lib/api/invoice";
 import ViewInvoiceModal from "./ViewInvoiceModal";
 
-export default function InvoicesList({ refreshTrigger }: { refreshTrigger: number }) {
+export default function InvoicesList({
+  refreshTrigger,
+  filterType = "ALL",
+}: {
+  refreshTrigger: number;
+  filterType?: "ALL" | "CUSTOMER" | "WALKIN";
+}) {
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -35,8 +41,13 @@ const handleView = (id: number) => {
     }
   };
 
+  const visibleInvoices = React.useMemo(() => {
+    if (filterType === "ALL") return invoices;
+    return invoices.filter((inv: any) => inv.customerType === filterType);
+  }, [invoices, filterType]);
+
   const { currentPage, totalPages, paginatedItems, goToPage, totalItems } = 
-    usePagination(invoices, { itemsPerPage: 10 });
+    usePagination(visibleInvoices, { itemsPerPage: 10 });
 
   useEffect(() => {
     fetchInvoices();
@@ -44,7 +55,15 @@ const handleView = (id: number) => {
 
   if (loading) return <Skeleton variant="rectangular" height={400} />;
   if (error) return <ResourceNotFound variant="error" title="Error" message={error} />;
-  if (invoices.length === 0) return <ResourceNotFound variant="empty" title="No Invoices" message="Start by creating a new bill." />;
+  if (visibleInvoices.length === 0) {
+    const message =
+      filterType === "CUSTOMER"
+        ? "No permanent customer invoices found."
+        : filterType === "WALKIN"
+        ? "No walk-in invoices found."
+        : "Start by creating a new bill.";
+    return <ResourceNotFound variant="empty" title="No Invoices" message={message} />;
+  }
 
   return (
     <div className="space-y-6">
@@ -54,6 +73,7 @@ const handleView = (id: number) => {
             <thead className="border-b border-gray-100 bg-gray-50/50 dark:border-gray-800 dark:bg-gray-900">
               <tr className="text-xs font-semibold uppercase tracking-wider text-gray-500">
                 <th className="px-6 py-4">Inv No</th>
+                <th className="px-6 py-4">Customer ID</th>
                 <th className="px-6 py-4">Customer</th>
                 <th className="px-6 py-4">Date</th>
                 <th className="px-6 py-4">Cutter / Driver</th>
@@ -66,9 +86,11 @@ const handleView = (id: number) => {
               {paginatedItems.map((inv: any) => (
                 <tr key={inv.id} className="text-sm hover:bg-gray-50 dark:hover:bg-white/5 transition">
                   <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">{inv.invoiceNumber}</td>
+                  <td className="px-6 py-4 font-mono text-xs text-gray-600">#{inv.customerId || inv.customer?.id || "—"}</td>
                   <td className="px-6 py-4">
                     <div className="font-medium">{inv.customer?.name}</div>
                     <div className="text-xs text-gray-500">{inv.customer?.phone}</div>
+                    <div className="text-xs text-gray-400">{inv.address || inv.customer?.address || "No address"}</div>
                   </td>
                   <td className="px-6 py-4 text-gray-500">
                     {new Date(inv.createdAt).toLocaleDateString()}

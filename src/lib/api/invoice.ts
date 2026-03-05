@@ -6,8 +6,14 @@ export interface InvoiceItem {
   SerialNum?: string;
   itemName: string;
   jobDescription?: string;
+  glassThickness?: string;
+  glassType?: string;
+  glassShade?: string;
+  standardSize?: string;
   width: number;
   height: number;
+  SWidth?: number;
+  SHeight?: number;
   qtyPcs: number;
   totalSqft: number;
   rate: number;
@@ -17,6 +23,7 @@ export interface InvoiceItem {
 export interface CreateInvoiceRequest {
   invoiceType?: "CUSTOMER" | "LABOUR";
   customerType: "CUSTOMER" | "WALKIN";
+  customerId?: number;
   name: string;
   phone: string;
   address?: string;
@@ -29,6 +36,14 @@ export interface CreateInvoiceRequest {
   discountPercent?: number;
   discount: number;
   paidAmount: number;
+}
+
+export interface CreateCustomerPaymentRequest {
+  amount: number;
+  method: "CASH" | "CHEQUE" | "BANK" | "OTHER";
+  invoiceId?: number;
+  reference?: string;
+  notes?: string;
 }
 
 export const invoicesApi = {
@@ -49,6 +64,21 @@ export const invoicesApi = {
 
   getCustomerHistory: async (phone: string) => {
     const response = await apiClient.get(`/invoices/customer/${phone}`);
+    return response.data;
+  },
+
+  getCustomerHistoryById: async (customerId: number) => {
+    const response = await apiClient.get(`/invoices/customer/by-id/${customerId}`);
+    return response.data;
+  },
+
+  getCustomerLedger: async (customerId: number) => {
+    const response = await apiClient.get(`/invoices/customer/${customerId}/ledger`);
+    return response.data;
+  },
+
+  addCustomerPayment: async (customerId: number, data: CreateCustomerPaymentRequest) => {
+    const response = await apiClient.post(`/invoices/customer/${customerId}/payments`, data);
     return response.data;
   }
 };

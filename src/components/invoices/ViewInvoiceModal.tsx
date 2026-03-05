@@ -11,6 +11,15 @@ export default function ViewInvoiceModal({ isOpen, onClose, invoiceId }: any) {
   const [ledgerLoading, setLedgerLoading] = useState(false);
   const [ledgerError, setLedgerError] = useState<string | null>(null);
   const [ledgerRows, setLedgerRows] = useState<any[]>([]);
+  const [ledgerCustomer, setLedgerCustomer] = useState<any>(null);
+  const [savingPayment, setSavingPayment] = useState(false);
+  const [paymentForm, setPaymentForm] = useState({
+    amount: "",
+    method: "CASH",
+    invoiceId: "",
+    reference: "",
+    notes: "",
+  });
   const [printMode, setPrintMode] = useState<"CUSTOMER" | "LABOUR">("CUSTOMER");
   const [showPrintOptions, setShowPrintOptions] = useState(false);
 
@@ -34,9 +43,10 @@ export default function ViewInvoiceModal({ isOpen, onClose, invoiceId }: any) {
   useEffect(() => {
     if (!isOpen) return;
 
-    const phone = String(invoice?.customer?.phone || invoice?.phone || "").trim();
-    if (!phone) {
+    const customerId = Number(invoice?.customerId || invoice?.customer?.id || 0);
+    if (!customerId) {
       setLedgerRows([]);
+      setLedgerCustomer(null);
       setLedgerError(null);
       return;
     }
@@ -45,35 +55,19 @@ export default function ViewInvoiceModal({ isOpen, onClose, invoiceId }: any) {
     setLedgerError(null);
 
     invoicesApi
-      .getCustomerHistory(phone)
+      .getCustomerLedger(customerId)
       .then((res) => {
         const payload = res?.data || res;
-        const invoices = Array.isArray(payload) ? payload : payload?.invoices || [];
-        const sorted = [...invoices].sort(
-          (a: any, b: any) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-        );
-
-        let running = 0;
-        const prepared = sorted.map((inv: any) => {
-          const debit = Number(inv.billValue || 0);
-          const credit = Number(inv.paidAmount || 0);
-          running += debit - credit;
-          return {
-            ...inv,
-            debit,
-            credit,
-            running,
-          };
-        });
-
-        setLedgerRows(prepared);
+        setLedgerCustomer(payload?.customer || null);
+        setLedgerRows(payload?.rows || []);
       })
       .catch(() => {
         setLedgerRows([]);
+        setLedgerCustomer(null);
         setLedgerError("Unable to load customer ledger history.");
       })
       .finally(() => setLedgerLoading(false));
-  }, [isOpen, invoice?.customer?.phone, invoice?.phone]);
+  }, [isOpen, invoice?.customerId, invoice?.customer?.id]);
 
   const isLabourView = printMode === "LABOUR";
 
@@ -96,51 +90,63 @@ export default function ViewInvoiceModal({ isOpen, onClose, invoiceId }: any) {
   const handlePrint = (mode: "CUSTOMER" | "LABOUR") => {
     setPrintMode(mode);
     setShowPrintOptions(false);
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        const invoiceNode = document.getElementById("printable-invoice");
-        if (!invoiceNode) return;
+    const cleanupPrintDom = () => {
+      document.body.classList.remove("printing-invoice");
+      const node = document.getElementById("invoice-print-root");
+      if (node) node.remove();
+    };
 
-        const printWindow = window.open("", "_blank", "noopener,noreferrer,width=1100,height=800");
-        if (!printWindow) {
-          window.print();
-          return;
-        }
+    setTimeout(() => {
+      const invoiceNode = document.getElementById("printable-invoice");
+      if (!invoiceNode) return;
 
-        const copiedStyles = Array.from(document.querySelectorAll('style, link[rel="stylesheet"]'))
-          .map((node) => node.outerHTML)
-          .join("\n");
+      const existingNode = document.getElementById("invoice-print-root");
+      if (existingNode) existingNode.remove();
 
-        printWindow.document.open();
-        printWindow.document.write(`
-          <!doctype html>
-          <html>
-            <head>
-              <meta charset="utf-8" />
-              <meta name="viewport" content="width=device-width,initial-scale=1" />
-              <title>Invoice Print</title>
-              ${copiedStyles}
-              <style>
-                @page { size: auto; margin: 12mm; }
-                html, body { background: #fff !important; }
-                body { margin: 0; padding: 0; }
-                .print\\:hidden { display: none !important; }
-              </style>
-            </head>
-            <body>
-              ${invoiceNode.outerHTML}
-            </body>
-          </html>
-        `);
-        printWindow.document.close();
-        printWindow.focus();
+      const printRoot = document.createElement("div");
+      printRoot.id = "invoice-print-root";
+      printRoot.style.display = "none";
+      printRoot.innerHTML = invoiceNode.outerHTML;
+      document.body.appendChild(printRoot);
 
-        setTimeout(() => {
-          printWindow.print();
-          printWindow.close();
-        }, 250);
+      document.body.classList.add("printing-invoice");
+      window.addEventListener("afterprint", cleanupPrintDom, { once: true });
+      window.print();
+      // Safety cleanup for browsers that skip afterprint.
+      setTimeout(cleanupPrintDom, 1200);
+    }, 120);
+  };
+
+  const handleAddPayment = async () => {
+    const customerId = Number(invoice?.customerId || invoice?.customer?.id || 0);
+    const amount = Number(paymentForm.amount || 0);
+    if (!customerId || amount <= 0) return;
+
+    try {
+      setSavingPayment(true);
+      await invoicesApi.addCustomerPayment(customerId, {
+        amount,
+        method: paymentForm.method as "CASH" | "CHEQUE" | "BANK" | "OTHER",
+        invoiceId: paymentForm.invoiceId ? Number(paymentForm.invoiceId) : undefined,
+        reference: paymentForm.reference || undefined,
+        notes: paymentForm.notes || undefined,
       });
-    });
+
+      setPaymentForm({
+        amount: "",
+        method: "CASH",
+        invoiceId: "",
+        reference: "",
+        notes: "",
+      });
+
+      const res = await invoicesApi.getCustomerLedger(customerId);
+      const payload = res?.data || res;
+      setLedgerCustomer(payload?.customer || null);
+      setLedgerRows(payload?.rows || []);
+    } finally {
+      setSavingPayment(false);
+    }
   };
 
   if (loading) {
@@ -155,15 +161,55 @@ export default function ViewInvoiceModal({ isOpen, onClose, invoiceId }: any) {
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} className="max-w-[980px] m-4 max-h-[95vh] overflow-y-auto">
+      <style>{`
+        @media print {
+          @page { size: auto; margin: 10mm; }
+          html, body {
+            overflow: visible !important;
+            background: #fff !important;
+          }
+          /* Hide all app content first to avoid printing list/sidebar pages */
+          body.printing-invoice > * {
+            display: none !important;
+          }
+          body.printing-invoice #invoice-print-root {
+            display: block !important;
+          }
+          body.printing-invoice #invoice-print-root #printable-invoice {
+            position: static !important;
+            display: block !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: #fff !important;
+            border-radius: 0 !important;
+          }
+          body.printing-invoice #invoice-print-root #printable-invoice,
+          body.printing-invoice #invoice-print-root #printable-invoice * {
+            visibility: visible !important;
+          }
+          .print-sheet { padding: 0 !important; background: #fff !important; border-radius: 0 !important; }
+          .print-compact { width: 100%; border-collapse: collapse; table-layout: auto; }
+          .print-compact th, .print-compact td { padding: 6px 8px !important; font-size: 11px !important; line-height: 1.3; }
+          .print-title { font-size: 24px !important; line-height: 1.2 !important; }
+          .print-avoid-break { break-inside: avoid; page-break-inside: avoid; }
+          .print-no-wrap { white-space: nowrap !important; }
+          .print\\:hidden { display: none !important; }
+          .totals-remarks { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 16px !important; align-items: start !important; }
+        }
+      `}</style>
       <div
-        className="p-8 bg-gradient-to-br from-white via-slate-50 to-white dark:from-gray-900 dark:via-gray-900 dark:to-gray-950 rounded-3xl"
+        className="print-sheet p-8 bg-gradient-to-br from-white via-slate-50 to-white dark:from-gray-900 dark:via-gray-900 dark:to-gray-950 rounded-3xl"
         id="printable-invoice"
       >
         <div className="rounded-2xl border border-slate-200 dark:border-gray-800 p-6 bg-white/90 dark:bg-gray-900/80 shadow-sm">
-          <div className="flex justify-between items-start border-b pb-6 border-gray-100 dark:border-gray-800">
-            <div>
-              <h1 className="text-3xl font-black tracking-tight text-brand-500 uppercase">Madina Glass</h1>
-              <p className="text-sm text-gray-500">Aluminium & Glass Works Specialist</p>
+          <div className="print-avoid-break flex justify-between items-start border-b pb-6 border-gray-100 dark:border-gray-800">
+            <div className="flex items-start gap-3">
+              <img src="/images/logo/logo.png" alt="Madina Glass Logo" className="h-14 w-14 object-contain" />
+              <div>
+                <h1 className="print-title text-3xl font-black tracking-tight text-brand-500 uppercase">Madina Glass</h1>
+                <p className="text-sm text-gray-500">Aluminium & Glass Works Specialist</p>
+              </div>
               <span className="inline-block mt-3 px-3 py-1 rounded-full text-xs font-bold bg-brand-50 text-brand-600 dark:bg-brand-500/20 dark:text-brand-300">
                 {printMode} INVOICE VIEW
               </span>
@@ -183,11 +229,12 @@ export default function ViewInvoiceModal({ isOpen, onClose, invoiceId }: any) {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-8 my-8 text-sm">
+          <div className="print-avoid-break grid grid-cols-2 gap-8 my-8 text-sm">
             <div>
               <h4 className="text-gray-400 uppercase font-semibold text-xs mb-2">Bill To:</h4>
               <p className="font-bold text-lg">{invoice.customer?.name}</p>
               <p className="text-gray-600">{invoice.customer?.phone}</p>
+              <p className="text-gray-600">Customer ID: {invoice.customerId || invoice.customer?.id || "—"}</p>
               <p className="text-gray-600 italic">{invoice.address || "No delivery address"}</p>
             </div>
             <div className="grid grid-cols-2 gap-4 bg-gray-50 dark:bg-white/5 p-4 rounded-2xl">
@@ -230,7 +277,7 @@ export default function ViewInvoiceModal({ isOpen, onClose, invoiceId }: any) {
           )}
 
           {!isLabourView && (
-            <div className="mb-8 rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+            <div className="mb-8 rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden print:hidden">
               <div className="px-4 py-3 bg-gray-50 dark:bg-gray-800 flex items-center justify-between">
                 <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-200">Customer Ledger (Debit/Credit)</h4>
                 {ledgerLoading && <span className="text-xs text-gray-500">Loading...</span>}
@@ -243,12 +290,80 @@ export default function ViewInvoiceModal({ isOpen, onClose, invoiceId }: any) {
               )}
 
               {!ledgerError && !ledgerLoading && ledgerRows.length > 0 && (
+                <div className="space-y-3 p-3 border-b border-gray-100 dark:border-gray-800">
+                  <div className="grid grid-cols-1 md:grid-cols-5 gap-2">
+                    <input
+                      type="number"
+                      placeholder="Amount"
+                      className="border rounded px-2 py-2 text-sm"
+                      value={paymentForm.amount}
+                      onChange={(e) => setPaymentForm((p) => ({ ...p, amount: e.target.value }))}
+                    />
+                    <select
+                      className="border rounded px-2 py-2 text-sm bg-transparent"
+                      value={paymentForm.method}
+                      onChange={(e) => setPaymentForm((p) => ({ ...p, method: e.target.value }))}
+                    >
+                      <option value="CASH">Cash</option>
+                      <option value="CHEQUE">Cheque</option>
+                      <option value="BANK">Bank</option>
+                      <option value="OTHER">Other</option>
+                    </select>
+                    <select
+                      className="border rounded px-2 py-2 text-sm bg-transparent"
+                      value={paymentForm.invoiceId}
+                      onChange={(e) => setPaymentForm((p) => ({ ...p, invoiceId: e.target.value }))}
+                    >
+                      <option value="">Against Invoice (Optional)</option>
+                      {ledgerRows
+                        .filter((r: any) => r.type === "INVOICE")
+                        .map((r: any) => (
+                          <option key={r.invoiceId} value={String(r.invoiceId)}>
+                            {r.ref}
+                          </option>
+                        ))}
+                    </select>
+                    <input
+                      type="text"
+                      placeholder="Reference"
+                      className="border rounded px-2 py-2 text-sm"
+                      value={paymentForm.reference}
+                      onChange={(e) => setPaymentForm((p) => ({ ...p, reference: e.target.value }))}
+                    />
+                    <button
+                      type="button"
+                      onClick={handleAddPayment}
+                      disabled={savingPayment}
+                      className="rounded bg-brand-500 text-white px-3 py-2 text-sm font-medium disabled:opacity-60"
+                    >
+                      {savingPayment ? "Saving..." : "Add Payment"}
+                    </button>
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Notes (optional)"
+                    className="w-full border rounded px-2 py-2 text-sm"
+                    value={paymentForm.notes}
+                    onChange={(e) => setPaymentForm((p) => ({ ...p, notes: e.target.value }))}
+                  />
+                  {ledgerCustomer && (
+                    <p className="text-xs text-gray-500">
+                      Ledger for: {ledgerCustomer.name} ({ledgerCustomer.phone})
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {!ledgerError && !ledgerLoading && ledgerRows.length > 0 && (
                 <div className="max-h-60 overflow-auto">
                   <table className="w-full text-sm">
                     <thead className="sticky top-0 bg-white dark:bg-gray-900 z-10">
                       <tr className="text-xs uppercase text-gray-500 border-b border-gray-100 dark:border-gray-800">
                         <th className="px-3 py-2 text-left">Date</th>
+                        <th className="px-3 py-2 text-left">Type</th>
                         <th className="px-3 py-2 text-left">Ref</th>
+                        <th className="px-3 py-2 text-left">Method</th>
+                        <th className="px-3 py-2 text-left">Received By</th>
                         <th className="px-3 py-2 text-right">Debit</th>
                         <th className="px-3 py-2 text-right">Credit</th>
                         <th className="px-3 py-2 text-right">Running Balance</th>
@@ -256,15 +371,18 @@ export default function ViewInvoiceModal({ isOpen, onClose, invoiceId }: any) {
                       </tr>
                     </thead>
                     <tbody>
-                      {ledgerRows.map((row: any) => (
-                        <tr key={row.id} className="border-b border-gray-100 dark:border-gray-800">
-                          <td className="px-3 py-2">{new Date(row.createdAt).toLocaleDateString()}</td>
-                          <td className="px-3 py-2 font-medium">{row.invoiceNumber || `INV-${row.id}`}</td>
-                          <td className="px-3 py-2 text-right text-red-600">Rs. {row.debit.toLocaleString()}</td>
-                          <td className="px-3 py-2 text-right text-green-600">Rs. {row.credit.toLocaleString()}</td>
-                          <td className="px-3 py-2 text-right font-semibold">Rs. {Math.abs(Number(row.running || 0)).toLocaleString()}</td>
-                          <td className={`px-3 py-2 text-right text-xs font-semibold ${row.running > 0 ? "text-red-600" : row.running < 0 ? "text-green-600" : "text-gray-500"}`}>
-                            {row.running > 0 ? "Due" : row.running < 0 ? "Plus" : "Settled"}
+                      {ledgerRows.map((row: any, idx: number) => (
+                        <tr key={`${row.type || "ROW"}-${row.invoiceId || row.paymentId || row.ref || idx}-${idx}`} className="border-b border-gray-100 dark:border-gray-800">
+                          <td className="px-3 py-2">{new Date(row.date || row.createdAt).toLocaleDateString()}</td>
+                          <td className="px-3 py-2 text-xs">{row.type?.replace("_", " ") || "—"}</td>
+                          <td className="px-3 py-2 font-medium">{row.ref || "—"}</td>
+                          <td className="px-3 py-2 text-xs">{row.method || "—"}</td>
+                          <td className="px-3 py-2 text-xs">{row.receivedByName || "—"}</td>
+                          <td className="px-3 py-2 text-right text-red-600">Rs. {Number(row.debit || 0).toLocaleString()}</td>
+                          <td className="px-3 py-2 text-right text-green-600">Rs. {Number(row.credit || 0).toLocaleString()}</td>
+                          <td className="px-3 py-2 text-right font-semibold">Rs. {Math.abs(Number(row.runningBalance || 0)).toLocaleString()}</td>
+                          <td className={`px-3 py-2 text-right text-xs font-semibold ${Number(row.runningBalance || 0) > 0 ? "text-red-600" : Number(row.runningBalance || 0) < 0 ? "text-green-600" : "text-gray-500"}`}>
+                            {Number(row.runningBalance || 0) > 0 ? "Due" : Number(row.runningBalance || 0) < 0 ? "Plus" : "Settled"}
                           </td>
                         </tr>
                       ))}
@@ -275,7 +393,7 @@ export default function ViewInvoiceModal({ isOpen, onClose, invoiceId }: any) {
             </div>
           )}
 
-          <table className="w-full text-left mb-8 rounded-xl overflow-hidden border border-gray-100 dark:border-gray-800">
+          <table className="print-compact w-full text-left mb-8 rounded-xl overflow-hidden border border-gray-100 dark:border-gray-800">
             <thead>
               <tr className="bg-gray-50 dark:bg-gray-800 text-xs text-gray-500 uppercase">
                 <th className="py-3 px-3">Serial #</th>
@@ -293,8 +411,8 @@ export default function ViewInvoiceModal({ isOpen, onClose, invoiceId }: any) {
                 <tr key={i} className="border-t border-gray-100 dark:border-gray-800">
                   <td className="py-3 px-3 font-mono">{item.SerialNum || "—"}</td>
                   <td className="py-3 px-3 font-medium">{item.itemName}</td>
-                  <td className="py-3 px-3 text-gray-500">{item.width}" × {item.height}"</td>
-                  <td className="py-3 px-3 text-gray-500">{item.standardSize || (item.SWidth && item.SHeight ? `${item.SWidth} x ${item.SHeight}` : "—")}</td>
+                  <td className="py-3 px-3 text-gray-500 print-no-wrap">{item.width}" × {item.height}"</td>
+                  <td className="py-3 px-3 text-gray-500 print-no-wrap">{item.standardSize || (item.SWidth && item.SHeight ? `${item.SWidth} x ${item.SHeight}` : "—")}</td>
                   <td className="py-3 px-3">{item.qtyPcs}</td>
                   <td className="py-3 px-3 font-mono">{item.totalSqft}</td>
                   {!isLabourView && <td className="py-3 px-3">Rs. {Number(item.rate || 0).toLocaleString()}</td>}
@@ -305,35 +423,45 @@ export default function ViewInvoiceModal({ isOpen, onClose, invoiceId }: any) {
           </table>
 
           {!isLabourView && (
-            <div className="flex justify-end">
-              <div className="w-72 space-y-3 rounded-2xl bg-gray-50 dark:bg-white/5 p-4 border border-gray-100 dark:border-gray-800">
-                <div className="flex justify-between text-gray-500">
-                  <span>Sub-Total</span>
-                  <span>Rs. {subTotal.toLocaleString()}</span>
+            <div className="totals-remarks print-avoid-break mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+              {invoice.remarks ? (
+                <div className="rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/80 dark:bg-white/5 p-4">
+                  <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Remarks / Terms</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-line">{invoice.remarks}</p>
                 </div>
-                <div className="flex justify-between text-gray-500">
-                  <span>Discount ({discountPercent.toFixed(2)}%)</span>
-                  <span>- Rs. {Number(invoice.discount || 0).toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between text-gray-500">
-                  <span>Carriage</span>
-                  <span>Rs. {Number(invoice.carriage || 0).toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between text-xl font-bold pt-3 border-t border-gray-200 dark:border-gray-700">
-                  <span>Total</span>
-                  <span className="text-brand-500">Rs. {billValue.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between text-sm text-green-600 font-medium">
-                  <span>Paid</span>
-                  <span>Rs. {paidAmount.toLocaleString()}</span>
-                </div>
-                <div
-                  className={`flex justify-between p-3 rounded-xl font-bold ${
-                    net > 0 ? "bg-red-50 text-red-600" : "bg-green-50 text-green-600"
-                  }`}
-                >
-                  <span>{net > 0 ? "Balance Due" : net < 0 ? "Customer Plus" : "Balance"}</span>
-                  <span>Rs. {Math.abs(net).toLocaleString()}</span>
+              ) : (
+                <div />
+              )}
+              <div className="flex justify-end">
+                <div className="w-72 space-y-3 rounded-2xl bg-gray-50 dark:bg-white/5 p-4 border border-gray-100 dark:border-gray-800">
+                  <div className="flex justify-between text-gray-500">
+                    <span>Sub-Total</span>
+                    <span>Rs. {subTotal.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between text-gray-500">
+                    <span>Discount ({discountPercent.toFixed(2)}%)</span>
+                    <span>- Rs. {Number(invoice.discount || 0).toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between text-gray-500">
+                    <span>Carriage</span>
+                    <span>Rs. {Number(invoice.carriage || 0).toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between text-xl font-bold pt-3 border-t border-gray-200 dark:border-gray-700">
+                    <span>Total</span>
+                    <span className="text-brand-500">Rs. {billValue.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between text-sm text-green-600 font-medium">
+                    <span>Paid</span>
+                    <span>Rs. {paidAmount.toLocaleString()}</span>
+                  </div>
+                  <div
+                    className={`flex justify-between p-3 rounded-xl font-bold ${
+                      net > 0 ? "bg-red-50 text-red-600" : "bg-green-50 text-green-600"
+                    }`}
+                  >
+                    <span>{net > 0 ? "Balance Due" : net < 0 ? "Customer Plus" : "Balance"}</span>
+                    <span>Rs. {Math.abs(net).toLocaleString()}</span>
+                  </div>
                 </div>
               </div>
             </div>
