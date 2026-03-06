@@ -9,5 +9,9 @@ export const customersApi = {
   getCustomerById: async (id: number) => {
     const response = await apiClient.get(`/customers/${id}`);
     return response.data;
-  }
+  },
+  deleteCustomer: async (id: number) => {
+    const response = await apiClient.delete(`/customers/${id}`);
+    return response.data;
+  },
 };

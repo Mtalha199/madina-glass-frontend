@@ -52,6 +52,16 @@ export const invoicesApi = {
     return response.data;
   },
 
+  updateInvoice: async (id: number, data: Partial<CreateInvoiceRequest>) => {
+    const response = await apiClient.patch(`/invoices/${id}`, data);
+    return response.data;
+  },
+
+  deleteInvoice: async (id: number) => {
+    const response = await apiClient.delete(`/invoices/${id}`);
+    return response.data;
+  },
+
   getInvoices: async () => {
     const response = await apiClient.get('/invoices');
     return response.data;
