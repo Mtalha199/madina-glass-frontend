@@ -11,25 +11,30 @@ import { TrashIcon } from "lucide-react";
 const THICKNESS_OPTIONS = ["3", "4", "5", "6", "8", "12"];
 const MIRROR_THICKNESS_OPTIONS = ["3", "4", "5", "6"];
 const GLASS_TYPE_OPTIONS = ["CLEAR", "COLORED", "MIRROR"];
-const COLORED_SHADE_OPTIONS = ["GRAY", "BROWN", "GREEN", "BLUE", "BRONZE", "TEA", "BLACK", "REFLECTIVE BLUE", "REFLECTIVE GREEN"];
+const COLORED_SHADE_OPTIONS = [
+  "GREEN REFLECTIVE",
+  "BROWN REFLECTIVE",
+  "BLUE REFLECTIVE",
+  "GREY REFLECTIVE",
+  "GREY SIMPLE",
+  "BROWN SIMPLE",
+  "BLUE SIMPLE",
+  "GREEN SIMPLE",
+];
 const MIRROR_SHADE_OPTIONS = ["MIRROR"];
 
-const MARKET_SIZE_CLASSES = {
-  CLEAR_3MM: [6, 9, 12, 15, 18, 21, 24, 30, 36, 42, 48, 54, 60, 72, 84],
-  CLEAR_OTHERS: [6, 9, 12, 15, 18, 21, 24, 30, 36, 42, 48, 54, 60, 66, 72, 78, 84, 90],
-  COLORED_ALL: [6, 9, 12, 15, 18, 21, 24, 28, 30, 33, 36, 42, 45, 48, 54, 60, 66, 72, 78, 84, 90, 96],
+const MARKET_SIZE_STEPS = [6, 9, 12, 15, 18, 21, 24, 28, 30, 33, 36, 42, 45, 48, 54, 60, 66, 72, 78, 84, 90, 96, 102, 108, 114, 120, 126, 132, 138, 144];
+
+const getSizeLimits = (thickness: string) => {
+  if (String(thickness) === "3") return { maxWidth: 78, maxHeight: 96 };
+  return { maxWidth: 144, maxHeight: 144 };
 };
 
-const getMarketSizeClass = (thickness: string, glassType: string) => {
-  if (glassType === "COLORED") return MARKET_SIZE_CLASSES.COLORED_ALL;
-  if (thickness === "3") return MARKET_SIZE_CLASSES.CLEAR_3MM;
-  return MARKET_SIZE_CLASSES.CLEAR_OTHERS;
-};
-
-const getRoundedMarketSize = (actual: number, sizes: number[]) => {
+const getRoundedMarketSize = (actual: number, maxAllowed: number) => {
   const value = Number(actual);
   if (!value) return null;
-  return sizes.find((size) => value <= size) ?? null;
+  if (value > maxAllowed) return null;
+  return MARKET_SIZE_STEPS.find((size) => value <= size && size <= maxAllowed) ?? null;
 };
 
 const buildItemName = (thickness: string, glassType: string, shade: string) => {
@@ -68,9 +73,9 @@ const recalcItem = (item: any) => {
   const qtyPcs = Number(item.qtyPcs || 0);
   const rate = Number(item.rate || 0);
 
-  const sizes = getMarketSizeClass(glassThickness, glassType);
-  const autoSWidth = getRoundedMarketSize(width, sizes);
-  const autoSHeight = getRoundedMarketSize(height, sizes);
+  const limits = getSizeLimits(glassThickness);
+  const autoSWidth = getRoundedMarketSize(width, limits.maxWidth);
+  const autoSHeight = getRoundedMarketSize(height, limits.maxHeight);
   const isStdManual = Boolean(item.isStdManual);
   const stdWidth = isStdManual ? Number(item.SWidth || 0) : Number(autoSWidth || 0);
   const stdHeight = isStdManual ? Number(item.SHeight || 0) : Number(autoSHeight || 0);
@@ -92,7 +97,7 @@ const recalcItem = (item: any) => {
     isStdManual,
     totalSqft,
     value,
-    standardSize: stdWidth && stdHeight ? `${stdWidth}" x ${stdHeight}"` : "—",
+    standardSize: stdWidth && stdHeight ? `${stdWidth}" x ${stdHeight}"` : (width && height ? "Oversize" : "—"),
   };
 };
 
