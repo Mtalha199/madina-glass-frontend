@@ -10,7 +10,8 @@ import { customersApi } from "@/lib/api/customer";
 import { TrashIcon } from "lucide-react";
 
 const THICKNESS_OPTIONS = ["3", "4", "5", "6", "8", "12"];
-const GLASS_TYPE_OPTIONS = ["CLEAR", "COLORED"];
+const MIRROR_THICKNESS_OPTIONS = ["3", "4", "5", "6"];
+const GLASS_TYPE_OPTIONS = ["CLEAR", "COLORED", "MIRROR"];
 const COLORED_SHADE_OPTIONS = [
   "GRAY",
   "BROWN",
@@ -22,6 +23,7 @@ const COLORED_SHADE_OPTIONS = [
   "REFLECTIVE BLUE",
   "REFLECTIVE GREEN",
 ];
+const MIRROR_SHADE_OPTIONS = ["MIRROR"];
 
 const DEFAULT_TERMS = `Terms & Conditions:
 1. Goods once sold will not be returned.
@@ -72,15 +74,41 @@ const nextSerial = (serial: string) => {
 };
 
 const buildItemName = (thickness: string, glassType: string, shade: string) => {
-  return glassType === "CLEAR" ? `${thickness}mm CLEAR` : `${thickness}mm ${shade}`;
+  if (glassType === "CLEAR") return `${thickness}mm CLEAR`;
+  if (glassType === "MIRROR") return `${thickness}mm MIRROR`;
+  return `${thickness}mm ${shade}`;
+};
+
+const getThicknessOptionsForType = (glassType: string) => {
+  return glassType === "MIRROR" ? MIRROR_THICKNESS_OPTIONS : THICKNESS_OPTIONS;
+};
+
+const getShadeOptionsForType = (glassType: string) => {
+  if (glassType === "CLEAR") return ["CLEAR"];
+  if (glassType === "MIRROR") return MIRROR_SHADE_OPTIONS;
+  return COLORED_SHADE_OPTIONS;
+};
+
+const getDefaultShadeForType = (glassType: string) => {
+  return getShadeOptionsForType(glassType)[0];
 };
 
 const recalcItem = (item: any, isLabour: boolean) => {
+  const glassType = String(item.glassType || "CLEAR");
+  const allowedThickness = getThicknessOptionsForType(glassType);
+  const glassThickness = allowedThickness.includes(String(item.glassThickness))
+    ? String(item.glassThickness)
+    : allowedThickness[0];
+  const shadeOptions = getShadeOptionsForType(glassType);
+  const glassShade = shadeOptions.includes(String(item.glassShade))
+    ? String(item.glassShade)
+    : shadeOptions[0];
+
   const width = Number(item.width || 0);
   const height = Number(item.height || 0);
   const qtyPcs = Number(item.qtyPcs || 0);
   const rate = isLabour ? 0 : Number(item.rate || 0);
-  const sizes = getMarketSizeClass(String(item.glassThickness), String(item.glassType));
+  const sizes = getMarketSizeClass(glassThickness, glassType);
   const autoSWidth = getRoundedMarketSize(width, sizes);
   const autoSHeight = getRoundedMarketSize(height, sizes);
   const isStdManual = Boolean(item.isStdManual);
@@ -90,14 +118,17 @@ const recalcItem = (item: any, isLabour: boolean) => {
   const calcHeight = stdHeight || height;
   const totalSqft = Number((((calcWidth * calcHeight) / 144) * qtyPcs).toFixed(2));
   const value = Number((totalSqft * rate).toFixed(2));
-  const itemName = buildItemName(String(item.glassThickness), String(item.glassType), String(item.glassShade));
+  const itemName = buildItemName(glassThickness, glassType, glassShade);
   const standardSize =
     stdWidth && stdHeight
       ? `${stdWidth}" x ${stdHeight}"`
-      : getStandardSizeForActual(width, height, String(item.glassThickness), String(item.glassType));
+      : getStandardSizeForActual(width, height, glassThickness, glassType);
 
   return {
     ...item,
+    glassThickness,
+    glassType,
+    glassShade,
     SWidth: stdWidth || undefined,
     SHeight: stdHeight || undefined,
     isStdManual,
@@ -282,7 +313,17 @@ export default function CreateInvoiceModal({ isOpen, onClose, onSuccess, presetC
     const updated = { ...newItems[index], [field]: val };
 
     if (field === "glassType") {
-      updated.glassShade = val === "CLEAR" ? "CLEAR" : COLORED_SHADE_OPTIONS[0];
+      const allowedThickness = getThicknessOptionsForType(String(val));
+      if (!allowedThickness.includes(String(updated.glassThickness))) {
+        updated.glassThickness = allowedThickness[0];
+      }
+      updated.glassShade = getDefaultShadeForType(String(val));
+    }
+    if (field === "glassThickness") {
+      const allowedThickness = getThicknessOptionsForType(String(updated.glassType));
+      if (!allowedThickness.includes(String(updated.glassThickness))) {
+        updated.glassThickness = allowedThickness[0];
+      }
     }
     if (field === "SWidth" || field === "SHeight") {
       updated.isStdManual = true;
@@ -552,7 +593,7 @@ export default function CreateInvoiceModal({ isOpen, onClose, onSuccess, presetC
                         value={item.glassThickness}
                         onChange={(e) => updateItem(idx, "glassThickness", e.target.value)}
                       >
-                        {THICKNESS_OPTIONS.map((size) => (
+                        {getThicknessOptionsForType(String(item.glassType)).map((size) => (
                           <option key={size} value={size}>
                             {size} mm
                           </option>
@@ -577,9 +618,9 @@ export default function CreateInvoiceModal({ isOpen, onClose, onSuccess, presetC
                         className="w-full border rounded p-1 bg-transparent"
                         value={item.glassShade}
                         onChange={(e) => updateItem(idx, "glassShade", e.target.value)}
-                        disabled={item.glassType === "CLEAR"}
+                        disabled={item.glassType === "CLEAR" || item.glassType === "MIRROR"}
                       >
-                        {(item.glassType === "CLEAR" ? ["CLEAR"] : COLORED_SHADE_OPTIONS).map((shade) => (
+                        {getShadeOptionsForType(String(item.glassType)).map((shade) => (
                           <option key={shade} value={shade}>
                             {shade}
                           </option>

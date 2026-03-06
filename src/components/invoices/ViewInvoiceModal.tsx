@@ -5,7 +5,13 @@ import Button from "../ui/button/Button";
 import { Loader } from "lucide-react";
 import { invoicesApi } from "@/lib/api/invoice";
 
-export default function ViewInvoiceModal({ isOpen, onClose, invoiceId }: any) {
+export default function ViewInvoiceModal({
+  isOpen,
+  onClose,
+  invoiceId,
+  printRequest,
+  onPrintRequestHandled,
+}: any) {
   const [invoice, setInvoice] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [ledgerLoading, setLedgerLoading] = useState(false);
@@ -22,14 +28,18 @@ export default function ViewInvoiceModal({ isOpen, onClose, invoiceId }: any) {
   });
   const [printMode, setPrintMode] = useState<"CUSTOMER" | "LABOUR">("CUSTOMER");
   const [showPrintOptions, setShowPrintOptions] = useState(false);
+  const [handledPrintRequestKey, setHandledPrintRequestKey] = useState<number | null>(null);
+
+  const loadInvoice = async () => {
+    if (!invoiceId) return;
+    const res = await invoicesApi.getInvoiceById(invoiceId);
+    setInvoice(res.data || res);
+  };
 
   useEffect(() => {
     if (isOpen && invoiceId) {
       setLoading(true);
-      invoicesApi.getInvoiceById(invoiceId).then((res) => {
-        setInvoice(res.data || res);
-        setLoading(false);
-      });
+      loadInvoice().finally(() => setLoading(false));
     }
   }, [isOpen, invoiceId]);
 
@@ -86,6 +96,7 @@ export default function ViewInvoiceModal({ isOpen, onClose, invoiceId }: any) {
   const billValue = Number(invoice?.billValue || 0);
   const paidAmount = Number(invoice?.paidAmount || 0);
   const net = Number((billValue - paidAmount).toFixed(2)); // +ve means customer owes, -ve means customer in plus
+  const shouldTightenPrint = (invoice?.items?.length || 0) > 10 || String(invoice?.remarks || "").length > 180;
 
   const handlePrint = (mode: "CUSTOMER" | "LABOUR") => {
     setPrintMode(mode);
@@ -117,6 +128,15 @@ export default function ViewInvoiceModal({ isOpen, onClose, invoiceId }: any) {
     }, 120);
   };
 
+  useEffect(() => {
+    if (!isOpen || !invoice || !printRequest?.key) return;
+    if (handledPrintRequestKey === printRequest.key) return;
+
+    setHandledPrintRequestKey(printRequest.key);
+    handlePrint(printRequest.mode || "CUSTOMER");
+    onPrintRequestHandled?.();
+  }, [isOpen, invoice, printRequest, handledPrintRequestKey, onPrintRequestHandled]);
+
   const handleAddPayment = async () => {
     const customerId = Number(invoice?.customerId || invoice?.customer?.id || 0);
     const amount = Number(paymentForm.amount || 0);
@@ -144,6 +164,7 @@ export default function ViewInvoiceModal({ isOpen, onClose, invoiceId }: any) {
       const payload = res?.data || res;
       setLedgerCustomer(payload?.customer || null);
       setLedgerRows(payload?.rows || []);
+      await loadInvoice();
     } finally {
       setSavingPayment(false);
     }
@@ -163,7 +184,7 @@ export default function ViewInvoiceModal({ isOpen, onClose, invoiceId }: any) {
     <Modal isOpen={isOpen} onClose={onClose} className="max-w-[980px] m-4 max-h-[95vh] overflow-y-auto">
       <style>{`
         @media print {
-          @page { size: auto; margin: 10mm; }
+          @page { size: auto; margin: 6mm; }
           html, body {
             overflow: visible !important;
             background: #fff !important;
@@ -189,21 +210,37 @@ export default function ViewInvoiceModal({ isOpen, onClose, invoiceId }: any) {
             visibility: visible !important;
           }
           .print-sheet { padding: 0 !important; background: #fff !important; border-radius: 0 !important; }
+          #printable-invoice { font-size: 12px !important; line-height: 1.25 !important; }
           .print-compact { width: 100%; border-collapse: collapse; table-layout: auto; }
-          .print-compact th, .print-compact td { padding: 6px 8px !important; font-size: 11px !important; line-height: 1.3; }
+          .print-compact th, .print-compact td { padding: 5px 7px !important; font-size: 10.5px !important; line-height: 1.2 !important; }
+          .print-compact tbody tr { break-inside: avoid; page-break-inside: avoid; }
           .print-title { font-size: 24px !important; line-height: 1.2 !important; }
+          .print-header { padding-bottom: 10px !important; }
+          .print-meta { margin-top: 10px !important; margin-bottom: 10px !important; gap: 12px !important; }
+          .print-summary-cards { margin-bottom: 10px !important; gap: 8px !important; }
+          .print-remarks p { font-size: 10px !important; line-height: 1.2 !important; max-height: 60px; overflow: hidden; }
           .print-avoid-break { break-inside: avoid; page-break-inside: avoid; }
           .print-no-wrap { white-space: nowrap !important; }
           .print\\:hidden { display: none !important; }
           .totals-remarks { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 16px !important; align-items: start !important; }
+
+          /* Dense print mode for long invoices: reduce visual chrome to keep first page packed */
+          #printable-invoice.print-fit-tight .print-title { font-size: 20px !important; }
+          #printable-invoice.print-fit-tight .print-header { padding-bottom: 8px !important; }
+          #printable-invoice.print-fit-tight .print-meta { margin-top: 8px !important; margin-bottom: 8px !important; gap: 10px !important; }
+          #printable-invoice.print-fit-tight .print-summary-cards { display: none !important; }
+          #printable-invoice.print-fit-tight .print-compact th,
+          #printable-invoice.print-fit-tight .print-compact td { padding: 4px 6px !important; font-size: 10px !important; line-height: 1.15 !important; }
+          #printable-invoice.print-fit-tight .totals-remarks { gap: 10px !important; }
+          #printable-invoice.print-fit-tight .print-remarks p { max-height: 44px; }
         }
       `}</style>
       <div
-        className="print-sheet p-8 bg-gradient-to-br from-white via-slate-50 to-white dark:from-gray-900 dark:via-gray-900 dark:to-gray-950 rounded-3xl"
+        className={`print-sheet p-8 bg-gradient-to-br from-white via-slate-50 to-white dark:from-gray-900 dark:via-gray-900 dark:to-gray-950 rounded-3xl ${shouldTightenPrint ? "print-fit-tight" : ""}`}
         id="printable-invoice"
       >
         <div className="rounded-2xl border border-slate-200 dark:border-gray-800 p-6 bg-white/90 dark:bg-gray-900/80 shadow-sm">
-          <div className="print-avoid-break flex justify-between items-start border-b pb-6 border-gray-100 dark:border-gray-800">
+          <div className="print-avoid-break print-header flex justify-between items-start border-b pb-6 border-gray-100 dark:border-gray-800">
             <div className="flex items-start gap-3">
               <img src="/images/logo/logo.png" alt="Madina Glass Logo" className="h-14 w-14 object-contain" />
               <div>
@@ -229,7 +266,7 @@ export default function ViewInvoiceModal({ isOpen, onClose, invoiceId }: any) {
             </div>
           </div>
 
-          <div className="print-avoid-break grid grid-cols-2 gap-8 my-8 text-sm">
+          <div className="print-avoid-break print-meta grid grid-cols-2 gap-8 my-8 text-sm">
             <div>
               <h4 className="text-gray-400 uppercase font-semibold text-xs mb-2">Bill To:</h4>
               <p className="font-bold text-lg">{invoice.customer?.name}</p>
@@ -258,7 +295,7 @@ export default function ViewInvoiceModal({ isOpen, onClose, invoiceId }: any) {
           </div>
 
           {!isLabourView && (
-            <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="print-summary-cards mb-6 grid grid-cols-1 md:grid-cols-3 gap-3">
               <div className="rounded-lg bg-red-50 dark:bg-red-500/10 p-3 text-sm border border-red-100 dark:border-red-500/20">
                 <p className="text-xs text-gray-500">Debit (Bill)</p>
                 <p className="font-semibold text-red-600">Rs. {billValue.toLocaleString()}</p>
@@ -399,9 +436,9 @@ export default function ViewInvoiceModal({ isOpen, onClose, invoiceId }: any) {
                 <th className="py-3 px-3">Serial #</th>
                 <th className="py-3 px-3">Item Description</th>
                 <th className="py-3 px-3">Size (WxH)</th>
-                <th className="py-3 px-3">Std Size</th>
+                {!isLabourView && <th className="py-3 px-3">Std Size</th>}
                 <th className="py-3 px-3">Qty</th>
-                <th className="py-3 px-3">Sqft</th>
+                {!isLabourView && <th className="py-3 px-3">Sqft</th>}
                 {!isLabourView && <th className="py-3 px-3">Rate</th>}
                 {!isLabourView && <th className="py-3 px-3 text-right">Value</th>}
               </tr>
@@ -412,9 +449,9 @@ export default function ViewInvoiceModal({ isOpen, onClose, invoiceId }: any) {
                   <td className="py-3 px-3 font-mono">{item.SerialNum || "—"}</td>
                   <td className="py-3 px-3 font-medium">{item.itemName}</td>
                   <td className="py-3 px-3 text-gray-500 print-no-wrap">{item.width}" × {item.height}"</td>
-                  <td className="py-3 px-3 text-gray-500 print-no-wrap">{item.standardSize || (item.SWidth && item.SHeight ? `${item.SWidth} x ${item.SHeight}` : "—")}</td>
+                  {!isLabourView && <td className="py-3 px-3 text-gray-500 print-no-wrap">{item.standardSize || (item.SWidth && item.SHeight ? `${item.SWidth} x ${item.SHeight}` : "—")}</td>}
                   <td className="py-3 px-3">{item.qtyPcs}</td>
-                  <td className="py-3 px-3 font-mono">{item.totalSqft}</td>
+                  {!isLabourView && <td className="py-3 px-3 font-mono">{item.totalSqft}</td>}
                   {!isLabourView && <td className="py-3 px-3">Rs. {Number(item.rate || 0).toLocaleString()}</td>}
                   {!isLabourView && <td className="py-3 px-3 text-right font-bold">Rs. {Number(item.value || 0).toLocaleString()}</td>}
                 </tr>
@@ -425,7 +462,7 @@ export default function ViewInvoiceModal({ isOpen, onClose, invoiceId }: any) {
           {!isLabourView && (
             <div className="totals-remarks print-avoid-break mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
               {invoice.remarks ? (
-                <div className="rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/80 dark:bg-white/5 p-4">
+                <div className="print-remarks rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/80 dark:bg-white/5 p-4">
                   <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Remarks / Terms</h4>
                   <p className="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-line">{invoice.remarks}</p>
                 </div>
