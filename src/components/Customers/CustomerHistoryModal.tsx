@@ -7,11 +7,20 @@ import Badge from "../ui/badge/Badge";
 import { customersApi } from "@/lib/api/customer";
 import { Loader } from "lucide-react";
 import { invoicesApi } from "@/lib/api/invoice";
+import ViewInvoiceModal from "../invoices/ViewInvoiceModal";
 
-export default function CustomerHistoryModal({ isOpen, onClose, customerId }) {
+interface CustomerHistoryModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  customerId: number | null;
+}
+
+export default function CustomerHistoryModal({ isOpen, onClose, customerId }: CustomerHistoryModalProps) {
   const [data, setData] = useState<any>(null);
   const [ledgerRows, setLedgerRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedInvoiceId, setSelectedInvoiceId] = useState<number | null>(null);
+  const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
 
   useEffect(() => {
     if (isOpen && customerId) {
@@ -27,6 +36,20 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId }) {
       });
     }
   }, [isOpen, customerId]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setIsInvoiceModalOpen(false);
+      setSelectedInvoiceId(null);
+    }
+  }, [isOpen]);
+
+  const handleOpenInvoice = (invoiceId: number | null | undefined) => {
+    const id = Number(invoiceId || 0);
+    if (!id) return;
+    setSelectedInvoiceId(id);
+    setIsInvoiceModalOpen(true);
+  };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} className="max-w-[900px]">
@@ -66,7 +89,16 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId }) {
 
                   <div className="flex justify-between mt-4 text-sm">
                     <span className="text-gray-500">Billed by: <b className="text-gray-700 dark:text-gray-300">{inv.admin?.name}</b></span>
-                    <span className="font-bold">Total: Rs. {inv.billValue}</span>
+                    <div className="flex items-center gap-3">
+                      <span className="font-bold">Total: Rs. {inv.billValue}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleOpenInvoice(inv.id)}
+                        className="text-brand-500 hover:underline font-medium"
+                      >
+                        Open Invoice
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -85,6 +117,7 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId }) {
                       <th className="px-3 py-2 text-right">Debit</th>
                       <th className="px-3 py-2 text-right">Credit</th>
                       <th className="px-3 py-2 text-right">Running</th>
+                      <th className="px-3 py-2 text-right">Action</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -97,6 +130,19 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId }) {
                         <td className="px-3 py-2 text-right text-red-600">Rs. {Number(row.debit || 0).toLocaleString()}</td>
                         <td className="px-3 py-2 text-right text-green-600">Rs. {Number(row.credit || 0).toLocaleString()}</td>
                         <td className="px-3 py-2 text-right font-semibold">Rs. {Math.abs(Number(row.runningBalance || 0)).toLocaleString()}</td>
+                        <td className="px-3 py-2 text-right">
+                          {row.invoiceId ? (
+                            <button
+                              type="button"
+                              onClick={() => handleOpenInvoice(row.invoiceId)}
+                              className="text-brand-500 hover:underline text-xs font-medium"
+                            >
+                              Open Invoice
+                            </button>
+                          ) : (
+                            <span className="text-xs text-gray-400">—</span>
+                          )}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -109,6 +155,11 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId }) {
           <Button onClick={onClose} variant="outline">Close Ledger</Button>
         </div>
       </div>
+      <ViewInvoiceModal
+        isOpen={isInvoiceModalOpen}
+        onClose={() => setIsInvoiceModalOpen(false)}
+        invoiceId={selectedInvoiceId}
+      />
     </Modal>
   );
 }
