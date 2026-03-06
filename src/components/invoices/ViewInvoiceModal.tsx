@@ -22,7 +22,7 @@ export default function ViewInvoiceModal({
   const [paymentForm, setPaymentForm] = useState({
     amount: "",
     method: "CASH",
-    invoiceId: "",
+    invoiceId: "__CURRENT__",
     reference: "",
     notes: "",
   });
@@ -141,13 +141,22 @@ export default function ViewInvoiceModal({
     const customerId = Number(invoice?.customerId || invoice?.customer?.id || 0);
     const amount = Number(paymentForm.amount || 0);
     if (!customerId || amount <= 0) return;
+    const currentInvoiceId = Number(invoice?.id || invoiceId || 0);
+    let selectedInvoiceId: number | undefined;
+    if (paymentForm.invoiceId === "__OVERALL__") {
+      selectedInvoiceId = undefined;
+    } else if (paymentForm.invoiceId === "__CURRENT__" || paymentForm.invoiceId === "") {
+      selectedInvoiceId = currentInvoiceId || undefined;
+    } else {
+      selectedInvoiceId = Number(paymentForm.invoiceId) || undefined;
+    }
 
     try {
       setSavingPayment(true);
       await invoicesApi.addCustomerPayment(customerId, {
         amount,
         method: paymentForm.method as "CASH" | "CHEQUE" | "BANK" | "OTHER",
-        invoiceId: paymentForm.invoiceId ? Number(paymentForm.invoiceId) : undefined,
+        invoiceId: selectedInvoiceId || undefined,
         reference: paymentForm.reference || undefined,
         notes: paymentForm.notes || undefined,
       });
@@ -155,7 +164,7 @@ export default function ViewInvoiceModal({
       setPaymentForm({
         amount: "",
         method: "CASH",
-        invoiceId: "",
+        invoiceId: "__CURRENT__",
         reference: "",
         notes: "",
       });
@@ -351,12 +360,13 @@ export default function ViewInvoiceModal({
                       value={paymentForm.invoiceId}
                       onChange={(e) => setPaymentForm((p) => ({ ...p, invoiceId: e.target.value }))}
                     >
-                      <option value="">Against Invoice (Optional)</option>
+                      <option value="__CURRENT__">Against This Invoice ({invoice?.invoiceNumber || `INV-${invoice?.id || ""}`})</option>
+                      <option value="__OVERALL__">Overall Customer Payment (No Invoice Link)</option>
                       {ledgerRows
                         .filter((r: any) => r.type === "INVOICE")
                         .map((r: any) => (
                           <option key={r.invoiceId} value={String(r.invoiceId)}>
-                            {r.ref}
+                            Against: {r.ref}
                           </option>
                         ))}
                     </select>

@@ -19,21 +19,36 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId }: Cu
   const [data, setData] = useState<any>(null);
   const [ledgerRows, setLedgerRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [savingPayment, setSavingPayment] = useState(false);
+  const [paymentForm, setPaymentForm] = useState({
+    amount: "",
+    method: "CASH",
+    invoiceId: "__OVERALL__",
+    reference: "",
+    notes: "",
+  });
   const [selectedInvoiceId, setSelectedInvoiceId] = useState<number | null>(null);
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
 
-  useEffect(() => {
-    if (isOpen && customerId) {
-      setLoading(true);
-      Promise.all([
+  const loadCustomerHistory = async () => {
+    if (!customerId) return;
+    setLoading(true);
+    try {
+      const [customerRes, ledgerRes] = await Promise.all([
         customersApi.getCustomerById(customerId),
         invoicesApi.getCustomerLedger(customerId),
-      ]).then(([customerRes, ledgerRes]) => {
-        setData(customerRes.data || customerRes);
-        const ledgerPayload = ledgerRes?.data || ledgerRes;
-        setLedgerRows(ledgerPayload?.rows || []);
-        setLoading(false);
-      });
+      ]);
+      setData(customerRes.data || customerRes);
+      const ledgerPayload = ledgerRes?.data || ledgerRes;
+      setLedgerRows(ledgerPayload?.rows || []);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen && customerId) {
+      loadCustomerHistory();
     }
   }, [isOpen, customerId]);
 
@@ -49,6 +64,40 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId }: Cu
     if (!id) return;
     setSelectedInvoiceId(id);
     setIsInvoiceModalOpen(true);
+  };
+
+  const handleAddCustomerPayment = async () => {
+    if (!customerId) return;
+    const amount = Number(paymentForm.amount || 0);
+    if (amount <= 0) return;
+
+    const selectedInvoiceId =
+      paymentForm.invoiceId === "__OVERALL__"
+        ? undefined
+        : Number(paymentForm.invoiceId) || undefined;
+
+    try {
+      setSavingPayment(true);
+      await invoicesApi.addCustomerPayment(customerId, {
+        amount,
+        method: paymentForm.method as "CASH" | "CHEQUE" | "BANK" | "OTHER",
+        invoiceId: selectedInvoiceId,
+        reference: paymentForm.reference || undefined,
+        notes: paymentForm.notes || undefined,
+      });
+
+      setPaymentForm({
+        amount: "",
+        method: "CASH",
+        invoiceId: "__OVERALL__",
+        reference: "",
+        notes: "",
+      });
+
+      await loadCustomerHistory();
+    } finally {
+      setSavingPayment(false);
+    }
   };
 
   return (
@@ -105,6 +154,61 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId }: Cu
             </div>
 
             <h4 className="text-lg font-semibold mt-8 mb-4 text-brand-500">Payment & Transaction Ledger</h4>
+            <div className="space-y-3 p-3 mb-4 rounded-xl border border-gray-100 dark:border-gray-800">
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-2">
+                <input
+                  type="number"
+                  placeholder="Amount"
+                  className="border rounded px-2 py-2 text-sm"
+                  value={paymentForm.amount}
+                  onChange={(e) => setPaymentForm((p) => ({ ...p, amount: e.target.value }))}
+                />
+                <select
+                  className="border rounded px-2 py-2 text-sm bg-transparent"
+                  value={paymentForm.method}
+                  onChange={(e) => setPaymentForm((p) => ({ ...p, method: e.target.value }))}
+                >
+                  <option value="CASH">Cash</option>
+                  <option value="CHEQUE">Cheque</option>
+                  <option value="BANK">Bank</option>
+                  <option value="OTHER">Other</option>
+                </select>
+                <select
+                  className="border rounded px-2 py-2 text-sm bg-transparent"
+                  value={paymentForm.invoiceId}
+                  onChange={(e) => setPaymentForm((p) => ({ ...p, invoiceId: e.target.value }))}
+                >
+                  <option value="__OVERALL__">Overall Customer Payment</option>
+                  {data?.invoices?.map((inv: any) => (
+                    <option key={inv.id} value={String(inv.id)}>
+                      Against: {inv.invoiceNumber}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  type="text"
+                  placeholder="Reference"
+                  className="border rounded px-2 py-2 text-sm"
+                  value={paymentForm.reference}
+                  onChange={(e) => setPaymentForm((p) => ({ ...p, reference: e.target.value }))}
+                />
+                <button
+                  type="button"
+                  onClick={handleAddCustomerPayment}
+                  disabled={savingPayment}
+                  className="rounded bg-brand-500 text-white px-3 py-2 text-sm font-medium disabled:opacity-60"
+                >
+                  {savingPayment ? "Saving..." : "Add Payment"}
+                </button>
+              </div>
+              <input
+                type="text"
+                placeholder="Notes (optional)"
+                className="w-full border rounded px-2 py-2 text-sm"
+                value={paymentForm.notes}
+                onChange={(e) => setPaymentForm((p) => ({ ...p, notes: e.target.value }))}
+              />
+            </div>
             <div className="rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
               <div className="max-h-72 overflow-auto">
                 <table className="w-full text-sm">

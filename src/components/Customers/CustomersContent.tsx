@@ -29,7 +29,10 @@ export default function CustomersContent({ filterType = "ALL" }: { filterType?: 
       const data = (res.data || res).map((c: any) => ({
         ...c,
         totalInvoices: c._count.invoices,
-        totalBalance: c.invoices.reduce((acc: number, inv: any) => acc + inv.balance, 0),
+        totalBalance:
+          c.totalBalance !== undefined && c.totalBalance !== null
+            ? Number(c.totalBalance)
+            : c.invoices.reduce((acc: number, inv: any) => acc + Number(inv.balance || 0), 0),
         permanentInvoices: c.invoices.filter((inv: any) => inv.customerType === "CUSTOMER").length,
         walkinInvoices: c.invoices.filter((inv: any) => inv.customerType === "WALKIN").length,
       }));
