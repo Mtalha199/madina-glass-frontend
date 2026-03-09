@@ -253,13 +253,15 @@ export default function ViewInvoiceModal({
           #printable-invoice.print-fit-tight .print-remarks p { max-height: 44px; }
 
           /* Labour print mode: larger, clearer data text */
-          #printable-invoice.print-labour-large { font-size: 13px !important; line-height: 1.3 !important; }
-          #printable-invoice.print-labour-large .print-title { font-size: 26px !important; }
-          #printable-invoice.print-labour-large h2 { font-size: 24px !important; }
+          #printable-invoice.print-labour-large { font-size: 15px !important; line-height: 1.38 !important; }
+          #printable-invoice.print-labour-large .print-title { font-size: 30px !important; }
+          #printable-invoice.print-labour-large h2 { font-size: 28px !important; }
           #printable-invoice.print-labour-large .print-compact th,
-          #printable-invoice.print-labour-large .print-compact td { font-size: 12.5px !important; line-height: 1.35 !important; padding: 6px 8px !important; }
+          #printable-invoice.print-labour-large .print-compact td { font-size: 14px !important; line-height: 1.45 !important; padding: 7px 9px !important; }
           #printable-invoice.print-labour-large .print-meta p,
-          #printable-invoice.print-labour-large .print-meta h4 { font-size: 13px !important; }
+          #printable-invoice.print-labour-large .print-meta h4 { font-size: 15px !important; }
+          #printable-invoice.print-labour-large .print-meta .font-bold,
+          #printable-invoice.print-labour-large .print-meta .font-medium { font-size: 16px !important; }
         }
       `}</style>
       <div
