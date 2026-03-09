@@ -218,6 +218,15 @@ export default function ViewInvoiceModal({
           body.printing-invoice #invoice-print-root #printable-invoice * {
             visibility: visible !important;
           }
+          /* Force high-contrast print text */
+          body.printing-invoice #invoice-print-root #printable-invoice,
+          body.printing-invoice #invoice-print-root #printable-invoice * {
+            color: #000 !important;
+            text-shadow: none !important;
+            -webkit-text-fill-color: #000 !important;
+            print-color-adjust: exact !important;
+            -webkit-print-color-adjust: exact !important;
+          }
           .print-sheet { padding: 0 !important; background: #fff !important; border-radius: 0 !important; }
           #printable-invoice { font-size: 12px !important; line-height: 1.25 !important; }
           .print-compact { width: 100%; border-collapse: collapse; table-layout: auto; }
@@ -242,10 +251,19 @@ export default function ViewInvoiceModal({
           #printable-invoice.print-fit-tight .print-compact td { padding: 4px 6px !important; font-size: 10px !important; line-height: 1.15 !important; }
           #printable-invoice.print-fit-tight .totals-remarks { gap: 10px !important; }
           #printable-invoice.print-fit-tight .print-remarks p { max-height: 44px; }
+
+          /* Labour print mode: larger, clearer data text */
+          #printable-invoice.print-labour-large { font-size: 13px !important; line-height: 1.3 !important; }
+          #printable-invoice.print-labour-large .print-title { font-size: 26px !important; }
+          #printable-invoice.print-labour-large h2 { font-size: 24px !important; }
+          #printable-invoice.print-labour-large .print-compact th,
+          #printable-invoice.print-labour-large .print-compact td { font-size: 12.5px !important; line-height: 1.35 !important; padding: 6px 8px !important; }
+          #printable-invoice.print-labour-large .print-meta p,
+          #printable-invoice.print-labour-large .print-meta h4 { font-size: 13px !important; }
         }
       `}</style>
       <div
-        className={`print-sheet p-8 bg-gradient-to-br from-white via-slate-50 to-white dark:from-gray-900 dark:via-gray-900 dark:to-gray-950 rounded-3xl ${shouldTightenPrint ? "print-fit-tight" : ""}`}
+        className={`print-sheet p-8 bg-gradient-to-br from-white via-slate-50 to-white dark:from-gray-900 dark:via-gray-900 dark:to-gray-950 rounded-3xl ${shouldTightenPrint ? "print-fit-tight" : ""} ${isLabourView ? "print-labour-large" : ""}`}
         id="printable-invoice"
       >
         <div className="rounded-2xl border border-slate-200 dark:border-gray-800 p-6 bg-white/90 dark:bg-gray-900/80 shadow-sm">
