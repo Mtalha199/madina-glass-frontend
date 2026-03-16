@@ -80,6 +80,37 @@ export default function ViewInvoiceModal({
   }, [isOpen, invoice?.customerId, invoice?.customer?.id]);
 
   const isLabourView = printMode === "LABOUR";
+  const defaultPaymentTarget = invoice?.customerType === "CUSTOMER" ? "__OVERALL__" : "__CURRENT__";
+
+  useEffect(() => {
+    if (!isOpen) return;
+    setPaymentForm((p) => ({ ...p, invoiceId: defaultPaymentTarget }));
+  }, [isOpen, defaultPaymentTarget]);
+  const labourColSpan = 4;
+
+  const getLabourGroupKey = (item: any) => {
+    const name = String(item?.itemName || "").trim();
+    if (name) return name;
+    const thickness = item?.glassThickness ? `${item.glassThickness}mm` : "";
+    const shade = item?.glassShade || item?.glassType || "";
+    const fallback = [thickness, shade].filter(Boolean).join(" ");
+    return fallback || "UNSPECIFIED";
+  };
+
+  const labourRows = useMemo(() => {
+    if (!isLabourView) return [];
+    const rows: Array<{ type: "group" | "item"; key: string; item?: any; index?: number }> = [];
+    let lastKey = "";
+    (invoice?.items || []).forEach((item: any, index: number) => {
+      const key = getLabourGroupKey(item);
+      if (key !== lastKey) {
+        rows.push({ type: "group", key });
+        lastKey = key;
+      }
+      rows.push({ type: "item", key, item, index });
+    });
+    return rows;
+  }, [invoice?.items, isLabourView]);
 
   const subTotal = useMemo(() => {
     if (!invoice?.items) return 0;
@@ -164,7 +195,7 @@ export default function ViewInvoiceModal({
       setPaymentForm({
         amount: "",
         method: "CASH",
-        invoiceId: "__CURRENT__",
+        invoiceId: defaultPaymentTarget,
         reference: "",
         notes: "",
       });
@@ -271,12 +302,11 @@ export default function ViewInvoiceModal({
         <div className="rounded-2xl border border-slate-200 dark:border-gray-800 p-6 bg-white/90 dark:bg-gray-900/80 shadow-sm">
           <div className="print-avoid-break print-header flex justify-between items-start border-b pb-6 border-gray-100 dark:border-gray-800">
             <div className="flex items-start gap-3">
-              <img src="/images/logo/logo.png" alt="Madina Glass Logo" className="h-14 w-14 object-contain" />
               <div>
                 <h1 className="print-title text-3xl font-black tracking-tight text-brand-500 uppercase">Madina Glass</h1>
                 <p className="text-sm text-gray-500">Aluminium & Glass Works Specialist</p>
               </div>
-              <span className="inline-block mt-3 px-3 py-1 rounded-full text-xs font-bold bg-brand-50 text-brand-600 dark:bg-brand-500/20 dark:text-brand-300">
+              <span className="inline-block mt-3 px-3 py-1 rounded-full text-xs font-bold bg-brand-50 text-brand-600 dark:bg-brand-500/20 dark:text-brand-300 print:hidden">
                 {printMode} INVOICE VIEW
               </span>
             </div>
@@ -474,18 +504,42 @@ export default function ViewInvoiceModal({
               </tr>
             </thead>
             <tbody className="text-sm">
-              {invoice.items?.map((item: any, i: number) => (
-                <tr key={i} className="border-t border-gray-100 dark:border-gray-800">
-                  <td className="py-3 px-3 font-mono">{item.SerialNum || "—"}</td>
-                  <td className="py-3 px-3 font-medium">{item.itemName}</td>
-                  <td className="py-3 px-3 text-gray-500 print-no-wrap">{item.width}" × {item.height}"</td>
-                  {!isLabourView && <td className="py-3 px-3 text-gray-500 print-no-wrap">{item.standardSize || (item.SWidth && item.SHeight ? `${item.SWidth} x ${item.SHeight}` : "—")}</td>}
-                  <td className="py-3 px-3">{item.qtyPcs}</td>
-                  {!isLabourView && <td className="py-3 px-3 font-mono">{item.totalSqft}</td>}
-                  {!isLabourView && <td className="py-3 px-3">Rs. {Number(item.rate || 0).toLocaleString()}</td>}
-                  {!isLabourView && <td className="py-3 px-3 text-right font-bold">Rs. {Number(item.value || 0).toLocaleString()}</td>}
-                </tr>
-              ))}
+              {isLabourView
+                ? labourRows.map((row, idx) => {
+                    if (row.type === "group") {
+                      return (
+                        <tr
+                          key={`group-${row.key}-${idx}`}
+                          className="bg-gray-50 dark:bg-gray-900/40 border-t border-gray-200 dark:border-gray-700"
+                        >
+                          <td colSpan={labourColSpan} className="py-2 px-3 text-xs font-semibold uppercase tracking-wide text-gray-600 dark:text-gray-300">
+                            {row.key}
+                          </td>
+                        </tr>
+                      );
+                    }
+                    const item = row.item;
+                    return (
+                      <tr key={`item-${row.index}`} className="border-t border-gray-100 dark:border-gray-800">
+                        <td className="py-3 px-3 font-mono">{item.SerialNum || "—"}</td>
+                        <td className="py-3 px-3 font-medium">{item.itemName}</td>
+                        <td className="py-3 px-3 text-gray-500 print-no-wrap">{item.width}" × {item.height}"</td>
+                        <td className="py-3 px-3">{item.qtyPcs}</td>
+                      </tr>
+                    );
+                  })
+                : invoice.items?.map((item: any, i: number) => (
+                    <tr key={i} className="border-t border-gray-100 dark:border-gray-800">
+                      <td className="py-3 px-3 font-mono">{item.SerialNum || "—"}</td>
+                      <td className="py-3 px-3 font-medium">{item.itemName}</td>
+                      <td className="py-3 px-3 text-gray-500 print-no-wrap">{item.width}" × {item.height}"</td>
+                      {!isLabourView && <td className="py-3 px-3 text-gray-500 print-no-wrap">{item.standardSize || (item.SWidth && item.SHeight ? `${item.SWidth} x ${item.SHeight}` : "—")}</td>}
+                      <td className="py-3 px-3">{item.qtyPcs}</td>
+                      {!isLabourView && <td className="py-3 px-3 font-mono">{item.totalSqft}</td>}
+                      {!isLabourView && <td className="py-3 px-3">Rs. {Number(item.rate || 0).toLocaleString()}</td>}
+                      {!isLabourView && <td className="py-3 px-3 text-right font-bold">Rs. {Number(item.value || 0).toLocaleString()}</td>}
+                    </tr>
+                  ))}
             </tbody>
           </table>
 

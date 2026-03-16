@@ -141,6 +141,7 @@ export default function CustomersContent({ filterType = "ALL" }: { filterType?: 
         isOpen={isHistoryOpen}
         onClose={() => setIsHistoryOpen(false)}
         customerId={selectedCustomerId}
+        onPaymentSaved={fetchCustomers}
       />
       <ConfirmModal
         isOpen={!!customerToDelete}
