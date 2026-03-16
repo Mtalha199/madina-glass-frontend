@@ -112,6 +112,14 @@ export default function ViewInvoiceModal({
     return rows;
   }, [invoice?.items, isLabourView]);
 
+  const totals = useMemo(() => {
+    const items = invoice?.items || [];
+    return {
+      qty: items.reduce((acc: number, item: any) => acc + Number(item.qtyPcs || 0), 0),
+      sqft: Number(items.reduce((acc: number, item: any) => acc + Number(item.totalSqft || 0), 0).toFixed(2)),
+    };
+  }, [invoice?.items]);
+
   const subTotal = useMemo(() => {
     if (!invoice?.items) return 0;
     return invoice.items.reduce((acc: number, item: any) => acc + Number(item.value || 0), 0);
@@ -436,6 +444,25 @@ export default function ViewInvoiceModal({
                       {savingPayment ? "Saving..." : "Add Payment"}
                     </button>
                   </div>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-gray-500">
+                      {net > 0 ? `Remaining: Rs. ${net.toLocaleString()}` : net < 0 ? `Customer Plus: Rs. ${Math.abs(net).toLocaleString()}` : "Invoice Settled"}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setPaymentForm((p) => ({
+                          ...p,
+                          amount: net > 0 ? String(net) : "",
+                          invoiceId: "__CURRENT__",
+                        }))
+                      }
+                      disabled={net <= 0}
+                      className="rounded border border-brand-200 text-brand-600 px-3 py-1.5 font-medium hover:bg-brand-50 disabled:opacity-50"
+                    >
+                      Quick Pay Remaining
+                    </button>
+                  </div>
                   <input
                     type="text"
                     placeholder="Notes (optional)"
@@ -542,6 +569,17 @@ export default function ViewInvoiceModal({
                   ))}
             </tbody>
           </table>
+
+          <div className="flex flex-wrap items-center justify-end gap-3 mb-8 text-sm">
+            <div className="rounded-lg border border-gray-200 dark:border-gray-800 px-3 py-2 bg-gray-50 dark:bg-white/5">
+              <span className="text-gray-500">Total Qty</span>
+              <span className="ml-2 font-semibold text-gray-800 dark:text-gray-100">{totals.qty.toLocaleString()}</span>
+            </div>
+            <div className="rounded-lg border border-gray-200 dark:border-gray-800 px-3 py-2 bg-gray-50 dark:bg-white/5">
+              <span className="text-gray-500">Total Sqft</span>
+              <span className="ml-2 font-semibold text-gray-800 dark:text-gray-100">{totals.sqft.toLocaleString()}</span>
+            </div>
+          </div>
 
           {!isLabourView && (
             <div className="totals-remarks print-avoid-break mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
