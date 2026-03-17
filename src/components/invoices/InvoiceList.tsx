@@ -32,6 +32,7 @@ export default function InvoicesList({
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [actionMenu, setActionMenu] = useState<{ id: number; invoiceNumber: string; top: number; left: number } | null>(null);
   const [printRequest, setPrintRequest] = useState<{ key: number; mode: "CUSTOMER" | "LABOUR" } | null>(null);
+  const [downloadRequest, setDownloadRequest] = useState<{ key: number; mode: "CUSTOMER" | "LABOUR" } | null>(null);
   const actionMenuRef = useRef<HTMLDivElement | null>(null);
 
   const handleView = (id: number) => {
@@ -51,14 +52,14 @@ export default function InvoicesList({
   const handleDownloadInvoice = (id: number, mode: "CUSTOMER" | "LABOUR") => {
     setSelectedInvoiceId(id);
     setIsViewModalOpen(true);
-    setPrintRequest({ key: Date.now(), mode });
+    setDownloadRequest({ key: Date.now(), mode });
   };
 
   const handleToggleActionMenu = (event: React.MouseEvent<HTMLButtonElement>, id: number, invoiceNumber: string) => {
     const target = event.currentTarget;
     const rect = target.getBoundingClientRect();
     const menuWidth = 220;
-    const menuHeight = 150;
+    const menuHeight = 220;
 
     const left = Math.max(8, Math.min(rect.right - menuWidth, window.innerWidth - menuWidth - 8));
     let top = rect.bottom + 6;
@@ -199,6 +200,8 @@ export default function InvoicesList({
         invoiceId={selectedInvoiceId}
         printRequest={printRequest}
         onPrintRequestHandled={() => setPrintRequest(null)}
+        downloadRequest={downloadRequest}
+        onDownloadRequestHandled={() => setDownloadRequest(null)}
       />
 
       {actionMenu && (

@@ -11,6 +11,8 @@ export default function ViewInvoiceModal({
   invoiceId,
   printRequest,
   onPrintRequestHandled,
+  downloadRequest,
+  onDownloadRequestHandled,
 }: any) {
   const [invoice, setInvoice] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -29,6 +31,8 @@ export default function ViewInvoiceModal({
   const [printMode, setPrintMode] = useState<"CUSTOMER" | "LABOUR">("CUSTOMER");
   const [showPrintOptions, setShowPrintOptions] = useState(false);
   const [handledPrintRequestKey, setHandledPrintRequestKey] = useState<number | null>(null);
+  const [handledDownloadRequestKey, setHandledDownloadRequestKey] = useState<number | null>(null);
+  const [downloadingPdf, setDownloadingPdf] = useState(false);
 
   const loadInvoice = async () => {
     if (!invoiceId) return;
@@ -167,6 +171,140 @@ export default function ViewInvoiceModal({
     }, 120);
   };
 
+  const handleDownloadPdf = async (mode: "CUSTOMER" | "LABOUR") => {
+    const invoiceNode = document.getElementById("printable-invoice");
+    if (!invoiceNode || downloadingPdf) return;
+    setDownloadingPdf(true);
+    try {
+      setPrintMode(mode);
+      const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
+        import("html2canvas"),
+        import("jspdf"),
+      ]);
+
+      const cloneId = "pdf-capture-invoice";
+      const existing = document.getElementById(cloneId);
+      if (existing) existing.remove();
+      const clone = invoiceNode.cloneNode(true) as HTMLElement;
+      clone.id = cloneId;
+      clone.style.position = "fixed";
+      clone.style.left = "-10000px";
+      clone.style.top = "0";
+      clone.style.width = "794px";
+      clone.style.maxWidth = "794px";
+      clone.style.padding = "24px";
+      clone.style.background = "#ffffff";
+      clone.style.borderRadius = "0";
+      clone.style.boxShadow = "none";
+      clone.style.overflow = "visible";
+      const style = document.createElement("style");
+      style.textContent = `
+        #${cloneId}, #${cloneId} * {
+          color: #111827 !important;
+          background-color: #ffffff !important;
+          background-image: none !important;
+          border-color: #e5e7eb !important;
+          box-shadow: none !important;
+          text-shadow: none !important;
+          filter: none !important;
+          line-height: 1.5 !important;
+        }
+        #${cloneId} h1,
+        #${cloneId} h2,
+        #${cloneId} h3,
+        #${cloneId} h4,
+        #${cloneId} p,
+        #${cloneId} span,
+        #${cloneId} td,
+        #${cloneId} th {
+          padding-top: 3px !important;
+          padding-bottom: 4px !important;
+        }
+        #${cloneId} .print-title {
+          line-height: 1.25 !important;
+          padding-top: 6px !important;
+          padding-bottom: 6px !important;
+          display: block !important;
+        }
+        #${cloneId} .print-subtitle {
+          display: block !important;
+          margin-top: 4px !important;
+        }
+        #${cloneId} .print-meta p,
+        #${cloneId} .print-meta h4,
+        #${cloneId} .print-remarks p {
+          display: block !important;
+        }
+        #${cloneId} .print-compact {
+          overflow: visible !important;
+          border-radius: 0 !important;
+        }
+        #${cloneId} .print-compact th,
+        #${cloneId} .print-compact td {
+          padding-top: 6px !important;
+          padding-bottom: 6px !important;
+          line-height: 1.45 !important;
+        }
+      `;
+      clone.prepend(style);
+      clone.querySelectorAll(".print\\:hidden, .invoice-actions").forEach((el) => el.remove());
+      document.body.appendChild(clone);
+
+      const rect = clone.getBoundingClientRect();
+      const captureWidth = Math.ceil(clone.scrollWidth || rect.width);
+      const captureHeight = Math.ceil(clone.scrollHeight || rect.height);
+      const canvas = await html2canvas(clone, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#ffffff",
+        width: captureWidth,
+        height: captureHeight,
+        windowWidth: captureWidth,
+        windowHeight: captureHeight,
+        scrollX: -window.scrollX,
+        scrollY: -window.scrollY,
+      });
+      clone.remove();
+      const pdf = new jsPDF("p", "mm", "a4");
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const scale = canvas.width / pageWidth;
+      const pageHeightPx = Math.floor(pageHeight * scale);
+
+      const overlap = 20;
+      let y = 0;
+      let pageIndex = 0;
+      while (y < canvas.height) {
+        const sliceHeight = Math.min(pageHeightPx, canvas.height - y);
+        if (sliceHeight <= overlap) break;
+        if (pageIndex > 0 && sliceHeight < pageHeightPx * 0.15) break;
+        const pageCanvas = document.createElement("canvas");
+        pageCanvas.width = canvas.width;
+        pageCanvas.height = sliceHeight;
+        const ctx = pageCanvas.getContext("2d");
+        if (ctx) {
+          ctx.fillStyle = "#ffffff";
+          ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+          ctx.drawImage(canvas, 0, -y);
+        }
+        const imgData = pageCanvas.toDataURL("image/png");
+        if (pageIndex > 0) pdf.addPage();
+        pdf.setFillColor(255, 255, 255);
+        pdf.rect(0, 0, pageWidth, pageHeight, "F");
+        const imgHeightMm = sliceHeight / scale;
+        pdf.addImage(imgData, "PNG", 0, 0, pageWidth, imgHeightMm);
+        y += sliceHeight - overlap;
+        pageIndex += 1;
+      }
+
+      const safeNumber = invoice?.invoiceNumber || `INV-${invoice?.id || ""}`;
+      const suffix = mode === "LABOUR" ? "-LABOUR" : "-CUSTOMER";
+      pdf.save(`${safeNumber}${suffix}.pdf`);
+    } finally {
+      setDownloadingPdf(false);
+    }
+  };
+
   useEffect(() => {
     if (!isOpen || !invoice || !printRequest?.key) return;
     if (handledPrintRequestKey === printRequest.key) return;
@@ -175,6 +313,14 @@ export default function ViewInvoiceModal({
     handlePrint(printRequest.mode || "CUSTOMER");
     onPrintRequestHandled?.();
   }, [isOpen, invoice, printRequest, handledPrintRequestKey, onPrintRequestHandled]);
+
+  useEffect(() => {
+    if (!isOpen || !invoice || !downloadRequest?.key) return;
+    if (handledDownloadRequestKey === downloadRequest.key) return;
+    setHandledDownloadRequestKey(downloadRequest.key);
+    handleDownloadPdf(downloadRequest.mode || "CUSTOMER");
+    onDownloadRequestHandled?.();
+  }, [isOpen, invoice, downloadRequest, handledDownloadRequestKey, onDownloadRequestHandled]);
 
   const handleAddPayment = async () => {
     const customerId = Number(invoice?.customerId || invoice?.customer?.id || 0);
@@ -236,6 +382,10 @@ export default function ViewInvoiceModal({
           html, body {
             overflow: visible !important;
             background: #fff !important;
+          }
+          #printable-invoice,
+          #printable-invoice * {
+            color: #111827 !important;
           }
           /* Hide all app content first to avoid printing list/sidebar pages */
           body.printing-invoice > * {
@@ -626,7 +776,7 @@ export default function ViewInvoiceModal({
             </div>
           )}
 
-          <div className="flex justify-end gap-3 mt-8 pt-6 border-t print:hidden relative">
+          <div className="invoice-actions flex justify-end gap-3 mt-8 pt-6 border-t print:hidden relative">
             <Button variant="outline" onClick={onClose}>Close</Button>
             <Button onClick={() => setShowPrintOptions((prev) => !prev)} className="bg-brand-500 text-white">
               Print Invoice

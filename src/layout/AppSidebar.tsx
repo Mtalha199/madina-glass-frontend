@@ -155,6 +155,11 @@ const navItems: NavItem[] = [
       },
     ],
   },
+  {
+    icon: <DocsIcon />,
+    name: "Estimates",
+    path: "/admin/estimate",
+  },
 
   {
     icon: <DocsIcon />,
