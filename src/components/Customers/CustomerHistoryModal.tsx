@@ -31,6 +31,8 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
   const [selectedInvoiceId, setSelectedInvoiceId] = useState<number | null>(null);
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
   const [showPrintOptions, setShowPrintOptions] = useState(false);
+  const [showDownloadOptions, setShowDownloadOptions] = useState(false);
+  const [downloadingPdf, setDownloadingPdf] = useState(false);
 
   const ledgerTotals = useMemo(() => {
     const totals = ledgerRows.reduce(
@@ -72,6 +74,7 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
       setIsInvoiceModalOpen(false);
       setSelectedInvoiceId(null);
       setShowPrintOptions(false);
+      setShowDownloadOptions(false);
     }
   }, [isOpen]);
 
@@ -183,6 +186,179 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
     setTimeout(cleanupPrintDom, 1200);
   };
 
+  const handleDownloadPdf = async (mode: "LEDGER" | "INVOICES" | "ALL") => {
+    if (downloadingPdf) return;
+    const ledgerNode = document.getElementById("customer-history-ledger");
+    const invoicesNode = document.getElementById("customer-history-invoices");
+    if (!ledgerNode || !invoicesNode) return;
+    setDownloadingPdf(true);
+    try {
+      const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
+        import("html2canvas"),
+        import("jspdf"),
+      ]);
+
+      const cloneId = "pdf-capture-ledger";
+      const existing = document.getElementById(cloneId);
+      if (existing) existing.remove();
+      const wrapper = document.createElement("div");
+      wrapper.id = cloneId;
+      wrapper.style.position = "fixed";
+      wrapper.style.left = "-10000px";
+      wrapper.style.top = "0";
+      wrapper.style.width = "794px";
+      wrapper.style.maxWidth = "794px";
+      wrapper.style.padding = "32px";
+      wrapper.style.background = "#ffffff";
+      wrapper.style.borderRadius = "0";
+      wrapper.style.boxShadow = "none";
+      wrapper.style.overflow = "visible";
+      const style = document.createElement("style");
+      style.textContent = `
+        #${cloneId}, #${cloneId} * {
+          color: #000000 !important;
+          background-color: #ffffff !important;
+          background-image: none !important;
+          border-color: #e5e7eb !important;
+          box-shadow: none !important;
+          text-shadow: none !important;
+          filter: none !important;
+          line-height: 1.6 !important;
+        }
+        #${cloneId} h1,
+        #${cloneId} h2,
+        #${cloneId} h3,
+        #${cloneId} h4,
+        #${cloneId} p {
+          padding-top: 3px !important;
+          padding-bottom: 4px !important;
+        }
+        #${cloneId} table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        #${cloneId} th, #${cloneId} td { border: 1.5px solid #111827; padding: 9px 7px; }
+        #${cloneId} th { background: #f3f4f6; text-transform: uppercase; font-size: 11px; letter-spacing: .03em; }
+        #${cloneId} .print-summary { margin-top: 14px; border: 1px solid #111827; border-radius: 10px; padding: 0; background: #ffffff; }
+        #${cloneId} .print-summary .divider { width: 1px; background: #111827; align-self: stretch; }
+        #${cloneId} .print-summary .box { padding: 10px 14px; border-right: 1px solid #111827; border-left: 1px solid #111827; }
+        #${cloneId} .print-summary .box:last-child { border-right: none; }
+        #${cloneId} .print-summary .label { color: #000; font-size: 11px; text-transform: uppercase; letter-spacing: .03em; }
+        #${cloneId} .print-summary .value { color: #000; font-weight: 700; }
+        #${cloneId} .print-summary { page-break-inside: avoid; }
+        #${cloneId} .print-summary * { line-height: 1.2 !important; }
+        #${cloneId} th:nth-child(5),
+        #${cloneId} th:nth-child(6),
+        #${cloneId} th:nth-child(7),
+        #${cloneId} td:nth-child(5),
+        #${cloneId} td:nth-child(6),
+        #${cloneId} td:nth-child(7) {
+          background: #f3f4f6 !important;
+        }
+        #${cloneId} .print-summary { border: 2px solid #111827 !important; }
+        #${cloneId} .print-summary .box { border-right: 2px solid #111827 !important; }
+      `;
+      wrapper.appendChild(style);
+
+      const header = document.createElement("div");
+      header.style.marginBottom = "18px";
+      header.style.borderBottom = "1px solid #e5e7eb";
+      header.style.paddingBottom = "10px";
+      header.innerHTML = `
+        <div style="font-size:22px;font-weight:800;line-height:1.25;">Madina Glass</div>
+        <div style="font-size:12px;color:#000;line-height:1.4;margin-top:4px;">Aluminium & Glass Works Specialist</div>
+        <div style="margin-top:10px;font-size:14px;font-weight:700;line-height:1.4;">${data?.name || "Customer"}</div>
+        <div style="font-size:12px;color:#000;line-height:1.4;">${data?.phone || ""}${data?.address ? ` • ${data.address}` : ""}</div>
+      `;
+      wrapper.appendChild(header);
+
+      if (mode === "LEDGER" || mode === "ALL") {
+        const ledgerClone = ledgerNode.cloneNode(true) as HTMLElement;
+        ledgerClone.style.overflow = "visible";
+        ledgerClone.style.maxHeight = "none";
+        ledgerClone.querySelectorAll(".print-hide").forEach((el) => el.remove());
+        wrapper.appendChild(ledgerClone);
+
+        const summary = document.createElement("div");
+        summary.className = "print-summary";
+        summary.innerHTML = `
+          <div style="display:flex;justify-content:flex-end;align-items:stretch;">
+            <div class="box"><div class="label">Total Debit</div><div class="value">Rs. ${ledgerTotals.debit.toLocaleString()}</div></div>
+            <div class="box"><div class="label">Total Credit</div><div class="value">Rs. ${ledgerTotals.credit.toLocaleString()}</div></div>
+            <div class="box"><div class="label">Running Balance</div><div class="value">Rs. ${Math.abs(ledgerTotals.running).toLocaleString()}</div></div>
+          </div>
+        `;
+        wrapper.appendChild(summary);
+      }
+
+      if (mode === "INVOICES" || mode === "ALL") {
+        const invoicesClone = invoicesNode.cloneNode(true) as HTMLElement;
+        invoicesClone.style.overflow = "visible";
+        invoicesClone.style.maxHeight = "none";
+        invoicesClone.querySelectorAll(".print-hide").forEach((el) => el.remove());
+        if (mode === "ALL") {
+          const spacer = document.createElement("div");
+          spacer.style.height = "12px";
+          wrapper.appendChild(spacer);
+        }
+        wrapper.appendChild(invoicesClone);
+      }
+
+      document.body.appendChild(wrapper);
+
+      const rect = wrapper.getBoundingClientRect();
+      const captureWidth = Math.ceil(wrapper.scrollWidth || rect.width);
+      const captureHeight = Math.ceil(wrapper.scrollHeight || rect.height);
+      const canvas = await html2canvas(wrapper, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#ffffff",
+        width: captureWidth,
+        height: captureHeight,
+        windowWidth: captureWidth,
+        windowHeight: captureHeight,
+        scrollX: -window.scrollX,
+        scrollY: -window.scrollY,
+      });
+
+      wrapper.remove();
+
+      const pdf = new jsPDF("p", "mm", "a4");
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const scale = canvas.width / pageWidth;
+      const pageHeightPx = Math.floor(pageHeight * scale);
+      const overlap = 20;
+      let y = 0;
+      let pageIndex = 0;
+      while (y < canvas.height) {
+        const sliceHeight = Math.min(pageHeightPx, canvas.height - y);
+        if (sliceHeight <= overlap) break;
+        if (pageIndex > 0 && sliceHeight < pageHeightPx * 0.15) break;
+        const pageCanvas = document.createElement("canvas");
+        pageCanvas.width = canvas.width;
+        pageCanvas.height = sliceHeight;
+        const ctx = pageCanvas.getContext("2d");
+        if (ctx) {
+          ctx.fillStyle = "#ffffff";
+          ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+          ctx.drawImage(canvas, 0, -y);
+        }
+        const imgData = pageCanvas.toDataURL("image/png");
+        if (pageIndex > 0) pdf.addPage();
+        pdf.setFillColor(255, 255, 255);
+        pdf.rect(0, 0, pageWidth, pageHeight, "F");
+        const imgHeightMm = sliceHeight / scale;
+        pdf.addImage(imgData, "PNG", 0, 0, pageWidth, imgHeightMm);
+        y += sliceHeight - overlap;
+        pageIndex += 1;
+      }
+
+      const fileSuffix = mode === "LEDGER" ? "LEDGER" : mode === "INVOICES" ? "INVOICES" : "ALL";
+      const safeName = data?.name ? String(data.name).replace(/\s+/g, "_") : "Customer";
+      pdf.save(`${safeName}-${fileSuffix}.pdf`);
+    } finally {
+      setDownloadingPdf(false);
+    }
+  };
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} className="max-w-[900px]">
       <style>{`
@@ -202,11 +378,14 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
           #customer-history-printable .print-customer-name { font-size: 16px; font-weight: 700; }
           #customer-history-printable .print-customer-meta { font-size: 11px; color: #6b7280; margin-top: 2px; }
           #customer-history-printable table { width: 100%; border-collapse: collapse; font-size: 12px; }
-          #customer-history-printable th, #customer-history-printable td { border: 1px solid #e5e7eb; padding: 6px; }
-          #customer-history-printable th { background: #f9fafb; text-transform: uppercase; font-size: 11px; letter-spacing: .03em; color: #6b7280; }
+          #customer-history-printable th, #customer-history-printable td { border: 1.5px solid #111827; padding: 6px; }
+          #customer-history-printable th { background: #f9fafb; text-transform: uppercase; font-size: 11px; letter-spacing: .03em; color: #000000; }
+          .print-summary { border: 1px solid #111827 !important; background: #ffffff !important; padding: 0 !important; }
+          .print-summary .box { border-right: 1px solid #111827 !important; border-left: 1px solid #111827 !important; padding: 10px 14px; }
+          .print-summary .box:last-child { border-right: none !important; }
           .print-hide { display: none !important; }
           .print-only { display: block !important; }
-          .print-summary { margin-top: 10px; border: 1px solid #e5e7eb; border-radius: 10px; padding: 10px 12px; background: #f9fafb; }
+          .print-summary { margin-top: 10px; border-radius: 10px; }
           .print-summary .label { color: #000; font-size: 11px; text-transform: uppercase; letter-spacing: .03em; }
           .print-summary .value { color: #000; font-weight: 700; }
         }
@@ -221,42 +400,83 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
                 <h2 className="text-2xl font-bold text-gray-800 dark:text-white">{data.name}</h2>
                 <p className="text-gray-500">{data.phone} • {data.address || "No Address"}</p>
               </div>
-              <div className="relative print-hide">
-                <Button variant="outline" onClick={() => setShowPrintOptions((v) => !v)}>Print</Button>
-                {showPrintOptions && (
-                  <div className="absolute right-0 mt-2 w-48 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-lg p-2 z-20">
-                    <button
-                      type="button"
-                      className="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-gray-50 dark:hover:bg-white/5"
-                      onClick={() => {
-                        setShowPrintOptions(false);
-                        handlePrint("LEDGER");
-                      }}
-                    >
-                      Print Ledger Only
-                    </button>
-                    <button
-                      type="button"
-                      className="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-gray-50 dark:hover:bg-white/5"
-                      onClick={() => {
-                        setShowPrintOptions(false);
-                        handlePrint("INVOICES");
-                      }}
-                    >
-                      Print Invoices Only
-                    </button>
-                    <button
-                      type="button"
-                      className="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-gray-50 dark:hover:bg-white/5"
-                      onClick={() => {
-                        setShowPrintOptions(false);
-                        handlePrint("ALL");
-                      }}
-                    >
-                      Print Ledger + Invoices
-                    </button>
-                  </div>
-                )}
+              <div className="flex items-center gap-2 print-hide">
+                <div className="relative">
+                  <Button variant="outline" onClick={() => setShowPrintOptions((v) => !v)}>Print</Button>
+                  {showPrintOptions && (
+                    <div className="absolute right-0 mt-2 w-48 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-lg p-2 z-20">
+                      <button
+                        type="button"
+                        className="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-gray-50 dark:hover:bg-white/5"
+                        onClick={() => {
+                          setShowPrintOptions(false);
+                          handlePrint("LEDGER");
+                        }}
+                      >
+                        Print Ledger Only
+                      </button>
+                      <button
+                        type="button"
+                        className="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-gray-50 dark:hover:bg-white/5"
+                        onClick={() => {
+                          setShowPrintOptions(false);
+                          handlePrint("INVOICES");
+                        }}
+                      >
+                        Print Invoices Only
+                      </button>
+                      <button
+                        type="button"
+                        className="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-gray-50 dark:hover:bg-white/5"
+                        onClick={() => {
+                          setShowPrintOptions(false);
+                          handlePrint("ALL");
+                        }}
+                      >
+                        Print Ledger + Invoices
+                      </button>
+                    </div>
+                  )}
+                </div>
+                <div className="relative">
+                  <Button variant="outline" onClick={() => setShowDownloadOptions((v) => !v)} disabled={downloadingPdf}>
+                    {downloadingPdf ? "Preparing..." : "Download"}
+                  </Button>
+                  {showDownloadOptions && (
+                    <div className="absolute right-0 mt-2 w-56 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-lg p-2 z-20">
+                      <button
+                        type="button"
+                        className="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-gray-50 dark:hover:bg-white/5"
+                        onClick={() => {
+                          setShowDownloadOptions(false);
+                          handleDownloadPdf("LEDGER");
+                        }}
+                      >
+                        Download Ledger Only
+                      </button>
+                      <button
+                        type="button"
+                        className="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-gray-50 dark:hover:bg-white/5"
+                        onClick={() => {
+                          setShowDownloadOptions(false);
+                          handleDownloadPdf("INVOICES");
+                        }}
+                      >
+                        Download Invoices Only
+                      </button>
+                      <button
+                        type="button"
+                        className="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-gray-50 dark:hover:bg-white/5"
+                        onClick={() => {
+                          setShowDownloadOptions(false);
+                          handleDownloadPdf("ALL");
+                        }}
+                      >
+                        Download Ledger + Invoices
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
