@@ -385,7 +385,7 @@ export default function ViewInvoiceModal({
           }
           #printable-invoice,
           #printable-invoice * {
-            color: #111827 !important;
+            color: #000000 !important;
           }
           /* Hide all app content first to avoid printing list/sidebar pages */
           body.printing-invoice > * {
@@ -630,9 +630,9 @@ export default function ViewInvoiceModal({
 
               {!ledgerError && !ledgerLoading && ledgerRows.length > 0 && (
                 <div className="max-h-60 overflow-auto">
-                  <table className="w-full text-sm">
+                  <table className="w-full text-sm text-gray-900 dark:text-white">
                     <thead className="sticky top-0 bg-white dark:bg-gray-900 z-10">
-                      <tr className="text-xs uppercase text-gray-500 border-b border-gray-100 dark:border-gray-800">
+                      <tr className="text-xs uppercase text-gray-700 dark:text-gray-200 border-b border-gray-100 dark:border-gray-800">
                         <th className="px-3 py-2 text-left">Date</th>
                         <th className="px-3 py-2 text-left">Type</th>
                         <th className="px-3 py-2 text-left">Ref</th>

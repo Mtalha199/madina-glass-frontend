@@ -263,7 +263,7 @@ export default function ViewEstimateModal({ isOpen, onClose, estimateId, printRe
           body.printing-estimate #estimate-print-root { display: block !important; }
           body.printing-estimate #estimate-print-root #printable-estimate { box-shadow: none !important; }
           body.printing-estimate #estimate-print-root #printable-estimate,
-          body.printing-estimate #estimate-print-root #printable-estimate * { color: #111827 !important; }
+          body.printing-estimate #estimate-print-root #printable-estimate * { color: #000000 !important; }
           #printable-estimate { font-size: 12px !important; line-height: 1.25 !important; }
           .print-title { font-size: 24px !important; line-height: 1.2 !important; }
           .print-header { padding-bottom: 10px !important; }

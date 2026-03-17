@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Modal } from "../ui/modal";
 import Button from "../ui/button/Button";
 
@@ -31,6 +31,19 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
   const [selectedInvoiceId, setSelectedInvoiceId] = useState<number | null>(null);
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
   const [showPrintOptions, setShowPrintOptions] = useState(false);
+
+  const ledgerTotals = useMemo(() => {
+    const totals = ledgerRows.reduce(
+      (acc, row) => {
+        acc.debit += Number(row.debit || 0);
+        acc.credit += Number(row.credit || 0);
+        return acc;
+      },
+      { debit: 0, credit: 0 }
+    );
+    const running = totals.debit - totals.credit;
+    return { debit: totals.debit, credit: totals.credit, running };
+  }, [ledgerRows]);
 
   const loadCustomerHistory = async () => {
     if (!customerId) return;
@@ -179,7 +192,7 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
           body.printing-customer-history > * { display: none !important; }
           body.printing-customer-history #customer-history-print-root { display: block !important; }
           #customer-history-printable { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; color: #111827; }
-          #customer-history-printable, #customer-history-printable * { color: #111827 !important; }
+          #customer-history-printable, #customer-history-printable * { color: #000000 !important; }
           #customer-history-printable .print-sheet { border: 1px solid #e5e7eb; border-radius: 16px; padding: 18px; }
           #customer-history-printable .print-header { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid #e5e7eb; padding-bottom: 12px; margin-bottom: 12px; }
           #customer-history-printable .print-brand { display: flex; align-items: center; gap: 10px; }
@@ -192,6 +205,10 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
           #customer-history-printable th, #customer-history-printable td { border: 1px solid #e5e7eb; padding: 6px; }
           #customer-history-printable th { background: #f9fafb; text-transform: uppercase; font-size: 11px; letter-spacing: .03em; color: #6b7280; }
           .print-hide { display: none !important; }
+          .print-only { display: block !important; }
+          .print-summary { margin-top: 10px; border: 1px solid #e5e7eb; border-radius: 10px; padding: 10px 12px; background: #f9fafb; }
+          .print-summary .label { color: #000; font-size: 11px; text-transform: uppercase; letter-spacing: .03em; }
+          .print-summary .value { color: #000; font-weight: 700; }
         }
       `}</style>
       <div className="p-8 bg-white dark:bg-gray-900 rounded-3xl overflow-y-auto max-h-[85vh]">
@@ -344,9 +361,9 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
             </div>
             <div id="customer-history-ledger" className="rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
               <div className="max-h-72 overflow-auto">
-                <table className="w-full text-sm">
+                <table className="w-full text-sm text-gray-900 dark:text-white">
                   <thead className="sticky top-0 bg-gray-50 dark:bg-gray-800 z-10">
-                    <tr className="text-xs uppercase text-gray-500 border-b border-gray-100 dark:border-gray-700">
+                    <tr className="text-xs uppercase text-gray-700 dark:text-gray-200 border-b border-gray-100 dark:border-gray-700">
                       <th className="px-3 py-2 text-left">Date</th>
                       <th className="px-3 py-2 text-left">Type</th>
                       <th className="px-3 py-2 text-left">Ref</th>
@@ -384,6 +401,22 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
                     ))}
                   </tbody>
                 </table>
+              </div>
+              <div className="print-only hidden">
+                <div className="print-summary flex justify-end gap-8 text-sm">
+                  <div>
+                    <div className="label">Total Debit</div>
+                    <div className="value">Rs. {ledgerTotals.debit.toLocaleString()}</div>
+                  </div>
+                  <div>
+                    <div className="label">Total Credit</div>
+                    <div className="value">Rs. {ledgerTotals.credit.toLocaleString()}</div>
+                  </div>
+                  <div>
+                    <div className="label">Running Balance</div>
+                    <div className="value">Rs. {Math.abs(ledgerTotals.running).toLocaleString()}</div>
+                  </div>
+                </div>
               </div>
             </div>
           </>
