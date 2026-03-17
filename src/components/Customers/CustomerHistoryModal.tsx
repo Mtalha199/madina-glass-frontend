@@ -179,6 +179,7 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
           body.printing-customer-history > * { display: none !important; }
           body.printing-customer-history #customer-history-print-root { display: block !important; }
           #customer-history-printable { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; color: #111827; }
+          #customer-history-printable, #customer-history-printable * { color: #111827 !important; }
           #customer-history-printable .print-sheet { border: 1px solid #e5e7eb; border-radius: 16px; padding: 18px; }
           #customer-history-printable .print-header { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid #e5e7eb; padding-bottom: 12px; margin-bottom: 12px; }
           #customer-history-printable .print-brand { display: flex; align-items: center; gap: 10px; }
