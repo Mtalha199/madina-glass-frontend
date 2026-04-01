@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
+import { flushSync } from "react-dom";
 import { Modal } from "../ui/modal";
 import Button from "../ui/button/Button";
 import { Loader } from "lucide-react";
@@ -14,6 +15,11 @@ export default function ViewInvoiceModal({
   downloadRequest,
   onDownloadRequestHandled,
 }: any) {
+  const normalizePrintMode = (mode: string | null | undefined): "CUSTOMER" | "LABOUR" =>
+    String(mode || "").toUpperCase() === "LABOR" || String(mode || "").toUpperCase() === "LABOUR"
+      ? "LABOUR"
+      : "CUSTOMER";
+
   const [invoice, setInvoice] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [ledgerLoading, setLedgerLoading] = useState(false);
@@ -29,6 +35,7 @@ export default function ViewInvoiceModal({
     notes: "",
   });
   const [printMode, setPrintMode] = useState<"CUSTOMER" | "LABOUR">("CUSTOMER");
+  const [labourModeLocked, setLabourModeLocked] = useState(false);
   const [showPrintOptions, setShowPrintOptions] = useState(false);
   const [handledPrintRequestKey, setHandledPrintRequestKey] = useState<number | null>(null);
   const [handledDownloadRequestKey, setHandledDownloadRequestKey] = useState<number | null>(null);
@@ -48,11 +55,20 @@ export default function ViewInvoiceModal({
   }, [isOpen, invoiceId]);
 
   useEffect(() => {
-    if (isOpen) {
-      setPrintMode("CUSTOMER");
-      setShowPrintOptions(false);
-    }
+    if (!isOpen) return;
+    setPrintMode("CUSTOMER");
+    setLabourModeLocked(false);
+    setShowPrintOptions(false);
   }, [isOpen, invoiceId]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const requestedMode = normalizePrintMode(printRequest?.mode || downloadRequest?.mode);
+    if (requestedMode === "LABOUR") {
+      setPrintMode("LABOUR");
+      setLabourModeLocked(true);
+    }
+  }, [isOpen, printRequest?.key, downloadRequest?.key]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -83,38 +99,64 @@ export default function ViewInvoiceModal({
       .finally(() => setLedgerLoading(false));
   }, [isOpen, invoice?.customerId, invoice?.customer?.id]);
 
-  const isLabourView = printMode === "LABOUR";
+  const isLabourView = labourModeLocked || printMode === "LABOUR";
   const defaultPaymentTarget = invoice?.customerType === "CUSTOMER" ? "__OVERALL__" : "__CURRENT__";
 
   useEffect(() => {
     if (!isOpen) return;
     setPaymentForm((p) => ({ ...p, invoiceId: defaultPaymentTarget }));
   }, [isOpen, defaultPaymentTarget]);
-  const labourColSpan = 4;
 
-  const getLabourGroupKey = (item: any) => {
+  const getItemGroupKey = (item: any) => {
+    const thicknessRaw = String(item?.glassThickness || "").trim();
+    const thickness = thicknessRaw ? `${thicknessRaw}mm` : "";
+    const shade = String(item?.glassShade || item?.glassType || "").trim();
     const name = String(item?.itemName || "").trim();
-    if (name) return name;
-    const thickness = item?.glassThickness ? `${item.glassThickness}mm` : "";
-    const shade = item?.glassShade || item?.glassType || "";
-    const fallback = [thickness, shade].filter(Boolean).join(" ");
-    return fallback || "UNSPECIFIED";
+    if (thickness && shade) return `${thickness} ${shade}`;
+    if (thickness) return thickness;
+    if (shade) return shade;
+    return name || "UNSPECIFIED";
   };
 
-  const labourRows = useMemo(() => {
-    if (!isLabourView) return [];
-    const rows: Array<{ type: "group" | "item"; key: string; item?: any; index?: number }> = [];
-    let lastKey = "";
+  const groupedRows = useMemo(() => {
+    const groups = new Map<
+      string,
+      { items: Array<{ item: any; index: number }>; qty: number; sqft: number }
+    >();
+
     (invoice?.items || []).forEach((item: any, index: number) => {
-      const key = getLabourGroupKey(item);
-      if (key !== lastKey) {
-        rows.push({ type: "group", key });
-        lastKey = key;
+      const key = getItemGroupKey(item);
+      if (!groups.has(key)) {
+        groups.set(key, { items: [], qty: 0, sqft: 0 });
       }
-      rows.push({ type: "item", key, item, index });
+      const current = groups.get(key)!;
+      current.items.push({ item, index });
+      current.qty += Number(item?.qtyPcs || 0);
+      current.sqft += Number(item?.totalSqft || 0);
     });
+
+    const rows: Array<{
+      type: "group" | "item" | "summary";
+      key: string;
+      item?: any;
+      index?: number;
+      qty?: number;
+      sqft?: number;
+    }> = [];
+
+    groups.forEach((value, key) => {
+      rows.push({ type: "group", key });
+      value.items.forEach(({ item, index }) => rows.push({ type: "item", key, item, index }));
+      rows.push({
+        type: "summary",
+        key,
+        qty: value.qty,
+        sqft: Number(value.sqft.toFixed(2)),
+      });
+    });
+
     return rows;
-  }, [invoice?.items, isLabourView]);
+  }, [invoice?.items]);
 
   const totals = useMemo(() => {
     const items = invoice?.items || [];
@@ -140,9 +182,31 @@ export default function ViewInvoiceModal({
   const paidAmount = Number(invoice?.paidAmount || 0);
   const net = Number((billValue - paidAmount).toFixed(2)); // +ve means customer owes, -ve means customer in plus
   const shouldTightenPrint = (invoice?.items?.length || 0) > 10 || String(invoice?.remarks || "").length > 180;
+  const tableColSpan = isLabourView ? 4 : 8;
+  const groupSummaryLabelColSpan = isLabourView ? 3 : 4;
+
+  const removeLabourSqftSummary = (root: ParentNode) => {
+    root.querySelectorAll(".invoice-total-sqft").forEach((el) => el.remove());
+
+    root.querySelectorAll("span").forEach((el) => {
+      const label = (el.textContent || "").trim().toLowerCase();
+      if (!(label.includes("sqft") || label.includes("square"))) return;
+      const card = el.closest("div.rounded-lg");
+      if (card) {
+        card.remove();
+        return;
+      }
+      const parent = el.parentElement;
+      if (parent) parent.remove();
+    });
+  };
 
   const handlePrint = (mode: "CUSTOMER" | "LABOUR") => {
-    setPrintMode(mode);
+    const resolvedMode = normalizePrintMode(mode);
+    flushSync(() => {
+      setPrintMode(resolvedMode);
+      setLabourModeLocked(resolvedMode === "LABOUR");
+    });
     setShowPrintOptions(false);
     const cleanupPrintDom = () => {
       document.body.classList.remove("printing-invoice");
@@ -161,6 +225,9 @@ export default function ViewInvoiceModal({
       printRoot.id = "invoice-print-root";
       printRoot.style.display = "none";
       printRoot.innerHTML = invoiceNode.outerHTML;
+      if (resolvedMode === "LABOUR") {
+        removeLabourSqftSummary(printRoot);
+      }
       document.body.appendChild(printRoot);
 
       document.body.classList.add("printing-invoice");
@@ -172,11 +239,16 @@ export default function ViewInvoiceModal({
   };
 
   const handleDownloadPdf = async (mode: "CUSTOMER" | "LABOUR") => {
-    const invoiceNode = document.getElementById("printable-invoice");
-    if (!invoiceNode || downloadingPdf) return;
+    if (downloadingPdf) return;
     setDownloadingPdf(true);
     try {
-      setPrintMode(mode);
+      const resolvedMode = normalizePrintMode(mode);
+      flushSync(() => {
+        setPrintMode(resolvedMode);
+        setLabourModeLocked(resolvedMode === "LABOUR");
+      });
+      const invoiceNode = document.getElementById("printable-invoice");
+      if (!invoiceNode) return;
       const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
         import("html2canvas"),
         import("jspdf"),
@@ -248,6 +320,9 @@ export default function ViewInvoiceModal({
       `;
       clone.prepend(style);
       clone.querySelectorAll(".print\\:hidden, .invoice-actions").forEach((el) => el.remove());
+      if (resolvedMode === "LABOUR") {
+        removeLabourSqftSummary(clone);
+      }
       document.body.appendChild(clone);
 
       const rect = clone.getBoundingClientRect();
@@ -298,7 +373,7 @@ export default function ViewInvoiceModal({
       }
 
       const safeNumber = invoice?.invoiceNumber || `INV-${invoice?.id || ""}`;
-      const suffix = mode === "LABOUR" ? "-LABOUR" : "-CUSTOMER";
+      const suffix = resolvedMode === "LABOUR" ? "-LABOUR" : "-CUSTOMER";
       pdf.save(`${safeNumber}${suffix}.pdf`);
     } finally {
       setDownloadingPdf(false);
@@ -451,6 +526,7 @@ export default function ViewInvoiceModal({
           #printable-invoice.print-labour-large .print-meta h4 { font-size: 15px !important; }
           #printable-invoice.print-labour-large .print-meta .font-bold,
           #printable-invoice.print-labour-large .print-meta .font-medium { font-size: 16px !important; }
+          #printable-invoice.print-labour-large .invoice-total-sqft { display: none !important; }
         }
       `}</style>
       <div
@@ -483,13 +559,13 @@ export default function ViewInvoiceModal({
             </div>
           </div>
 
-          <div className="print-avoid-break print-meta grid grid-cols-2 gap-8 my-8 text-sm">
+          <div className={`print-avoid-break print-meta ${isLabourView ? "grid grid-cols-1" : "grid grid-cols-2"} gap-8 my-8 text-sm`}>
             <div>
-              <h4 className="text-gray-400 uppercase font-semibold text-xs mb-2">Bill To:</h4>
+              {!isLabourView && <h4 className="text-gray-400 uppercase font-semibold text-xs mb-2">Bill To:</h4>}
               <p className="font-bold text-lg">{invoice.customer?.name}</p>
-              <p className="text-gray-600">{invoice.customer?.phone}</p>
-              <p className="text-gray-600">Customer ID: {invoice.customerId || invoice.customer?.id || "—"}</p>
-              <p className="text-gray-600 italic">{invoice.address || "No delivery address"}</p>
+              {!isLabourView && <p className="text-gray-600">{invoice.customer?.phone}</p>}
+              {!isLabourView && <p className="text-gray-600">Customer ID: {invoice.customerId || invoice.customer?.id || "—"}</p>}
+              {!isLabourView && <p className="text-gray-600 italic">{invoice.address || "No delivery address"}</p>}
             </div>
             <div className="grid grid-cols-2 gap-4 bg-gray-50 dark:bg-white/5 p-4 rounded-2xl">
               <div>
@@ -681,42 +757,48 @@ export default function ViewInvoiceModal({
               </tr>
             </thead>
             <tbody className="text-sm">
-              {isLabourView
-                ? labourRows.map((row, idx) => {
-                    if (row.type === "group") {
-                      return (
-                        <tr
-                          key={`group-${row.key}-${idx}`}
-                          className="bg-gray-50 dark:bg-gray-900/40 border-t border-gray-200 dark:border-gray-700"
-                        >
-                          <td colSpan={labourColSpan} className="py-2 px-3 text-xs font-semibold uppercase tracking-wide text-gray-600 dark:text-gray-300">
-                            {row.key}
-                          </td>
-                        </tr>
-                      );
-                    }
-                    const item = row.item;
-                    return (
-                      <tr key={`item-${row.index}`} className="border-t border-gray-100 dark:border-gray-800">
-                        <td className="py-3 px-3 font-mono">{item.SerialNum || "—"}</td>
-                        <td className="py-3 px-3 font-medium">{item.itemName}</td>
-                        <td className="py-3 px-3 text-gray-500 print-no-wrap">{item.width}" × {item.height}"</td>
-                        <td className="py-3 px-3">{item.qtyPcs}</td>
-                      </tr>
-                    );
-                  })
-                : invoice.items?.map((item: any, i: number) => (
-                    <tr key={i} className="border-t border-gray-100 dark:border-gray-800">
-                      <td className="py-3 px-3 font-mono">{item.SerialNum || "—"}</td>
-                      <td className="py-3 px-3 font-medium">{item.itemName}</td>
-                      <td className="py-3 px-3 text-gray-500 print-no-wrap">{item.width}" × {item.height}"</td>
-                      {!isLabourView && <td className="py-3 px-3 text-gray-500 print-no-wrap">{item.standardSize || (item.SWidth && item.SHeight ? `${item.SWidth} x ${item.SHeight}` : "—")}</td>}
-                      <td className="py-3 px-3">{item.qtyPcs}</td>
-                      {!isLabourView && <td className="py-3 px-3 font-mono">{item.totalSqft}</td>}
-                      {!isLabourView && <td className="py-3 px-3">Rs. {Number(item.rate || 0).toLocaleString()}</td>}
-                      {!isLabourView && <td className="py-3 px-3 text-right font-bold">Rs. {Number(item.value || 0).toLocaleString()}</td>}
+              {groupedRows.map((row, idx) => {
+                if (row.type === "group") {
+                  return (
+                    <tr
+                      key={`group-${row.key}-${idx}`}
+                      className="bg-gray-50 dark:bg-gray-900/40 border-t border-gray-200 dark:border-gray-700"
+                    >
+                      <td colSpan={tableColSpan} className="py-2 px-3 text-xs font-semibold uppercase tracking-wide text-gray-600 dark:text-gray-300">
+                        {row.key}
+                      </td>
                     </tr>
-                  ))}
+                  );
+                }
+
+                if (row.type === "summary") {
+                  return (
+                    <tr key={`summary-${row.key}-${idx}`} className="bg-gray-50/70 dark:bg-gray-900/30 border-t border-gray-200 dark:border-gray-700">
+                      <td colSpan={groupSummaryLabelColSpan} className="py-2 px-3 text-xs font-semibold uppercase tracking-wide text-gray-600 dark:text-gray-300">
+                        Group Total
+                      </td>
+                      <td className="py-2 px-3 font-semibold">{Number(row.qty || 0).toLocaleString()}</td>
+                      {!isLabourView && <td className="py-2 px-3 font-semibold">{Number(row.sqft || 0).toLocaleString()}</td>}
+                      {!isLabourView && <td className="py-2 px-3 text-gray-400">—</td>}
+                      {!isLabourView && <td className="py-2 px-3 text-right text-gray-400">—</td>}
+                    </tr>
+                  );
+                }
+
+                const item = row.item;
+                return (
+                  <tr key={`item-${row.index}`} className="border-t border-gray-100 dark:border-gray-800">
+                    <td className="py-3 px-3 font-mono">{item.SerialNum || "—"}</td>
+                    <td className="py-3 px-3 font-medium">{item.itemName}</td>
+                    <td className="py-3 px-3 text-gray-500 print-no-wrap">{item.width}" × {item.height}"</td>
+                    {!isLabourView && <td className="py-3 px-3 text-gray-500 print-no-wrap">{item.standardSize || (item.SWidth && item.SHeight ? `${item.SWidth} x ${item.SHeight}` : "—")}</td>}
+                    <td className="py-3 px-3">{item.qtyPcs}</td>
+                    {!isLabourView && <td className="py-3 px-3 font-mono">{item.totalSqft}</td>}
+                    {!isLabourView && <td className="py-3 px-3">Rs. {Number(item.rate || 0).toLocaleString()}</td>}
+                    {!isLabourView && <td className="py-3 px-3 text-right font-bold">Rs. {Number(item.value || 0).toLocaleString()}</td>}
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
 
@@ -725,10 +807,12 @@ export default function ViewInvoiceModal({
               <span className="text-gray-500">Total Qty</span>
               <span className="ml-2 font-semibold text-gray-800 dark:text-gray-100">{totals.qty.toLocaleString()}</span>
             </div>
-            <div className="rounded-lg border border-gray-200 dark:border-gray-800 px-3 py-2 bg-gray-50 dark:bg-white/5">
-              <span className="text-gray-500">Total Sqft</span>
-              <span className="ml-2 font-semibold text-gray-800 dark:text-gray-100">{totals.sqft.toLocaleString()}</span>
-            </div>
+            {!isLabourView && (
+              <div className="invoice-total-sqft rounded-lg border border-gray-200 dark:border-gray-800 px-3 py-2 bg-gray-50 dark:bg-white/5">
+                <span className="text-gray-500">Total Sqft</span>
+                <span className="ml-2 font-semibold text-gray-800 dark:text-gray-100">{totals.sqft.toLocaleString()}</span>
+              </div>
+            )}
           </div>
 
           {!isLabourView && (
@@ -775,6 +859,19 @@ export default function ViewInvoiceModal({
               </div>
             </div>
           )}
+
+          <div className="print-avoid-break mt-10 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm">
+              <div>
+                <p className="text-gray-500 mb-10">Authorized Signature</p>
+                <div className="border-t border-gray-400 dark:border-gray-500" />
+              </div>
+              <div>
+                <p className="text-gray-500 mb-10">Stamp</p>
+                <div className="h-16 rounded-lg border-2 border-dashed border-gray-400 dark:border-gray-500" />
+              </div>
+            </div>
+          </div>
 
           <div className="invoice-actions flex justify-end gap-3 mt-8 pt-6 border-t print:hidden relative">
             <Button variant="outline" onClick={onClose}>Close</Button>

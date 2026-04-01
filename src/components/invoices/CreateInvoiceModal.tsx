@@ -561,13 +561,13 @@ export default function CreateInvoiceModal({ isOpen, onClose, onSuccess, presetC
                   <th className="p-3">Color</th>
                   <th className="p-3">W (in)</th>
                   <th className="p-3">H (in)</th>
-                  <th className="p-3">Std W</th>
-                  <th className="p-3">Std H</th>
-                  <th className="p-3">Std Size</th>
                   <th className="p-3">Pcs</th>
                   <th className="p-3">Sqft</th>
                   {!isLabourInvoice && <th className="p-3">Rate</th>}
                   {!isLabourInvoice && <th className="p-3">Total</th>}
+                  <th className="p-3">Std W</th>
+                  <th className="p-3">Std H</th>
+                  <th className="p-3">Std Size</th>
                   <th className="p-3"></th>
                 </tr>
               </thead>
@@ -642,25 +642,6 @@ export default function CreateInvoiceModal({ isOpen, onClose, onSuccess, presetC
                       <input
                         type="number"
                         className="w-16 border rounded p-1"
-                        value={item.SWidth ?? ""}
-                        onChange={(e) => updateItem(idx, "SWidth", e.target.value)}
-                        placeholder="Auto"
-                      />
-                    </td>
-                    <td className="p-2">
-                      <input
-                        type="number"
-                        className="w-16 border rounded p-1"
-                        value={item.SHeight ?? ""}
-                        onChange={(e) => updateItem(idx, "SHeight", e.target.value)}
-                        placeholder="Auto"
-                      />
-                    </td>
-                    <td className="p-2 text-center text-xs font-medium">{item.standardSize || "—"}</td>
-                    <td className="p-2">
-                      <input
-                        type="number"
-                        className="w-12 border rounded p-1"
                         value={item.qtyPcs}
                         onChange={(e) => updateItem(idx, "qtyPcs", e.target.value)}
                       />
@@ -677,6 +658,25 @@ export default function CreateInvoiceModal({ isOpen, onClose, onSuccess, presetC
                       </td>
                     )}
                     {!isLabourInvoice && <td className="p-2 font-bold">Rs. {Number(item.value || 0).toLocaleString()}</td>}
+                    <td className="p-2">
+                      <input
+                        type="number"
+                        className="w-16 border rounded p-1"
+                        value={item.SWidth ?? ""}
+                        onChange={(e) => updateItem(idx, "SWidth", e.target.value)}
+                        placeholder="Auto"
+                      />
+                    </td>
+                    <td className="p-2">
+                      <input
+                        type="number"
+                        className="w-16 border rounded p-1"
+                        value={item.SHeight ?? ""}
+                        onChange={(e) => updateItem(idx, "SHeight", e.target.value)}
+                        placeholder="Auto"
+                      />
+                    </td>
+                    <td className="p-2 text-center text-xs font-medium">{item.standardSize || "—"}</td>
                     <td className="p-2">
                       <button
                         type="button"

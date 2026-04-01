@@ -559,6 +559,22 @@ export default function CreateEstimateModal({ isOpen, onClose, onSuccess }: any)
                     <Input type="number" value={item.height} onChange={(e) => updateItem(index, "height", e.target.value)} />
                   </div>
                   <div className="md:col-span-1">
+                    <Label>Qty</Label>
+                    <Input
+                      type="number"
+                      value={item.qtyPcs}
+                      onChange={(e) => updateItem(index, "qtyPcs", e.target.value)}
+                    />
+                  </div>
+                  <div className="md:col-span-1">
+                    <Label>Rate</Label>
+                    <Input
+                      type="number"
+                      value={item.rate}
+                      onChange={(e) => updateItem(index, "rate", e.target.value)}
+                    />
+                  </div>
+                  <div className="md:col-span-1">
                     <Label>Std W</Label>
                     <Input
                       type="number"
@@ -581,14 +597,6 @@ export default function CreateEstimateModal({ isOpen, onClose, onSuccess }: any)
                     <div className="h-10 flex items-center text-xs font-medium text-gray-600 dark:text-gray-300">
                       {item.standardSize || "—"}
                     </div>
-                  </div>
-                  <div className="md:col-span-1">
-                    <Label>Qty</Label>
-                    <Input type="number" value={item.qtyPcs} onChange={(e) => updateItem(index, "qtyPcs", e.target.value)} />
-                  </div>
-                  <div className="md:col-span-1">
-                    <Label>Rate</Label>
-                    <Input type="number" value={item.rate} onChange={(e) => updateItem(index, "rate", e.target.value)} />
                   </div>
                   <div className="md:col-span-1 flex justify-end">
                     <button type="button" onClick={() => removeItem(index)} className="text-red-500 hover:text-red-700">

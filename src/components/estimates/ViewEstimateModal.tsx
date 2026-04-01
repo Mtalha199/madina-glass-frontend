@@ -42,6 +42,17 @@ export default function ViewEstimateModal({ isOpen, onClose, estimateId, printRe
     return getStandardSizeForActual(Number(item?.width || 0), Number(item?.height || 0), String(item?.glassThickness || "5"), String(item?.glassType || "CLEAR"));
   };
 
+  const getItemGroupKey = (item: any) => {
+    const thicknessRaw = String(item?.glassThickness || "").trim();
+    const thickness = thicknessRaw ? `${thicknessRaw}mm` : "";
+    const shade = String(item?.glassShade || item?.glassType || "").trim();
+    const name = String(item?.itemName || "").trim();
+    if (thickness && shade) return `${thickness} ${shade}`;
+    if (thickness) return thickness;
+    if (shade) return shade;
+    return name || "UNSPECIFIED";
+  };
+
   const loadEstimate = async () => {
     if (!estimateId) return;
     const res = await estimatesApi.getEstimateById(estimateId);
@@ -63,6 +74,46 @@ export default function ViewEstimateModal({ isOpen, onClose, estimateId, printRe
     };
   }, [estimate?.items]);
 
+  const groupedRows = useMemo(() => {
+    const groups = new Map<
+      string,
+      { items: Array<{ item: any; index: number }>; qty: number; sqft: number }
+    >();
+
+    (estimate?.items || []).forEach((item: any, index: number) => {
+      const key = getItemGroupKey(item);
+      if (!groups.has(key)) {
+        groups.set(key, { items: [], qty: 0, sqft: 0 });
+      }
+      const current = groups.get(key)!;
+      current.items.push({ item, index });
+      current.qty += Number(item?.qtyPcs || 0);
+      current.sqft += Number(item?.totalSqft || 0);
+    });
+
+    const rows: Array<{
+      type: "group" | "item" | "summary";
+      key: string;
+      item?: any;
+      index?: number;
+      qty?: number;
+      sqft?: number;
+    }> = [];
+
+    groups.forEach((value, key) => {
+      rows.push({ type: "group", key });
+      value.items.forEach(({ item, index }) => rows.push({ type: "item", key, item, index }));
+      rows.push({
+        type: "summary",
+        key,
+        qty: value.qty,
+        sqft: Number(value.sqft.toFixed(2)),
+      });
+    });
+
+    return rows;
+  }, [estimate?.items]);
+
   const subTotal = useMemo(() => {
     if (!estimate?.items) return 0;
     return estimate.items.reduce((acc: number, item: any) => acc + Number(item.value || 0), 0);
@@ -75,6 +126,8 @@ export default function ViewEstimateModal({ isOpen, onClose, estimateId, printRe
   }, [estimate, subTotal]);
 
   const billValue = Number(estimate?.billValue || 0);
+  const tableColSpan = 8;
+  const groupSummaryLabelColSpan = 4;
 
   const handlePrint = () => {
     const cleanupPrintDom = () => {
@@ -336,18 +389,45 @@ export default function ViewEstimateModal({ isOpen, onClose, estimateId, printRe
               </tr>
             </thead>
             <tbody className="text-sm">
-              {estimate.items?.map((item: any, i: number) => (
-                <tr key={i} className="border-t border-gray-100 dark:border-gray-800">
-                  <td className="py-3 px-3 font-mono">{item.SerialNum || "—"}</td>
-                  <td className="py-3 px-3 font-medium">{item.itemName}</td>
-                  <td className="py-3 px-3 text-gray-500 print-no-wrap">{item.width}" × {item.height}"</td>
-                  <td className="py-3 px-3 text-gray-500 print-no-wrap">{getStdSizeLabel(item)}</td>
-                  <td className="py-3 px-3">{item.qtyPcs}</td>
-                  <td className="py-3 px-3 font-mono">{item.totalSqft}</td>
-                  <td className="py-3 px-3">Rs. {Number(item.rate || 0).toLocaleString()}</td>
-                  <td className="py-3 px-3 text-right font-bold">Rs. {Number(item.value || 0).toLocaleString()}</td>
-                </tr>
-              ))}
+              {groupedRows.map((row, idx) => {
+                if (row.type === "group") {
+                  return (
+                    <tr key={`group-${row.key}-${idx}`} className="bg-gray-50 dark:bg-gray-900/40 border-t border-gray-200 dark:border-gray-700">
+                      <td colSpan={tableColSpan} className="py-2 px-3 text-xs font-semibold uppercase tracking-wide text-gray-600 dark:text-gray-300">
+                        {row.key}
+                      </td>
+                    </tr>
+                  );
+                }
+
+                if (row.type === "summary") {
+                  return (
+                    <tr key={`summary-${row.key}-${idx}`} className="bg-gray-50/70 dark:bg-gray-900/30 border-t border-gray-200 dark:border-gray-700">
+                      <td colSpan={groupSummaryLabelColSpan} className="py-2 px-3 text-xs font-semibold uppercase tracking-wide text-gray-600 dark:text-gray-300">
+                        Group Total
+                      </td>
+                      <td className="py-2 px-3 font-semibold">{Number(row.qty || 0).toLocaleString()}</td>
+                      <td className="py-2 px-3 font-semibold">{Number(row.sqft || 0).toLocaleString()}</td>
+                      <td className="py-2 px-3 text-gray-400">—</td>
+                      <td className="py-2 px-3 text-right text-gray-400">—</td>
+                    </tr>
+                  );
+                }
+
+                const item = row.item;
+                return (
+                  <tr key={`item-${row.index}`} className="border-t border-gray-100 dark:border-gray-800">
+                    <td className="py-3 px-3 font-mono">{item.SerialNum || "—"}</td>
+                    <td className="py-3 px-3 font-medium">{item.itemName}</td>
+                    <td className="py-3 px-3 text-gray-500 print-no-wrap">{item.width}" × {item.height}"</td>
+                    <td className="py-3 px-3 text-gray-500 print-no-wrap">{getStdSizeLabel(item)}</td>
+                    <td className="py-3 px-3">{item.qtyPcs}</td>
+                    <td className="py-3 px-3 font-mono">{item.totalSqft}</td>
+                    <td className="py-3 px-3">Rs. {Number(item.rate || 0).toLocaleString()}</td>
+                    <td className="py-3 px-3 text-right font-bold">Rs. {Number(item.value || 0).toLocaleString()}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
 

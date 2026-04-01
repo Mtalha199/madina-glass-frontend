@@ -148,23 +148,6 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
       </div>
     `;
 
-    const sections: string[] = [];
-    if (mode === "LEDGER" || mode === "ALL") {
-      sections.push(`
-        <div style="margin-top:16px;">
-          <h3 style="margin:0 0 8px;font-size:14px;font-weight:700;">Transaction Ledger</h3>
-          ${ledgerNode.outerHTML}
-        </div>
-      `);
-    }
-    if (mode === "INVOICES" || mode === "ALL") {
-      sections.push(`
-        <div style="margin-top:16px;">
-          ${invoicesNode.outerHTML}
-        </div>
-      `);
-    }
-
     const printRoot = document.createElement("div");
     printRoot.id = "customer-history-print-root";
     printRoot.style.display = "none";
@@ -172,10 +155,46 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
       <div id="customer-history-printable">
         <div class="print-sheet">
           ${headerHtml}
-          ${sections.join("")}
         </div>
       </div>
     `;
+
+    const printSheet = printRoot.querySelector(".print-sheet");
+    if (printSheet && (mode === "LEDGER" || mode === "ALL")) {
+      const ledgerSection = document.createElement("div");
+      ledgerSection.style.marginTop = "16px";
+      ledgerSection.innerHTML = `<h3 style="margin:0 0 8px;font-size:14px;font-weight:700;">Transaction Ledger</h3>`;
+
+      const ledgerClone = ledgerNode.cloneNode(true) as HTMLElement;
+      ledgerClone.style.overflow = "visible";
+      ledgerClone.style.maxHeight = "none";
+      ledgerClone.querySelectorAll(".print-hide").forEach((el) => el.remove());
+
+      const scrollWrap = ledgerClone.querySelector(".max-h-72.overflow-auto") as HTMLElement | null;
+      if (scrollWrap) {
+        scrollWrap.style.maxHeight = "none";
+        scrollWrap.style.overflow = "visible";
+      }
+
+      const stickyHead = ledgerClone.querySelector("thead.sticky") as HTMLElement | null;
+      if (stickyHead) {
+        stickyHead.style.position = "static";
+      }
+
+      ledgerSection.appendChild(ledgerClone);
+      printSheet.appendChild(ledgerSection);
+    }
+
+    if (printSheet && (mode === "INVOICES" || mode === "ALL")) {
+      const invoicesSection = document.createElement("div");
+      invoicesSection.style.marginTop = "16px";
+      const invoicesClone = invoicesNode.cloneNode(true) as HTMLElement;
+      invoicesClone.style.overflow = "visible";
+      invoicesClone.style.maxHeight = "none";
+      invoicesClone.querySelectorAll(".print-hide").forEach((el) => el.remove());
+      printSheet.appendChild(invoicesSection);
+      invoicesSection.appendChild(invoicesClone);
+    }
 
     const existingNode = document.getElementById("customer-history-print-root");
     if (existingNode) existingNode.remove();
