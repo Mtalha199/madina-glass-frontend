@@ -200,7 +200,7 @@ export default function CreateInvoiceModal({ isOpen, onClose, onSuccess, presetC
       return;
     }
 
-    const selected = customers.find((c: any) => Number(c.id) === customerId);
+    const selected = permanentCustomers.find((c: any) => Number(c.id) === customerId);
     if (selected) {
       setCustomerLookup(`${selected.id} - ${selected.name} (${selected.phone})`);
     }
@@ -223,6 +223,13 @@ export default function CreateInvoiceModal({ isOpen, onClose, onSuccess, presetC
     }
     applyCustomerSelection(customerId);
   };
+
+  const permanentCustomers = useMemo(() => {
+    return customers.filter((customer: any) =>
+      Array.isArray(customer?.invoices) &&
+      customer.invoices.some((inv: any) => String(inv?.customerType || "").toUpperCase() === "CUSTOMER")
+    );
+  }, [customers]);
 
   useEffect(() => {
     if (!isOpen || formData.customerType !== "CUSTOMER") return;
@@ -444,7 +451,7 @@ export default function CreateInvoiceModal({ isOpen, onClose, onSuccess, presetC
                   list="customer-existing-options"
                 />
                 <datalist id="customer-existing-options">
-                  {customers.map((c: any) => (
+                  {permanentCustomers.map((c: any) => (
                     <option key={c.id} value={`${c.id} - ${c.name} (${c.phone})`} />
                   ))}
                 </datalist>
