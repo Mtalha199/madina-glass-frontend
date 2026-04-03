@@ -453,7 +453,7 @@ export default function ViewInvoiceModal({
     <Modal isOpen={isOpen} onClose={onClose} className="max-w-[980px] m-4 max-h-[95vh] overflow-y-auto">
       <style>{`
         @media print {
-          @page { size: auto; margin: 6mm; }
+          @page { size: auto; margin: 5mm; }
           html, body {
             overflow: visible !important;
             background: #fff !important;
@@ -492,29 +492,35 @@ export default function ViewInvoiceModal({
             -webkit-print-color-adjust: exact !important;
           }
           .print-sheet { padding: 0 !important; background: #fff !important; border-radius: 0 !important; }
-          #printable-invoice { font-size: 12px !important; line-height: 1.25 !important; }
+          #printable-invoice { font-size: 11px !important; line-height: 1.2 !important; }
           .print-compact { width: 100%; border-collapse: collapse; table-layout: auto; }
-          .print-compact th, .print-compact td { padding: 5px 7px !important; font-size: 10.5px !important; line-height: 1.2 !important; }
+          .print-compact th, .print-compact td { padding: 4px 6px !important; font-size: 9.75px !important; line-height: 1.12 !important; }
           .print-compact tbody tr { break-inside: avoid; page-break-inside: avoid; }
-          .print-title { font-size: 24px !important; line-height: 1.2 !important; }
-          .print-header { padding-bottom: 10px !important; }
-          .print-meta { margin-top: 10px !important; margin-bottom: 10px !important; gap: 12px !important; }
-          .print-summary-cards { margin-bottom: 10px !important; gap: 8px !important; }
-          .print-remarks p { font-size: 10px !important; line-height: 1.2 !important; max-height: 60px; overflow: hidden; }
+          .print-title { font-size: 21px !important; line-height: 1.15 !important; }
+          .print-header { padding-bottom: 8px !important; }
+          .print-meta { margin-top: 8px !important; margin-bottom: 8px !important; gap: 10px !important; }
+          .print-summary-cards { margin-bottom: 8px !important; gap: 6px !important; }
+          .print-remarks p { font-size: 9px !important; line-height: 1.1 !important; max-height: 44px; overflow: hidden; }
           .print-avoid-break { break-inside: avoid; page-break-inside: avoid; }
           .print-no-wrap { white-space: nowrap !important; }
           .print\\:hidden { display: none !important; }
-          .totals-remarks { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 16px !important; align-items: start !important; }
+          .totals-remarks { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 10px !important; align-items: start !important; }
+          .invoice-signoff { margin-top: 12px !important; padding-top: 8px !important; break-inside: avoid !important; page-break-inside: avoid !important; }
+          .invoice-signoff-label { margin-bottom: 22px !important; font-size: 9px !important; }
+          .invoice-stamp-box { height: 44px !important; }
 
           /* Dense print mode for long invoices: reduce visual chrome to keep first page packed */
-          #printable-invoice.print-fit-tight .print-title { font-size: 20px !important; }
-          #printable-invoice.print-fit-tight .print-header { padding-bottom: 8px !important; }
-          #printable-invoice.print-fit-tight .print-meta { margin-top: 8px !important; margin-bottom: 8px !important; gap: 10px !important; }
+          #printable-invoice.print-fit-tight .print-title { font-size: 18px !important; }
+          #printable-invoice.print-fit-tight .print-header { padding-bottom: 6px !important; }
+          #printable-invoice.print-fit-tight .print-meta { margin-top: 6px !important; margin-bottom: 6px !important; gap: 8px !important; }
           #printable-invoice.print-fit-tight .print-summary-cards { display: none !important; }
           #printable-invoice.print-fit-tight .print-compact th,
-          #printable-invoice.print-fit-tight .print-compact td { padding: 4px 6px !important; font-size: 10px !important; line-height: 1.15 !important; }
-          #printable-invoice.print-fit-tight .totals-remarks { gap: 10px !important; }
-          #printable-invoice.print-fit-tight .print-remarks p { max-height: 44px; }
+          #printable-invoice.print-fit-tight .print-compact td { padding: 3px 5px !important; font-size: 9px !important; line-height: 1.05 !important; }
+          #printable-invoice.print-fit-tight .totals-remarks { gap: 8px !important; }
+          #printable-invoice.print-fit-tight .print-remarks p { max-height: 34px; }
+          #printable-invoice.print-fit-tight .invoice-signoff { margin-top: 8px !important; padding-top: 6px !important; }
+          #printable-invoice.print-fit-tight .invoice-signoff-label { margin-bottom: 16px !important; font-size: 8.5px !important; }
+          #printable-invoice.print-fit-tight .invoice-stamp-box { height: 36px !important; }
 
           /* Labour print mode: larger, clearer data text */
           #printable-invoice.print-labour-large { font-size: 15px !important; line-height: 1.38 !important; }
@@ -860,16 +866,10 @@ export default function ViewInvoiceModal({
             </div>
           )}
 
-          <div className="print-avoid-break mt-10 pt-6 border-t border-gray-200 dark:border-gray-700">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm">
-              <div>
-                <p className="text-gray-500 mb-10">Authorized Signature</p>
-                <div className="border-t border-gray-400 dark:border-gray-500" />
-              </div>
-              <div>
-                <p className="text-gray-500 mb-10">Stamp</p>
-                <div className="h-16 rounded-lg border-2 border-dashed border-gray-400 dark:border-gray-500" />
-              </div>
+          <div className="invoice-signoff print-avoid-break mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="max-w-sm ml-auto text-sm">
+              <p className="invoice-signoff-label text-gray-500 mb-8">Stamp & Signature</p>
+              <div className="invoice-stamp-box rounded-lg border-2 border-dashed border-gray-400 dark:border-gray-500" />
             </div>
           </div>
 

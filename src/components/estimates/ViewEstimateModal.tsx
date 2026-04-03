@@ -310,21 +310,23 @@ export default function ViewEstimateModal({ isOpen, onClose, estimateId, printRe
     <Modal isOpen={isOpen} onClose={onClose} className="max-w-[980px] m-4 max-h-[95vh] overflow-y-auto">
       <style>{`
         @media print {
-          @page { size: auto; margin: 6mm; }
+          @page { size: auto; margin: 5mm; }
           html, body { overflow: visible !important; background: #fff !important; }
           body.printing-estimate > * { display: none !important; }
           body.printing-estimate #estimate-print-root { display: block !important; }
           body.printing-estimate #estimate-print-root #printable-estimate { box-shadow: none !important; }
           body.printing-estimate #estimate-print-root #printable-estimate,
           body.printing-estimate #estimate-print-root #printable-estimate * { color: #000000 !important; }
-          #printable-estimate { font-size: 12px !important; line-height: 1.25 !important; }
-          .print-title { font-size: 24px !important; line-height: 1.2 !important; }
-          .print-header { padding-bottom: 10px !important; }
-          .print-meta { margin-top: 10px !important; margin-bottom: 10px !important; gap: 12px !important; }
+          #printable-estimate { font-size: 11px !important; line-height: 1.2 !important; }
+          .print-title { font-size: 21px !important; line-height: 1.15 !important; }
+          .print-header { padding-bottom: 8px !important; }
+          .print-meta { margin-top: 8px !important; margin-bottom: 8px !important; gap: 10px !important; }
           .print-avoid-break { break-inside: avoid; page-break-inside: avoid; }
           .print-no-wrap { white-space: nowrap !important; }
           .print\\:hidden { display: none !important; }
-          .totals-remarks { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 16px !important; align-items: start !important; }
+          .totals-remarks { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 10px !important; align-items: start !important; }
+          .print-compact th, .print-compact td { padding: 4px 6px !important; font-size: 9.75px !important; line-height: 1.12 !important; }
+          .print-remarks p { font-size: 9px !important; line-height: 1.1 !important; max-height: 44px; overflow: hidden; }
         }
       `}</style>
       <div
