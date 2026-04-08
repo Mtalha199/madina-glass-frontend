@@ -324,6 +324,7 @@ export default function ViewInvoiceModal({
         removeLabourSqftSummary(clone);
       }
       document.body.appendChild(clone);
+      await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
 
       const rect = clone.getBoundingClientRect();
       const captureWidth = Math.ceil(clone.scrollWidth || rect.width);
@@ -343,34 +344,16 @@ export default function ViewInvoiceModal({
       const pdf = new jsPDF("p", "mm", "a4");
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
-      const scale = canvas.width / pageWidth;
-      const pageHeightPx = Math.floor(pageHeight * scale);
 
-      const overlap = 20;
-      let y = 0;
-      let pageIndex = 0;
-      while (y < canvas.height) {
-        const sliceHeight = Math.min(pageHeightPx, canvas.height - y);
-        if (sliceHeight <= overlap) break;
-        if (pageIndex > 0 && sliceHeight < pageHeightPx * 0.15) break;
-        const pageCanvas = document.createElement("canvas");
-        pageCanvas.width = canvas.width;
-        pageCanvas.height = sliceHeight;
-        const ctx = pageCanvas.getContext("2d");
-        if (ctx) {
-          ctx.fillStyle = "#ffffff";
-          ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
-          ctx.drawImage(canvas, 0, -y);
-        }
-        const imgData = pageCanvas.toDataURL("image/png");
-        if (pageIndex > 0) pdf.addPage();
-        pdf.setFillColor(255, 255, 255);
-        pdf.rect(0, 0, pageWidth, pageHeight, "F");
-        const imgHeightMm = sliceHeight / scale;
-        pdf.addImage(imgData, "PNG", 0, 0, pageWidth, imgHeightMm);
-        y += sliceHeight - overlap;
-        pageIndex += 1;
-      }
+      // Keep invoice exports to a single A4 page, matching print layout intent.
+      const ratio = Math.min(pageWidth / canvas.width, pageHeight / canvas.height);
+      const renderWidth = canvas.width * ratio;
+      const renderHeight = canvas.height * ratio;
+      const x = (pageWidth - renderWidth) / 2;
+      const y = 0;
+      pdf.setFillColor(255, 255, 255);
+      pdf.rect(0, 0, pageWidth, pageHeight, "F");
+      pdf.addImage(canvas.toDataURL("image/png"), "PNG", x, y, renderWidth, renderHeight);
 
       const safeNumber = invoice?.invoiceNumber || `INV-${invoice?.id || ""}`;
       const suffix = resolvedMode === "LABOUR" ? "-LABOUR" : "-CUSTOMER";
