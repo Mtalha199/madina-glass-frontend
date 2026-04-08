@@ -120,16 +120,97 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
     }
   };
 
-  const handlePrint = (mode: "LEDGER" | "INVOICES" | "ALL") => {
+  const waitForRender = () =>
+    new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+
+  const getPrintableCaptureCss = () => `
+    #customer-history-printable { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; color: #111827; }
+    #customer-history-printable, #customer-history-printable * { color: #000000 !important; }
+    #customer-history-printable .print-sheet { border: 1px solid #e5e7eb; border-radius: 12px; padding: 10px; background: #ffffff; }
+    #customer-history-printable .print-header { display: flex; justify-content: space-between; gap: 10px; border-bottom: 1px solid #e5e7eb; padding-bottom: 8px; margin-bottom: 8px; }
+    #customer-history-printable .print-brand { display: flex; align-items: center; gap: 10px; }
+    #customer-history-printable .print-title { font-size: 18px; font-weight: 800; letter-spacing: .02em; text-transform: uppercase; color: #0f172a; }
+    #customer-history-printable .print-subtitle { font-size: 11px; color: #6b7280; margin-top: 2px; }
+    #customer-history-printable .print-customer { text-align: right; }
+    #customer-history-printable .print-customer-name { font-size: 14px; font-weight: 700; }
+    #customer-history-printable .print-customer-meta { font-size: 10px; color: #6b7280; margin-top: 2px; }
+    #customer-history-printable table { width: 100%; border-collapse: collapse; font-size: 11px; }
+    #customer-history-printable th, #customer-history-printable td { border: 1.25px solid #111827; padding: 4px; }
+    #customer-history-printable th { background: #f9fafb; text-transform: uppercase; font-size: 10px; letter-spacing: .03em; color: #000000; }
+    #customer-history-printable .overflow-auto,
+    #customer-history-printable .overflow-hidden,
+    #customer-history-printable [class*="overflow-"] { overflow: visible !important; }
+    #customer-history-printable .max-h-72,
+    #customer-history-printable [class*="max-h-"] { max-height: none !important; height: auto !important; }
+    #customer-history-printable thead.sticky,
+    #customer-history-printable [class*="sticky"] { position: static !important; top: auto !important; }
+    #customer-history-printable .print-hide { display: none !important; }
+    #customer-history-printable .print-only { display: block !important; }
+    #customer-history-printable .print-summary {
+      border: 1px solid #111827 !important;
+      background: #ffffff !important;
+      padding: 0 !important;
+      margin-top: 8px;
+      border-radius: 8px;
+      overflow: hidden;
+      display: grid !important;
+      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+    #customer-history-printable .print-summary > div,
+    #customer-history-printable .print-summary .box {
+      padding: 8px 10px;
+      border-right: 1px solid #111827 !important;
+      min-height: 48px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    #customer-history-printable .print-summary > div:last-child,
+    #customer-history-printable .print-summary .box:last-child { border-right: none !important; }
+    #customer-history-printable .print-summary .label { color: #000; font-size: 10px; text-transform: uppercase; letter-spacing: .03em; }
+    #customer-history-printable .print-summary .value { color: #000; font-weight: 700; font-size: 11px; }
+    #customer-history-printable .invoice-print-page { margin: 0; background: #ffffff; }
+    #customer-history-printable .invoice-print-shell { border: 1px solid #e5e7eb; border-radius: 12px; padding: 10px; background: #ffffff; min-height: calc(297mm - 10mm); box-sizing: border-box; }
+    #customer-history-printable .invoice-print-top { border-bottom: 1px solid #e5e7eb; padding-bottom: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: flex-start; }
+    #customer-history-printable .invoice-print-title { font-size: 20px; font-weight: 800; line-height: 1.15; text-transform: uppercase; letter-spacing: .02em; color: #0f172a; }
+    #customer-history-printable .invoice-print-subtitle { font-size: 10px; color: #6b7280; margin-top: 1px; }
+    #customer-history-printable .invoice-print-head-right { text-align: right; }
+    #customer-history-printable .invoice-print-number { font-size: 15px; font-weight: 700; }
+    #customer-history-printable .invoice-print-meta { font-size: 10px; color: #6b7280; margin-top: 2px; }
+    #customer-history-printable .invoice-print-status { display: inline-block; margin-top: 4px; padding: 3px 8px; border-radius: 999px; font-size: 9px; font-weight: 700; background: #fef2f2; color: #b91c1c; }
+    #customer-history-printable .invoice-print-meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 8px 0; }
+    #customer-history-printable .invoice-print-billto { font-size: 10px; }
+    #customer-history-printable .invoice-print-staff { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; background: #f9fafb; border-radius: 10px; padding: 8px; }
+    #customer-history-printable .invoice-print-staff > div { display: flex; flex-direction: column; gap: 2px; }
+    #customer-history-printable .invoice-print-label { font-size: 9px; color: #6b7280; text-transform: uppercase; font-weight: 600; }
+    #customer-history-printable .invoice-print-value-strong { font-size: 12px; font-weight: 700; color: #111827; }
+    #customer-history-printable .invoice-print-value { font-size: 10px; color: #374151; }
+    #customer-history-printable .invoice-print-summary-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin: 8px 0; }
+    #customer-history-printable .invoice-print-summary-card { border: 1px solid #e5e7eb; border-radius: 8px; padding: 7px; background: #ffffff; }
+    #customer-history-printable .invoice-print-summary-card.debit { background: #fef2f2; border-color: #fee2e2; }
+    #customer-history-printable .invoice-print-summary-card.credit { background: #f0fdf4; border-color: #dcfce7; }
+    #customer-history-printable .invoice-print-summary-card.status { background: #eff6ff; border-color: #dbeafe; }
+    #customer-history-printable .invoice-print-summary-card .summary-label { font-size: 9px; color: #6b7280; }
+    #customer-history-printable .invoice-print-summary-card .summary-value { font-size: 10px; font-weight: 700; margin-top: 1px; }
+    #customer-history-printable .invoice-print-table { width: 100%; border-collapse: collapse; font-size: 10px; margin-top: 6px; }
+    #customer-history-printable .invoice-print-table th,
+    #customer-history-printable .invoice-print-table td { border: 1px solid #111827; padding: 5px 6px; line-height: 1.25; }
+    #customer-history-printable .invoice-print-table th { background: #f9fafb; text-transform: uppercase; font-size: 9px; letter-spacing: .03em; }
+    #customer-history-printable .invoice-print-totals-wrap { display: grid; grid-template-columns: 1fr 240px; gap: 10px; margin-top: 8px; align-items: start; }
+    #customer-history-printable .invoice-print-summary { border: 1px solid #e5e7eb; border-radius: 10px; padding: 8px; background: #f9fafb; display: flex; flex-direction: column; gap: 4px; }
+    #customer-history-printable .invoice-print-summary .summary-row { display: flex; justify-content: space-between; font-size: 10px; color: #374151; }
+    #customer-history-printable .invoice-print-summary .summary-row.total { font-size: 12px; font-weight: 700; color: #111827; border-top: 1px solid #d1d5db; padding-top: 6px; }
+    #customer-history-printable .invoice-print-summary .summary-row.paid { color: #15803d; font-weight: 600; }
+    #customer-history-printable .invoice-print-summary .summary-row.balance { font-weight: 700; color: #b91c1c; }
+  `;
+
+  const buildPrintRoot = (mode: "LEDGER" | "INVOICES" | "ALL", includeCaptureStyles = false) => {
     const ledgerNode = document.getElementById("customer-history-ledger");
     const invoicesNode = document.getElementById("customer-history-invoices");
-    if (!ledgerNode || !invoicesNode) return;
+    if (!ledgerNode || !invoicesNode) return null;
 
-    const cleanupPrintDom = () => {
-      document.body.classList.remove("printing-customer-history");
-      const node = document.getElementById("customer-history-print-root");
-      if (node) node.remove();
-    };
+    const existingNode = document.getElementById("customer-history-print-root");
+    if (existingNode) existingNode.remove();
 
     const headerHtml = `
       <div class="print-header">
@@ -150,7 +231,17 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
 
     const printRoot = document.createElement("div");
     printRoot.id = "customer-history-print-root";
-    printRoot.style.display = "none";
+    printRoot.style.display = includeCaptureStyles ? "block" : "none";
+    if (includeCaptureStyles) {
+      printRoot.style.position = "fixed";
+      printRoot.style.left = "-10000px";
+      printRoot.style.top = "0";
+      printRoot.style.width = "794px";
+      printRoot.style.maxWidth = "794px";
+      printRoot.style.padding = "18px";
+      printRoot.style.background = "#ffffff";
+      printRoot.style.overflow = "visible";
+    }
     printRoot.innerHTML = `
       <div id="customer-history-printable" data-print-mode="${mode}">
         <div class="print-sheet">
@@ -162,6 +253,7 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
     const printSheet = printRoot.querySelector(".print-sheet");
     if (printSheet && (mode === "LEDGER" || mode === "ALL")) {
       const ledgerSection = document.createElement("div");
+      ledgerSection.className = "ledger-print-section";
       ledgerSection.style.marginTop = "16px";
       ledgerSection.innerHTML = `<h3 style="margin:0 0 8px;font-size:14px;font-weight:700;">Transaction Ledger</h3>`;
 
@@ -189,6 +281,7 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
 
     if (printSheet && (mode === "INVOICES" || mode === "ALL")) {
       const invoicesSection = document.createElement("div");
+      invoicesSection.className = "invoices-print-section";
       invoicesSection.style.marginTop = "16px";
       const invoices = Array.isArray(data?.invoices) ? data.invoices : [];
       const invoiceBlocks = invoices
@@ -313,8 +406,24 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
       printSheet.appendChild(invoicesSection);
     }
 
-    const existingNode = document.getElementById("customer-history-print-root");
-    if (existingNode) existingNode.remove();
+    if (includeCaptureStyles) {
+      const style = document.createElement("style");
+      style.textContent = getPrintableCaptureCss();
+      printRoot.prepend(style);
+    }
+
+    return printRoot;
+  };
+
+  const handlePrint = (mode: "LEDGER" | "INVOICES" | "ALL") => {
+    const printRoot = buildPrintRoot(mode, false);
+    if (!printRoot) return;
+    const cleanupPrintDom = () => {
+      document.body.classList.remove("printing-customer-history");
+      const node = document.getElementById("customer-history-print-root");
+      if (node) node.remove();
+    };
+
     document.body.appendChild(printRoot);
     document.body.classList.add("printing-customer-history");
     window.addEventListener("afterprint", cleanupPrintDom, { once: true });
@@ -324,176 +433,130 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
 
   const handleDownloadPdf = async (mode: "LEDGER" | "INVOICES" | "ALL") => {
     if (downloadingPdf) return;
-    const ledgerNode = document.getElementById("customer-history-ledger");
-    const invoicesNode = document.getElementById("customer-history-invoices");
-    if (!ledgerNode || !invoicesNode) return;
     setDownloadingPdf(true);
     try {
+      const printRoot = buildPrintRoot(mode, true);
+      if (!printRoot) return;
+
       const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
         import("html2canvas"),
         import("jspdf"),
       ]);
-
-      const cloneId = "pdf-capture-ledger";
-      const existing = document.getElementById(cloneId);
-      if (existing) existing.remove();
-      const wrapper = document.createElement("div");
-      wrapper.id = cloneId;
-      wrapper.style.position = "fixed";
-      wrapper.style.left = "-10000px";
-      wrapper.style.top = "0";
-      wrapper.style.width = "794px";
-      wrapper.style.maxWidth = "794px";
-      wrapper.style.padding = "32px";
-      wrapper.style.background = "#ffffff";
-      wrapper.style.borderRadius = "0";
-      wrapper.style.boxShadow = "none";
-      wrapper.style.overflow = "visible";
-      const style = document.createElement("style");
-      style.textContent = `
-        #${cloneId} {
-          color: #000000 !important;
-        }
-        #${cloneId} h1,
-        #${cloneId} h2,
-        #${cloneId} h3,
-        #${cloneId} h4,
-        #${cloneId} p,
-        #${cloneId} span,
-        #${cloneId} td,
-        #${cloneId} th {
-          padding-top: 3px !important;
-          padding-bottom: 4px !important;
-        }
-        #${cloneId} .ledger-pdf-section table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        #${cloneId} .ledger-pdf-section th,
-        #${cloneId} .ledger-pdf-section td { border: 1.5px solid #111827; padding: 9px 7px; }
-        #${cloneId} .ledger-pdf-section th { background: #f3f4f6; text-transform: uppercase; font-size: 11px; letter-spacing: .03em; }
-        #${cloneId} .print-summary { margin-top: 14px; border: 1px solid #111827; border-radius: 10px; padding: 0; background: #ffffff; }
-        #${cloneId} .print-summary .divider { width: 1px; background: #111827; align-self: stretch; }
-        #${cloneId} .print-summary .box { padding: 10px 14px; border-right: 1px solid #111827; border-left: 1px solid #111827; }
-        #${cloneId} .print-summary .box:last-child { border-right: none; }
-        #${cloneId} .print-summary .label { color: #000; font-size: 11px; text-transform: uppercase; letter-spacing: .03em; }
-        #${cloneId} .print-summary .value { color: #000; font-weight: 700; }
-        #${cloneId} .print-summary { page-break-inside: avoid; }
-        #${cloneId} .print-summary * { line-height: 1.2 !important; }
-        #${cloneId} .ledger-pdf-section th:nth-child(5),
-        #${cloneId} .ledger-pdf-section th:nth-child(6),
-        #${cloneId} .ledger-pdf-section th:nth-child(7),
-        #${cloneId} .ledger-pdf-section td:nth-child(5),
-        #${cloneId} .ledger-pdf-section td:nth-child(6),
-        #${cloneId} .ledger-pdf-section td:nth-child(7) {
-          background: #f3f4f6 !important;
-        }
-        #${cloneId} .print-summary { border: 2px solid #111827 !important; }
-        #${cloneId} .print-summary .box { border-right: 2px solid #111827 !important; }
-      `;
-      wrapper.appendChild(style);
-
-      const header = document.createElement("div");
-      header.style.marginBottom = "18px";
-      header.style.borderBottom = "1px solid #e5e7eb";
-      header.style.paddingBottom = "10px";
-      header.innerHTML = `
-        <div style="font-size:22px;font-weight:800;line-height:1.25;">Madina Glass</div>
-        <div style="font-size:12px;color:#000;line-height:1.4;margin-top:4px;">Aluminium & Glass Works Specialist</div>
-        <div style="margin-top:10px;font-size:14px;font-weight:700;line-height:1.4;">${data?.name || "Customer"}</div>
-        <div style="font-size:12px;color:#000;line-height:1.4;">${data?.phone || ""}${data?.address ? ` • ${data.address}` : ""}</div>
-      `;
-      wrapper.appendChild(header);
-
-      if (mode === "LEDGER" || mode === "ALL") {
-        const ledgerSection = document.createElement("div");
-        ledgerSection.className = "ledger-pdf-section";
-        const ledgerClone = ledgerNode.cloneNode(true) as HTMLElement;
-        ledgerClone.style.overflow = "visible";
-        ledgerClone.style.maxHeight = "none";
-        ledgerClone.querySelectorAll(".print-hide").forEach((el) => el.remove());
-        ledgerSection.appendChild(ledgerClone);
-        wrapper.appendChild(ledgerSection);
-
-        const summary = document.createElement("div");
-        summary.className = "print-summary";
-        summary.innerHTML = `
-          <div style="display:flex;justify-content:flex-end;align-items:stretch;">
-            <div class="box"><div class="label">Total Debit</div><div class="value">Rs. ${ledgerTotals.debit.toLocaleString()}</div></div>
-            <div class="box"><div class="label">Total Credit</div><div class="value">Rs. ${ledgerTotals.credit.toLocaleString()}</div></div>
-            <div class="box"><div class="label">Running Balance</div><div class="value">Rs. ${Math.abs(ledgerTotals.running).toLocaleString()}</div></div>
-          </div>
-        `;
-        wrapper.appendChild(summary);
-      }
-
-      if (mode === "INVOICES" || mode === "ALL") {
-        const invoicesSection = document.createElement("div");
-        invoicesSection.className = "invoices-pdf-section";
-        const invoicesClone = invoicesNode.cloneNode(true) as HTMLElement;
-        invoicesClone.style.overflow = "visible";
-        invoicesClone.style.maxHeight = "none";
-        invoicesClone.querySelectorAll(".print-hide").forEach((el) => el.remove());
-        if (mode === "ALL") {
-          const spacer = document.createElement("div");
-          spacer.style.height = "12px";
-          wrapper.appendChild(spacer);
-        }
-        invoicesSection.appendChild(invoicesClone);
-        wrapper.appendChild(invoicesSection);
-      }
-
-      document.body.appendChild(wrapper);
-
-      const rect = wrapper.getBoundingClientRect();
-      const captureWidth = Math.ceil(wrapper.scrollWidth || rect.width);
-      const captureHeight = Math.ceil(wrapper.scrollHeight || rect.height);
-      const canvas = await html2canvas(wrapper, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: "#ffffff",
-        width: captureWidth,
-        height: captureHeight,
-        windowWidth: captureWidth,
-        windowHeight: captureHeight,
-        scrollX: -window.scrollX,
-        scrollY: -window.scrollY,
-      });
-
-      wrapper.remove();
+      document.body.appendChild(printRoot);
+      await waitForRender();
 
       const pdf = new jsPDF("p", "mm", "a4");
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
-      const scale = canvas.width / pageWidth;
-      const pageHeightPx = Math.floor(pageHeight * scale);
-      const overlap = 20;
-      let y = 0;
       let pageIndex = 0;
-      while (y < canvas.height) {
-        const sliceHeight = Math.min(pageHeightPx, canvas.height - y);
-        if (sliceHeight <= overlap) break;
-        if (pageIndex > 0 && sliceHeight < pageHeightPx * 0.15) break;
-        const pageCanvas = document.createElement("canvas");
-        pageCanvas.width = canvas.width;
-        pageCanvas.height = sliceHeight;
-        const ctx = pageCanvas.getContext("2d");
-        if (ctx) {
-          ctx.fillStyle = "#ffffff";
-          ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
-          ctx.drawImage(canvas, 0, -y);
+
+      const addMultipageFromElement = async (element: HTMLElement) => {
+        const rect = element.getBoundingClientRect();
+        const captureWidth = Math.ceil(element.scrollWidth || rect.width);
+        const captureHeight = Math.ceil(element.scrollHeight || rect.height);
+        const canvas = await html2canvas(element, {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: "#ffffff",
+          width: captureWidth,
+          height: captureHeight,
+          windowWidth: captureWidth,
+          windowHeight: captureHeight,
+          scrollX: -window.scrollX,
+          scrollY: -window.scrollY,
+        });
+        const pxPerMm = canvas.width / pageWidth;
+        const pageHeightPx = Math.floor(pageHeight * pxPerMm);
+        const overlap = 20;
+        let y = 0;
+        while (y < canvas.height) {
+          const sliceHeight = Math.min(pageHeightPx, canvas.height - y);
+          if (sliceHeight <= 0) break;
+          if (pageIndex > 0) pdf.addPage();
+          const pageCanvas = document.createElement("canvas");
+          pageCanvas.width = canvas.width;
+          pageCanvas.height = sliceHeight;
+          const ctx = pageCanvas.getContext("2d");
+          if (ctx) {
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+            ctx.drawImage(canvas, 0, -y);
+          }
+          const imgData = pageCanvas.toDataURL("image/png");
+          pdf.setFillColor(255, 255, 255);
+          pdf.rect(0, 0, pageWidth, pageHeight, "F");
+          pdf.addImage(imgData, "PNG", 0, 0, pageWidth, sliceHeight / pxPerMm);
+          pageIndex += 1;
+          const nextY = y + sliceHeight;
+          if (nextY >= canvas.height) break;
+          y = Math.max(0, nextY - overlap);
         }
-        const imgData = pageCanvas.toDataURL("image/png");
+      };
+
+      const addSinglePageFromElement = async (element: HTMLElement) => {
+        const rect = element.getBoundingClientRect();
+        const captureWidth = Math.ceil(element.scrollWidth || rect.width);
+        const captureHeight = Math.ceil(element.scrollHeight || rect.height);
+        const canvas = await html2canvas(element, {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: "#ffffff",
+          width: captureWidth,
+          height: captureHeight,
+          windowWidth: captureWidth,
+          windowHeight: captureHeight,
+          scrollX: -window.scrollX,
+          scrollY: -window.scrollY,
+        });
         if (pageIndex > 0) pdf.addPage();
+        const ratio = Math.min(pageWidth / canvas.width, pageHeight / canvas.height);
+        const renderWidth = canvas.width * ratio;
+        const renderHeight = canvas.height * ratio;
+        const x = (pageWidth - renderWidth) / 2;
+        const y = 0;
         pdf.setFillColor(255, 255, 255);
         pdf.rect(0, 0, pageWidth, pageHeight, "F");
-        const imgHeightMm = sliceHeight / scale;
-        pdf.addImage(imgData, "PNG", 0, 0, pageWidth, imgHeightMm);
-        y += sliceHeight - overlap;
+        pdf.addImage(canvas.toDataURL("image/png"), "PNG", x, y, renderWidth, renderHeight);
         pageIndex += 1;
+      };
+
+      const printableRoot = printRoot.querySelector("#customer-history-printable") as HTMLElement | null;
+      if (!printableRoot) return;
+
+      if (mode === "LEDGER") {
+        const printSheet = printableRoot.querySelector(".print-sheet") as HTMLElement | null;
+        if (printSheet) await addMultipageFromElement(printSheet);
+      } else if (mode === "INVOICES") {
+        const invoicePages = Array.from(printableRoot.querySelectorAll(".invoice-print-page")) as HTMLElement[];
+        for (const invoicePage of invoicePages) {
+          await addSinglePageFromElement(invoicePage);
+        }
+      } else {
+        const printSheet = printableRoot.querySelector(".print-sheet") as HTMLElement | null;
+        const invoicesSection = printableRoot.querySelector(".invoices-print-section");
+        if (printSheet) {
+          const previousDisplay = (invoicesSection as HTMLElement | null)?.style.display ?? "";
+          if (invoicesSection instanceof HTMLElement) invoicesSection.style.display = "none";
+          await waitForRender();
+          await addMultipageFromElement(printSheet);
+          if (invoicesSection instanceof HTMLElement) invoicesSection.style.display = previousDisplay;
+        }
+        const invoicePages = Array.from((invoicesSection || printableRoot).querySelectorAll(".invoice-print-page")) as HTMLElement[];
+        for (const invoicePage of invoicePages) {
+          await addSinglePageFromElement(invoicePage);
+        }
       }
+
+      printRoot.remove();
 
       const fileSuffix = mode === "LEDGER" ? "LEDGER" : mode === "INVOICES" ? "INVOICES" : "ALL";
       const safeName = data?.name ? String(data.name).replace(/\s+/g, "_") : "Customer";
       pdf.save(`${safeName}-${fileSuffix}.pdf`);
+    } catch (error) {
+      console.error("Failed to download customer history PDF", error);
     } finally {
+      const node = document.getElementById("customer-history-print-root");
+      if (node) node.remove();
       setDownloadingPdf(false);
     }
   };
@@ -534,8 +597,24 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
             position: static !important;
             top: auto !important;
           }
-          .print-summary { border: 1px solid #111827 !important; background: #ffffff !important; padding: 0 !important; }
-          .print-summary .box { border-right: 1px solid #111827 !important; border-left: 1px solid #111827 !important; padding: 8px 10px; }
+          .print-summary {
+            border: 1px solid #111827 !important;
+            background: #ffffff !important;
+            padding: 0 !important;
+            overflow: hidden;
+            display: grid !important;
+            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+          }
+          .print-summary > div,
+          .print-summary .box {
+            border-right: 1px solid #111827 !important;
+            padding: 8px 10px;
+            min-height: 48px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+          }
+          .print-summary > div:last-child,
           .print-summary .box:last-child { border-right: none !important; }
           .print-hide { display: none !important; }
           .print-only { display: block !important; }
@@ -568,7 +647,7 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
           #customer-history-printable .invoice-print-summary-card .summary-value { font-size: 10px; font-weight: 700; margin-top: 1px; }
           #customer-history-printable .invoice-print-table { width: 100%; border-collapse: collapse; font-size: 10px; margin-top: 6px; }
           #customer-history-printable .invoice-print-table th,
-          #customer-history-printable .invoice-print-table td { border: 1px solid #111827; padding: 4px; line-height: 1.15; }
+          #customer-history-printable .invoice-print-table td { border: 1px solid #111827; padding: 5px 6px; line-height: 1.25; }
           #customer-history-printable .invoice-print-table th { background: #f9fafb; text-transform: uppercase; font-size: 9px; letter-spacing: .03em; }
           #customer-history-printable .invoice-print-totals-wrap { display: grid; grid-template-columns: 1fr 240px; gap: 10px; margin-top: 8px; align-items: start; }
           #customer-history-printable .invoice-print-summary { border: 1px solid #e5e7eb; border-radius: 10px; padding: 8px; background: #f9fafb; display: flex; flex-direction: column; gap: 4px; }
