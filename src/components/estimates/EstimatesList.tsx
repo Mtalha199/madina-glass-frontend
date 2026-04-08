@@ -9,6 +9,7 @@ import { estimatesApi } from "@/lib/api/estimate";
 import ViewEstimateModal from "./ViewEstimateModal";
 import ConfirmModal from "../common/ConfirmModal";
 import ConvertEstimateModal from "./ConvertEstimateModal";
+import EditEstimateModal from "./EditEstimateModal";
 
 export default function EstimatesList({ refreshTrigger }: { refreshTrigger: number }) {
   const [estimates, setEstimates] = useState<any[]>([]);
@@ -18,6 +19,7 @@ export default function EstimatesList({ refreshTrigger }: { refreshTrigger: numb
   const [selectedEstimateId, setSelectedEstimateId] = useState<number | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isConvertOpen, setIsConvertOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
   const [estimateToDelete, setEstimateToDelete] = useState<{ id: number; estimateNumber: string } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
@@ -57,6 +59,11 @@ export default function EstimatesList({ refreshTrigger }: { refreshTrigger: numb
   const handleConvert = (id: number) => {
     setSelectedEstimateId(id);
     setIsConvertOpen(true);
+  };
+
+  const handleEdit = (id: number) => {
+    setSelectedEstimateId(id);
+    setIsEditOpen(true);
   };
 
   const handleDeleteConfirm = async () => {
@@ -115,6 +122,9 @@ export default function EstimatesList({ refreshTrigger }: { refreshTrigger: numb
                       <button className="text-brand-400 hover:underline" onClick={() => handleView(est.id)}>View</button>
                       <button className="text-brand-400 hover:underline" onClick={() => handlePrint(est.id)}>Print</button>
                       {est.status !== "CONVERTED" && (
+                        <button className="text-blue-600 hover:underline" onClick={() => handleEdit(est.id)}>Edit</button>
+                      )}
+                      {est.status !== "CONVERTED" && (
                         <button className="text-green-600 hover:underline" onClick={() => handleConvert(est.id)}>Convert</button>
                       )}
                       <button className="text-red-600 hover:underline" onClick={() => setEstimateToDelete({ id: est.id, estimateNumber: est.estimateNumber })}>Delete</button>
@@ -145,6 +155,13 @@ export default function EstimatesList({ refreshTrigger }: { refreshTrigger: numb
       <ConvertEstimateModal
         isOpen={isConvertOpen}
         onClose={() => setIsConvertOpen(false)}
+        estimateId={selectedEstimateId}
+        onSuccess={fetchEstimates}
+      />
+
+      <EditEstimateModal
+        isOpen={isEditOpen}
+        onClose={() => setIsEditOpen(false)}
         estimateId={selectedEstimateId}
         onSuccess={fetchEstimates}
       />
