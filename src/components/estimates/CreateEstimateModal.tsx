@@ -521,88 +521,88 @@ export default function CreateEstimateModal({ isOpen, onClose, onSuccess }: any)
             </div>
             <div className="space-y-4">
               {items.map((item, index) => (
-                <div key={index} className="grid grid-cols-1 md:grid-cols-15 gap-3 items-end border-b pb-4 last:border-0 last:pb-0">
-                  <div className="md:col-span-1">
-                    <Label>Serial</Label>
-                    <Input value={item.SerialNum} onChange={(e) => updateItem(index, "SerialNum", e.target.value)} />
-                  </div>
-                  <div className="md:col-span-2">
-                    <Label>Glass Type</Label>
-                    <Select
-                      options={GLASS_TYPE_OPTIONS.map((t) => ({ value: t, label: t }))}
-                      value={item.glassType}
-                      onChange={(value) => updateItem(index, "glassType", value)}
-                    />
-                  </div>
-                  <div className="md:col-span-2">
-                    <Label>Thickness</Label>
-                    <Select
-                      options={getThicknessOptionsForType(item.glassType).map((t) => ({ value: t, label: `${t}mm` }))}
-                      value={item.glassThickness}
-                      onChange={(value) => updateItem(index, "glassThickness", value)}
-                    />
-                  </div>
-                  <div className="md:col-span-2">
-                    <Label>Shade</Label>
-                    <Select
-                      options={getShadeOptionsForType(item.glassType).map((t) => ({ value: t, label: t }))}
-                      value={item.glassShade}
-                      onChange={(value) => updateItem(index, "glassShade", value)}
-                    />
-                  </div>
-                  <div className="md:col-span-1">
-                    <Label>Width</Label>
-                    <Input type="number" value={item.width} onChange={(e) => updateItem(index, "width", e.target.value)} />
-                  </div>
-                  <div className="md:col-span-1">
-                    <Label>Height</Label>
-                    <Input type="number" value={item.height} onChange={(e) => updateItem(index, "height", e.target.value)} />
-                  </div>
-                  <div className="md:col-span-1">
-                    <Label>Qty</Label>
-                    <Input
-                      type="number"
-                      value={item.qtyPcs}
-                      onChange={(e) => updateItem(index, "qtyPcs", e.target.value)}
-                    />
-                  </div>
-                  <div className="md:col-span-1">
-                    <Label>Rate</Label>
-                    <Input
-                      type="number"
-                      value={item.rate}
-                      onChange={(e) => updateItem(index, "rate", e.target.value)}
-                    />
-                  </div>
-                  <div className="md:col-span-1">
-                    <Label>Std W</Label>
-                    <Input
-                      type="number"
-                      placeholder="Auto"
-                      value={item.SWidth ?? ""}
-                      onChange={(e) => updateItem(index, "SWidth", e.target.value)}
-                    />
-                  </div>
-                  <div className="md:col-span-1">
-                    <Label>Std H</Label>
-                    <Input
-                      type="number"
-                      placeholder="Auto"
-                      value={item.SHeight ?? ""}
-                      onChange={(e) => updateItem(index, "SHeight", e.target.value)}
-                    />
-                  </div>
-                  <div className="md:col-span-1">
-                    <Label>Std Size</Label>
-                    <div className="h-10 flex items-center text-xs font-medium text-gray-600 dark:text-gray-300">
-                      {item.standardSize || "—"}
+                <div key={index} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-14 gap-3 items-end border-b pb-4 last:border-0 last:pb-0">
+                    <div className="lg:col-span-1">
+                      <Label>Serial</Label>
+                      <Input value={item.SerialNum} onChange={(e) => updateItem(index, "SerialNum", e.target.value)} />
                     </div>
-                  </div>
-                  <div className="md:col-span-1 flex justify-end">
-                    <button type="button" onClick={() => removeItem(index)} className="text-red-500 hover:text-red-700">
-                      <TrashIcon className="w-4 h-4" />
-                    </button>
-                  </div>
+                    <div className="lg:col-span-2">
+                      <Label>Glass Type</Label>
+                      <Select
+                        options={GLASS_TYPE_OPTIONS.map((t) => ({ value: t, label: t }))}
+                        value={item.glassType}
+                        onChange={(value) => updateItem(index, "glassType", value)}
+                      />
+                    </div>
+                    <div className="lg:col-span-2">
+                      <Label>Thickness</Label>
+                      <Select
+                        options={getThicknessOptionsForType(item.glassType).map((t) => ({ value: t, label: `${t}mm` }))}
+                        value={item.glassThickness}
+                        onChange={(value) => updateItem(index, "glassThickness", value)}
+                      />
+                    </div>
+                    <div className="lg:col-span-2">
+                      <Label>Shade</Label>
+                      <Select
+                        options={getShadeOptionsForType(item.glassType).map((t) => ({ value: t, label: t }))}
+                        value={item.glassShade}
+                        onChange={(value) => updateItem(index, "glassShade", value)}
+                      />
+                    </div>
+                    <div className="lg:col-span-1">
+                      <Label>Width</Label>
+                      <Input type="number" value={item.width} onChange={(e) => updateItem(index, "width", e.target.value)} />
+                    </div>
+                    <div className="lg:col-span-1">
+                      <Label>Height</Label>
+                      <Input type="number" value={item.height} onChange={(e) => updateItem(index, "height", e.target.value)} />
+                    </div>
+                    <div className="lg:col-span-1">
+                      <Label>Qty</Label>
+                      <Input
+                        type="number"
+                        value={item.qtyPcs}
+                        onChange={(e) => updateItem(index, "qtyPcs", e.target.value)}
+                      />
+                    </div>
+                    <div className="lg:col-span-1">
+                      <Label>Rate</Label>
+                      <Input
+                        type="number"
+                        value={item.rate}
+                        onChange={(e) => updateItem(index, "rate", e.target.value)}
+                      />
+                    </div>
+                    <div className="lg:col-span-1">
+                      <Label>Std W</Label>
+                      <Input
+                        type="number"
+                        placeholder="Auto"
+                        value={item.SWidth ?? ""}
+                        onChange={(e) => updateItem(index, "SWidth", e.target.value)}
+                      />
+                    </div>
+                    <div className="lg:col-span-1">
+                      <Label>Std H</Label>
+                      <Input
+                        type="number"
+                        placeholder="Auto"
+                        value={item.SHeight ?? ""}
+                        onChange={(e) => updateItem(index, "SHeight", e.target.value)}
+                      />
+                    </div>
+                    <div className="lg:col-span-1">
+                      <Label>Std Size</Label>
+                      <div className="h-10 flex items-center text-xs font-medium text-gray-600 dark:text-gray-300">
+                        {item.standardSize || "—"}
+                      </div>
+                    </div>
+                    <div className="lg:col-span-1 flex justify-end">
+                      <button type="button" onClick={() => removeItem(index)} className="text-red-500 hover:text-red-700">
+                        <TrashIcon className="w-4 h-4" />
+                      </button>
+                    </div>
                 </div>
               ))}
             </div>
