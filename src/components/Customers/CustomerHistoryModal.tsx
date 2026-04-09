@@ -449,13 +449,15 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
       let pageIndex = 0;
+      const renderScale = 1.45;
+      const jpegQuality = 0.88;
 
       const addMultipageFromElement = async (element: HTMLElement) => {
         const rect = element.getBoundingClientRect();
         const captureWidth = Math.ceil(element.scrollWidth || rect.width);
         const captureHeight = Math.ceil(element.scrollHeight || rect.height);
         const canvas = await html2canvas(element, {
-          scale: 2,
+          scale: renderScale,
           useCORS: true,
           backgroundColor: "#ffffff",
           width: captureWidth,
@@ -482,10 +484,10 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
             ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
             ctx.drawImage(canvas, 0, -y);
           }
-          const imgData = pageCanvas.toDataURL("image/png");
+          const imgData = pageCanvas.toDataURL("image/jpeg", jpegQuality);
           pdf.setFillColor(255, 255, 255);
           pdf.rect(0, 0, pageWidth, pageHeight, "F");
-          pdf.addImage(imgData, "PNG", 0, 0, pageWidth, sliceHeight / pxPerMm);
+          pdf.addImage(imgData, "JPEG", 0, 0, pageWidth, sliceHeight / pxPerMm, undefined, "MEDIUM");
           pageIndex += 1;
           const nextY = y + sliceHeight;
           if (nextY >= canvas.height) break;
@@ -498,7 +500,7 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
         const captureWidth = Math.ceil(element.scrollWidth || rect.width);
         const captureHeight = Math.ceil(element.scrollHeight || rect.height);
         const canvas = await html2canvas(element, {
-          scale: 2,
+          scale: renderScale,
           useCORS: true,
           backgroundColor: "#ffffff",
           width: captureWidth,
@@ -516,7 +518,7 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
         const y = 0;
         pdf.setFillColor(255, 255, 255);
         pdf.rect(0, 0, pageWidth, pageHeight, "F");
-        pdf.addImage(canvas.toDataURL("image/png"), "PNG", x, y, renderWidth, renderHeight);
+        pdf.addImage(canvas.toDataURL("image/jpeg", jpegQuality), "JPEG", x, y, renderWidth, renderHeight, undefined, "MEDIUM");
         pageIndex += 1;
       };
 
