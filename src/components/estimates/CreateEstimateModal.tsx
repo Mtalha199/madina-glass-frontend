@@ -453,6 +453,17 @@ export default function CreateEstimateModal({ isOpen, onClose, onSuccess }: any)
               <Label>Fitter</Label>
               <Input value={formData.fitterName} onChange={(e) => setFormData({ ...formData, fitterName: e.target.value })} />
             </div>
+
+            <div className="md:col-span-4">
+              <Label>Description</Label>
+              <textarea
+                rows={4}
+                placeholder="Write estimate description, notes, or terms..."
+                className="w-full rounded-lg border px-4 py-2.5 text-sm bg-transparent text-gray-800 border-gray-300 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:focus:border-brand-800"
+                value={formData.remarks}
+                onChange={(e) => setFormData({ ...formData, remarks: e.target.value })}
+              />
+            </div>
           </div>
 
           {formData.customerType === "CUSTOMER" && (

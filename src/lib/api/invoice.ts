@@ -46,6 +46,14 @@ export interface CreateCustomerPaymentRequest {
   notes?: string;
 }
 
+export interface UpdateCustomerPaymentRequest {
+  amount?: number;
+  method?: "CASH" | "CHEQUE" | "BANK" | "OTHER";
+  invoiceId?: number | null;
+  reference?: string;
+  notes?: string;
+}
+
 export const invoicesApi = {
   createInvoice: async (data: CreateInvoiceRequest) => {
     const response = await apiClient.post('/invoices', data);
@@ -90,5 +98,15 @@ export const invoicesApi = {
   addCustomerPayment: async (customerId: number, data: CreateCustomerPaymentRequest) => {
     const response = await apiClient.post(`/invoices/customer/${customerId}/payments`, data);
     return response.data;
-  }
+  },
+
+  updateCustomerPayment: async (customerId: number, paymentId: number, data: UpdateCustomerPaymentRequest) => {
+    const response = await apiClient.patch(`/invoices/customer/${customerId}/payments/${paymentId}`, data);
+    return response.data;
+  },
+
+  deleteCustomerPayment: async (customerId: number, paymentId: number) => {
+    const response = await apiClient.delete(`/invoices/customer/${customerId}/payments/${paymentId}`);
+    return response.data;
+  },
 };

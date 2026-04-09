@@ -218,6 +218,8 @@ export default function ViewEstimateModal({ isOpen, onClose, estimateId, printRe
         #${cloneId} .print-meta h4,
         #${cloneId} .print-remarks p {
           display: block !important;
+          white-space: pre-wrap !important;
+          overflow: visible !important;
         }
         #${cloneId} .print-compact {
           overflow: visible !important;
@@ -326,7 +328,7 @@ export default function ViewEstimateModal({ isOpen, onClose, estimateId, printRe
           .print\\:hidden { display: none !important; }
           .totals-remarks { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 10px !important; align-items: start !important; }
           .print-compact th, .print-compact td { padding: 4px 6px !important; font-size: 9.75px !important; line-height: 1.12 !important; }
-          .print-remarks p { font-size: 9px !important; line-height: 1.1 !important; max-height: 44px; overflow: hidden; }
+          .print-remarks p { font-size: 9px !important; line-height: 1.18 !important; white-space: pre-wrap !important; max-height: none !important; overflow: visible !important; }
         }
       `}</style>
       <div
@@ -447,7 +449,7 @@ export default function ViewEstimateModal({ isOpen, onClose, estimateId, printRe
           <div className="totals-remarks print-avoid-break mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
             {estimate.remarks ? (
               <div className="print-remarks rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/80 dark:bg-white/5 p-4">
-                <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Remarks / Terms</h4>
+                <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Description / Remarks</h4>
                 <p className="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-line">{estimate.remarks}</p>
               </div>
             ) : (
