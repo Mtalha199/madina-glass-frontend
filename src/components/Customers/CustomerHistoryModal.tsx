@@ -8,6 +8,7 @@ import { customersApi } from "@/lib/api/customer";
 import { Loader } from "lucide-react";
 import { invoicesApi } from "@/lib/api/invoice";
 import ViewInvoiceModal from "../invoices/ViewInvoiceModal";
+import ConfirmModal from "../common/ConfirmModal";
 
 interface CustomerHistoryModalProps {
   isOpen: boolean;
@@ -33,6 +34,18 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
   const [showPrintOptions, setShowPrintOptions] = useState(false);
   const [showDownloadOptions, setShowDownloadOptions] = useState(false);
   const [downloadingPdf, setDownloadingPdf] = useState(false);
+  const [editingLedgerRow, setEditingLedgerRow] = useState<any | null>(null);
+  const [savingLedgerEdit, setSavingLedgerEdit] = useState(false);
+  const [ledgerEditError, setLedgerEditError] = useState<string | null>(null);
+  const [deletingLedgerRow, setDeletingLedgerRow] = useState<any | null>(null);
+  const [deletingLedgerPayment, setDeletingLedgerPayment] = useState(false);
+  const [editPaymentForm, setEditPaymentForm] = useState({
+    amount: "",
+    method: "CASH",
+    invoiceId: "__OVERALL__",
+    reference: "",
+    notes: "",
+  });
 
   const ledgerTotals = useMemo(() => {
     const totals = ledgerRows.reduce(
@@ -75,6 +88,9 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
       setSelectedInvoiceId(null);
       setShowPrintOptions(false);
       setShowDownloadOptions(false);
+      setEditingLedgerRow(null);
+      setLedgerEditError(null);
+      setDeletingLedgerRow(null);
     }
   }, [isOpen]);
 
@@ -117,6 +133,61 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
       onPaymentSaved?.();
     } finally {
       setSavingPayment(false);
+    }
+  };
+
+  const openEditLedgerPayment = (row: any) => {
+    if (!row?.paymentId) return;
+    setLedgerEditError(null);
+    setEditingLedgerRow(row);
+    setEditPaymentForm({
+      amount: String(Number(row.credit || 0) || ""),
+      method: String(row.method || "CASH").toUpperCase(),
+      invoiceId: row.invoiceId ? String(row.invoiceId) : "__OVERALL__",
+      reference: row.ref && String(row.ref).startsWith("PAY-") ? "" : String(row.ref || ""),
+      notes: String(row.notes || ""),
+    });
+  };
+
+  const handleUpdateLedgerPayment = async () => {
+    if (!customerId || !editingLedgerRow?.paymentId) return;
+    const amount = Number(editPaymentForm.amount || 0);
+    if (amount <= 0) {
+      setLedgerEditError("Amount must be greater than zero.");
+      return;
+    }
+
+    try {
+      setSavingLedgerEdit(true);
+      setLedgerEditError(null);
+      await invoicesApi.updateCustomerPayment(customerId, Number(editingLedgerRow.paymentId), {
+        amount,
+        method: editPaymentForm.method as "CASH" | "CHEQUE" | "BANK" | "OTHER",
+        invoiceId: editPaymentForm.invoiceId === "__OVERALL__" ? null : Number(editPaymentForm.invoiceId || 0) || null,
+        reference: editPaymentForm.reference || "",
+        notes: editPaymentForm.notes || "",
+      });
+      setEditingLedgerRow(null);
+      await loadCustomerHistory();
+      onPaymentSaved?.();
+    } catch (err: any) {
+      const message = err?.response?.data?.message;
+      setLedgerEditError(Array.isArray(message) ? message.join(", ") : message || "Failed to update payment.");
+    } finally {
+      setSavingLedgerEdit(false);
+    }
+  };
+
+  const handleDeleteLedgerPayment = async () => {
+    if (!customerId || !deletingLedgerRow?.paymentId) return;
+    try {
+      setDeletingLedgerPayment(true);
+      await invoicesApi.deleteCustomerPayment(customerId, Number(deletingLedgerRow.paymentId));
+      setDeletingLedgerRow(null);
+      await loadCustomerHistory();
+      onPaymentSaved?.();
+    } finally {
+      setDeletingLedgerPayment(false);
     }
   };
 
@@ -962,17 +1033,37 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
                         <td className="px-3 py-2 text-right text-green-600">Rs. {Number(row.credit || 0).toLocaleString()}</td>
                         <td className="px-3 py-2 text-right font-semibold">Rs. {Math.abs(Number(row.runningBalance || 0)).toLocaleString()}</td>
                         <td className="px-3 py-2 text-right print-hide">
-                          {row.invoiceId ? (
-                            <button
-                              type="button"
-                              onClick={() => handleOpenInvoice(row.invoiceId)}
-                              className="text-brand-500 hover:underline text-xs font-medium"
-                            >
-                              Open Invoice
-                            </button>
-                          ) : (
-                            <span className="text-xs text-gray-400">—</span>
-                          )}
+                          <div className="flex justify-end gap-2">
+                            {row.invoiceId ? (
+                              <button
+                                type="button"
+                                onClick={() => handleOpenInvoice(row.invoiceId)}
+                                className="text-brand-500 hover:underline text-xs font-medium"
+                              >
+                                Invoice
+                              </button>
+                            ) : (
+                              <span className="text-xs text-gray-400">—</span>
+                            )}
+                            {row.paymentId ? (
+                              <>
+                                <button
+                                  type="button"
+                                  onClick={() => openEditLedgerPayment(row)}
+                                  className="text-blue-600 hover:underline text-xs font-medium"
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setDeletingLedgerRow(row)}
+                                  className="text-red-600 hover:underline text-xs font-medium"
+                                >
+                                  Delete
+                                </button>
+                              </>
+                            ) : null}
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -1006,6 +1097,96 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
         isOpen={isInvoiceModalOpen}
         onClose={() => setIsInvoiceModalOpen(false)}
         invoiceId={selectedInvoiceId}
+      />
+      <Modal
+        isOpen={!!editingLedgerRow}
+        onClose={() => {
+          if (!savingLedgerEdit) setEditingLedgerRow(null);
+        }}
+        className="max-w-[560px] m-4"
+      >
+        <div className="p-6 bg-white dark:bg-gray-900 rounded-3xl">
+          <h4 className="text-lg font-semibold mb-4">Edit Ledger Payment</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+            <div className="rounded-lg bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-gray-800 px-3 py-2">
+              <p className="text-xs text-gray-500">Debit</p>
+              <p className="font-semibold text-red-600">Rs. 0</p>
+            </div>
+            <div className="rounded-lg bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-gray-800 px-3 py-2">
+              <p className="text-xs text-gray-500">Credit</p>
+              <p className="font-semibold text-green-600">Rs. {Number(editPaymentForm.amount || 0).toLocaleString()}</p>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <input
+              type="number"
+              placeholder="Amount"
+              className="w-full border rounded px-3 py-2 text-sm"
+              value={editPaymentForm.amount}
+              onChange={(e) => setEditPaymentForm((p) => ({ ...p, amount: e.target.value }))}
+            />
+            <select
+              className="w-full border rounded px-3 py-2 text-sm bg-transparent"
+              value={editPaymentForm.method}
+              onChange={(e) => setEditPaymentForm((p) => ({ ...p, method: e.target.value }))}
+            >
+              <option value="CASH">Cash</option>
+              <option value="CHEQUE">Cheque</option>
+              <option value="BANK">Bank</option>
+              <option value="OTHER">Other</option>
+            </select>
+            <select
+              className="w-full border rounded px-3 py-2 text-sm bg-transparent"
+              value={editPaymentForm.invoiceId}
+              onChange={(e) => setEditPaymentForm((p) => ({ ...p, invoiceId: e.target.value }))}
+            >
+              <option value="__OVERALL__">Overall Customer Payment</option>
+              {data?.invoices?.map((inv: any) => (
+                <option key={inv.id} value={String(inv.id)}>
+                  Against: {inv.invoiceNumber}
+                </option>
+              ))}
+            </select>
+            <input
+              type="text"
+              placeholder="Reference"
+              className="w-full border rounded px-3 py-2 text-sm"
+              value={editPaymentForm.reference}
+              onChange={(e) => setEditPaymentForm((p) => ({ ...p, reference: e.target.value }))}
+            />
+            <input
+              type="text"
+              placeholder="Notes (optional)"
+              className="w-full border rounded px-3 py-2 text-sm"
+              value={editPaymentForm.notes}
+              onChange={(e) => setEditPaymentForm((p) => ({ ...p, notes: e.target.value }))}
+            />
+            {ledgerEditError && <p className="text-sm text-red-600">{ledgerEditError}</p>}
+          </div>
+
+          <div className="mt-5 flex justify-end gap-3">
+            <Button variant="outline" onClick={() => setEditingLedgerRow(null)} disabled={savingLedgerEdit}>
+              Cancel
+            </Button>
+            <Button onClick={handleUpdateLedgerPayment} disabled={savingLedgerEdit}>
+              {savingLedgerEdit ? "Saving..." : "Save Changes"}
+            </Button>
+          </div>
+        </div>
+      </Modal>
+      <ConfirmModal
+        isOpen={!!deletingLedgerRow}
+        onClose={() => {
+          if (!deletingLedgerPayment) setDeletingLedgerRow(null);
+        }}
+        onConfirm={handleDeleteLedgerPayment}
+        title="Delete Ledger Payment"
+        message={`Delete payment "${deletingLedgerRow?.ref || "PAYMENT"}" of Rs. ${Number(deletingLedgerRow?.credit || 0).toLocaleString()}? This cannot be undone.`}
+        confirmLabel="Delete Payment"
+        cancelLabel="Cancel"
+        variant="danger"
+        isLoading={deletingLedgerPayment}
       />
     </Modal>
   );
