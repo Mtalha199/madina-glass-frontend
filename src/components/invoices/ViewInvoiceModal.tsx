@@ -201,17 +201,12 @@ export default function ViewInvoiceModal({
     });
 
     return Array.from(groups.entries()).map(([key, value]) => {
-      const pairs: Array<{ left: any | null; right: any | null }> = [];
-      for (let i = 0; i < value.items.length; i += 2) {
-        pairs.push({
-          left: value.items[i] || null,
-          right: value.items[i + 1] || null,
-        });
-      }
+      const splitAt = Math.ceil(value.items.length / 2);
       return {
         key,
         totalQty: value.totalQty,
-        pairs,
+        left: value.items.slice(0, splitAt),
+        right: value.items.slice(splitAt),
       };
     });
   }, [labourEntries]);
@@ -576,26 +571,67 @@ export default function ViewInvoiceModal({
           #printable-invoice.print-labour-large .print-meta h4 { font-size: 10px !important; }
           #printable-invoice.print-labour-large .print-meta .font-bold,
           #printable-invoice.print-labour-large .print-meta .font-medium { font-size: 11px !important; }
-          #printable-invoice.print-labour-large .labour-two-col { gap: 6px !important; }
+          #printable-invoice.print-labour-large .labour-two-col { gap: 4px !important; }
           #printable-invoice.print-labour-large .labour-group-box {
             break-inside: avoid !important;
             page-break-inside: avoid !important;
-            margin-bottom: 6px !important;
+            margin-bottom: 5px !important;
+            border: 2px solid #111 !important;
+            border-radius: 0 !important;
+            background: #fff !important;
+            box-shadow: none !important;
           }
           #printable-invoice.print-labour-large .labour-group-title {
-            font-size: 10px !important;
-            line-height: 1.1 !important;
+            font-size: 9.9px !important;
+            line-height: 1.02 !important;
             padding: 3px 6px !important;
+            border-bottom: 2px solid #111 !important;
+            background: #f4f4f4 !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.03em !important;
+            color: #000 !important;
           }
           #printable-invoice.print-labour-large .labour-group-total {
-            font-size: 10px !important;
+            font-size: 9.7px !important;
             padding: 2px 6px !important;
+            border-top: 2px solid #111 !important;
+            background: #fafafa !important;
+            color: #000 !important;
           }
-          #printable-invoice.print-labour-large .labour-packed-table th,
-          #printable-invoice.print-labour-large .labour-packed-table td {
-            font-size: 8.7px !important;
-            line-height: 1.05 !important;
-            padding: 2px 3px !important;
+          #printable-invoice.print-labour-large .labour-group-grid {
+            padding: 4px !important;
+            gap: 4px !important;
+          }
+          #printable-invoice.print-labour-large .labour-table-wrap {
+            border: 2px solid #111 !important;
+            border-radius: 0 !important;
+            overflow: hidden !important;
+          }
+          #printable-invoice.print-labour-large .labour-two-col-table th,
+          #printable-invoice.print-labour-large .labour-two-col-table td {
+            font-size: 8.95px !important;
+            line-height: 0.98 !important;
+            padding: 1px 2px !important;
+            border: 1px solid #111 !important;
+            color: #000 !important;
+          }
+          #printable-invoice.print-labour-large .labour-two-col-table {
+            border-collapse: collapse !important;
+            border-spacing: 0 !important;
+            border: none !important;
+            border-radius: 0 !important;
+          }
+          #printable-invoice.print-labour-large .labour-two-col-table thead tr {
+            background: #fff !important;
+          }
+          #printable-invoice.print-labour-large .labour-two-col-table th {
+            font-weight: 800 !important;
+            font-size: 8.9px !important;
+            text-transform: uppercase !important;
+            color: #000 !important;
+          }
+          #printable-invoice.print-labour-large .labour-two-col-table tbody tr {
+            background: #fff !important;
           }
           #printable-invoice.print-labour-large .invoice-total-sqft { display: none !important; }
         }
@@ -876,51 +912,63 @@ export default function ViewInvoiceModal({
           ) : (
             <div className="mb-6 space-y-3">
               {labourGroups.map((group, groupIdx) => (
-                <div key={`labour-group-${group.key}-${groupIdx}`} className="labour-group-box rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
-                  <div className="labour-group-title bg-gray-50 dark:bg-gray-800 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-gray-700 dark:text-gray-200">
+                <div
+                  key={`labour-group-${group.key}-${groupIdx}`}
+                  className="labour-group-box overflow-hidden rounded-none border-2 border-gray-900 bg-white shadow-none dark:border-gray-200 dark:bg-gray-950"
+                >
+                  <div className="labour-group-title border-b-2 border-gray-900 bg-gray-100 px-3 py-1.5 text-sm font-bold uppercase tracking-[0.12em] text-black dark:border-gray-200 dark:bg-gray-900 dark:text-white">
                     {group.key}
                   </div>
-                  <div className="p-2">
-                    <table className="labour-packed-table w-full text-left rounded-lg overflow-hidden border border-gray-100 dark:border-gray-800">
-                      <thead>
-                        <tr className="bg-gray-50 dark:bg-gray-800 text-[10px] text-gray-500 uppercase">
-                          <th className="py-1.5 px-2 w-10">sr#</th>
-                          <th className="py-1.5 px-2">W</th>
-                          <th className="py-1.5 px-2 text-center w-5">x</th>
-                          <th className="py-1.5 px-2">H</th>
-                          <th className="py-1.5 px-2 text-right w-10">Qty</th>
-                          <th className="py-1.5 px-2 w-10 border-l border-gray-300 dark:border-gray-700">sr#</th>
-                          <th className="py-1.5 px-2">W</th>
-                          <th className="py-1.5 px-2 text-center w-5">x</th>
-                          <th className="py-1.5 px-2">H</th>
-                          <th className="py-1.5 px-2 text-right w-10">Qty</th>
-                        </tr>
-                      </thead>
-                      <tbody className="text-xs">
-                        {group.pairs.length === 0 ? (
-                          <tr>
-                            <td colSpan={10} className="py-2 px-2 text-gray-400">—</td>
-                          </tr>
-                        ) : (
-                          group.pairs.map((pair: any, pairIdx: number) => (
-                            <tr key={`lab-pair-${groupIdx}-${pairIdx}`} className="border-t border-gray-100 dark:border-gray-800">
-                              <td className="py-1.5 px-2 font-mono">{pair.left ? pair.left.SerialNum || pair.left.__idx : "—"}</td>
-                              <td className="py-1.5 px-2 text-gray-700 print-no-wrap">{pair.left ? pair.left.width : "—"}</td>
-                              <td className="py-1.5 px-2 text-center text-gray-500">{pair.left ? "x" : ""}</td>
-                              <td className="py-1.5 px-2 text-gray-700 print-no-wrap">{pair.left ? pair.left.height : "—"}</td>
-                              <td className="py-1.5 px-2 text-right font-semibold">{pair.left ? Number(pair.left.qtyPcs || 0).toLocaleString() : "—"}</td>
-                              <td className="py-1.5 px-2 font-mono border-l border-gray-200 dark:border-gray-700">{pair.right ? pair.right.SerialNum || pair.right.__idx : "—"}</td>
-                              <td className="py-1.5 px-2 text-gray-700 print-no-wrap">{pair.right ? pair.right.width : "—"}</td>
-                              <td className="py-1.5 px-2 text-center text-gray-500">{pair.right ? "x" : ""}</td>
-                              <td className="py-1.5 px-2 text-gray-700 print-no-wrap">{pair.right ? pair.right.height : "—"}</td>
-                              <td className="py-1.5 px-2 text-right font-semibold">{pair.right ? Number(pair.right.qtyPcs || 0).toLocaleString() : "—"}</td>
+                  <div className="labour-group-grid labour-two-col grid grid-cols-1 gap-2 p-2 md:grid-cols-2">
+                    {[group.left, group.right].map((column: any[], colIdx: number) => (
+                      <div
+                        key={`lab-col-wrap-${groupIdx}-${colIdx}`}
+                        className="labour-table-wrap overflow-hidden rounded-none border-2 border-gray-900 dark:border-gray-200"
+                      >
+                        <table key={`lab-col-${groupIdx}-${colIdx}`} className="labour-two-col-table w-full border-collapse text-left">
+                          <thead>
+                            <tr className="bg-white text-[11px] uppercase text-black dark:bg-gray-950 dark:text-white">
+                              <th className="w-12 border border-gray-900 px-1.5 py-1 text-center font-extrabold dark:border-gray-200">sr#</th>
+                              <th className="border border-gray-900 px-1.5 py-1 text-center font-extrabold dark:border-gray-200">W</th>
+                              <th className="w-6 border border-gray-900 px-1 py-1 text-center font-extrabold dark:border-gray-200"></th>
+                              <th className="border border-gray-900 px-1.5 py-1 text-center font-extrabold dark:border-gray-200">H</th>
+                              <th className="w-12 border border-gray-900 px-1.5 py-1 text-center font-extrabold dark:border-gray-200">Qty</th>
                             </tr>
-                          ))
-                        )}
-                      </tbody>
-                    </table>
+                          </thead>
+                          <tbody className="text-xs">
+                            {column.length === 0 ? (
+                              <tr>
+                                <td colSpan={5} className="border border-gray-900 px-2 py-2 text-center text-gray-400 dark:border-gray-200">
+                                  —
+                                </td>
+                              </tr>
+                            ) : (
+                              column.map((item: any) => (
+                                <tr key={`lab-item-${groupIdx}-${colIdx}-${item.__idx}`} className="bg-white dark:bg-gray-950">
+                                  <td className="border border-gray-900 px-1.5 py-[3px] text-center text-[13px] font-bold text-black dark:border-gray-200 dark:text-white">
+                                    {item.SerialNum || item.__idx}
+                                  </td>
+                                  <td className="print-no-wrap border border-gray-900 px-1.5 py-[3px] text-center text-[13px] font-semibold text-black dark:border-gray-200 dark:text-white">
+                                    {item.width}
+                                  </td>
+                                  <td className="border border-gray-900 px-1 py-[3px] text-center text-[13px] font-bold text-black dark:border-gray-200 dark:text-white">
+                                    x
+                                  </td>
+                                  <td className="print-no-wrap border border-gray-900 px-1.5 py-[3px] text-center text-[13px] font-semibold text-black dark:border-gray-200 dark:text-white">
+                                    {item.height}
+                                  </td>
+                                  <td className="border border-gray-900 px-1.5 py-[3px] text-center text-[13px] font-extrabold text-black dark:border-gray-200 dark:text-white">
+                                    {Number(item.qtyPcs || 0).toLocaleString()}
+                                  </td>
+                                </tr>
+                              ))
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                    ))}
                   </div>
-                  <div className="labour-group-total border-t border-gray-200 dark:border-gray-700 px-3 py-2 text-sm font-semibold text-gray-800 dark:text-gray-100 flex justify-end">
+                  <div className="labour-group-total flex justify-end border-t-2 border-gray-900 bg-gray-50 px-3 py-1.5 text-sm font-extrabold text-black dark:border-gray-200 dark:bg-gray-900 dark:text-white">
                     Total Qty: {Number(group.totalQty || 0).toLocaleString()}
                   </div>
                 </div>
