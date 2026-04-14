@@ -996,14 +996,20 @@ export default function ViewInvoiceModal({
 
           {!isLabourView && (
             <div className="totals-remarks print-avoid-break mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
-              {invoice.remarks ? (
-                <div className="print-remarks rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/80 dark:bg-white/5 p-4">
-                  <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Remarks / Terms</h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-line">{invoice.remarks}</p>
+              <div className="space-y-4">
+                {invoice.remarks ? (
+                  <div className="print-remarks rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/80 dark:bg-white/5 p-4">
+                    <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Remarks / Terms</h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-line">{invoice.remarks}</p>
+                  </div>
+                ) : (
+                  <div />
+                )}
+                <div className="invoice-signoff print-avoid-break text-sm">
+                  <p className="invoice-signoff-label text-gray-500 mb-8">Stamp & Signature</p>
+                  <div className="invoice-stamp-box rounded-lg border-2 border-dashed border-gray-400 dark:border-gray-500" />
                 </div>
-              ) : (
-                <div />
-              )}
+              </div>
               <div className="flex justify-end">
                 <div className="w-72 space-y-3 rounded-2xl bg-gray-50 dark:bg-white/5 p-4 border border-gray-100 dark:border-gray-800">
                   <div className="flex justify-between text-gray-500">
@@ -1039,12 +1045,14 @@ export default function ViewInvoiceModal({
             </div>
           )}
 
-          <div className="invoice-signoff print-avoid-break mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <div className="max-w-sm ml-auto text-sm">
-              <p className="invoice-signoff-label text-gray-500 mb-8">Stamp & Signature</p>
-              <div className="invoice-stamp-box rounded-lg border-2 border-dashed border-gray-400 dark:border-gray-500" />
+          {isLabourView && (
+            <div className="invoice-signoff print-avoid-break mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <div className="max-w-sm ml-auto text-sm">
+                <p className="invoice-signoff-label text-gray-500 mb-8">Stamp & Signature</p>
+                <div className="invoice-stamp-box rounded-lg border-2 border-dashed border-gray-400 dark:border-gray-500" />
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="invoice-actions flex justify-end gap-3 mt-8 pt-6 border-t print:hidden relative">
             <Button variant="outline" onClick={onClose}>Close</Button>
