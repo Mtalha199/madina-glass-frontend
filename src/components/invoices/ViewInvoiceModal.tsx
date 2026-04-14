@@ -201,12 +201,10 @@ export default function ViewInvoiceModal({
     });
 
     return Array.from(groups.entries()).map(([key, value]) => {
-      const splitAt = Math.ceil(value.items.length / 2);
       return {
         key,
+        items: value.items,
         totalQty: value.totalQty,
-        left: value.items.slice(0, splitAt),
-        right: value.items.slice(splitAt),
       };
     });
   }, [labourEntries]);
@@ -577,11 +575,6 @@ export default function ViewInvoiceModal({
             gap: 8px !important;
             align-items: start !important;
           }
-          #printable-invoice.print-labour-large .labour-two-col {
-            gap: 4px !important;
-            align-items: flex-start !important;
-            justify-content: flex-start !important;
-          }
           #printable-invoice.print-labour-large .labour-group-box {
             break-inside: avoid !important;
             page-break-inside: avoid !important;
@@ -614,7 +607,6 @@ export default function ViewInvoiceModal({
           }
           #printable-invoice.print-labour-large .labour-group-grid {
             padding: 4px !important;
-            gap: 4px !important;
             width: 100% !important;
             max-width: 100% !important;
           }
@@ -622,16 +614,12 @@ export default function ViewInvoiceModal({
             border: 2px solid #111 !important;
             border-radius: 0 !important;
             overflow: hidden !important;
-            width: auto !important;
-            min-width: 0 !important;
-          }
-          #printable-invoice.print-labour-large .labour-table-wrap.single-table {
-            width: auto !important;
+            width: 100% !important;
             max-width: 100% !important;
           }
           #printable-invoice.print-labour-large .labour-two-col-table th,
           #printable-invoice.print-labour-large .labour-two-col-table td {
-            font-size: 8.95px !important;
+            font-size: 10.4px !important;
             line-height: 0.98 !important;
             padding: 1px 2px !important;
             border: 1px solid #111 !important;
@@ -744,11 +732,11 @@ export default function ViewInvoiceModal({
 
               {ledgerError && <p className="p-4 text-sm text-red-600">{ledgerError}</p>}
 
-              {!ledgerError && !ledgerLoading && ledgerRows.length === 0 && (
+              {!ledgerError && !ledgerLoading && ledgerRows?.length === 0 && (
                 <p className="p-4 text-sm text-gray-500">No customer history found.</p>
               )}
 
-              {!ledgerError && !ledgerLoading && ledgerRows.length > 0 && (
+              {!ledgerError && !ledgerLoading && ledgerRows?.length > 0 && (
                 <div className="space-y-3 p-3 border-b border-gray-100 dark:border-gray-800">
                   <div className="grid grid-cols-1 md:grid-cols-5 gap-2">
                     <input
@@ -833,7 +821,7 @@ export default function ViewInvoiceModal({
                 </div>
               )}
 
-              {!ledgerError && !ledgerLoading && ledgerRows.length > 0 && (
+              {!ledgerError && !ledgerLoading && ledgerRows?.length > 0 && (
                 <div className="max-h-60 overflow-auto">
                   <table className="w-full text-sm text-gray-900 dark:text-white">
                     <thead className="sticky top-0 bg-white dark:bg-gray-900 z-10">
@@ -934,11 +922,6 @@ export default function ViewInvoiceModal({
           ) : (
             <div className="labour-groups-layout mb-6 grid grid-cols-1 items-start gap-3 md:grid-cols-2">
               {labourGroups.map((group, groupIdx) => (
-                (() => {
-                  const labourColumns = [group.left, group.right].filter((column: any[]) => column.length > 0);
-                  const visibleColumns = labourColumns.length > 0 ? labourColumns : [group.left];
-
-                  return (
                 <div
                   key={`labour-group-${group.key}-${groupIdx}`}
                   className="labour-group-box flex w-full max-w-full flex-col self-start overflow-hidden rounded-none border-2 border-gray-900 bg-white shadow-none dark:border-gray-200 dark:bg-gray-950"
@@ -946,65 +929,54 @@ export default function ViewInvoiceModal({
                   <div className="labour-group-title border-b-2 border-gray-900 bg-gray-100 px-3 py-1.5 text-sm font-bold uppercase tracking-[0.12em] text-black dark:border-gray-200 dark:bg-gray-900 dark:text-white">
                     {group.key}
                   </div>
-                  <div className="labour-group-grid labour-two-col flex w-full max-w-full flex-wrap items-start gap-2 p-2">
-                    {visibleColumns.map((column: any[], colIdx: number) => (
-                      <div
-                        key={`lab-col-wrap-${groupIdx}-${colIdx}`}
-                        className={`labour-table-wrap shrink-0 overflow-hidden rounded-none border-2 border-gray-900 dark:border-gray-200 ${
-                          visibleColumns.length === 1
-                            ? "single-table w-full max-w-full"
-                            : "w-full md:w-[48.5%] md:max-w-[48.5%]"
-                        }`}
-                      >
-                        <table key={`lab-col-${groupIdx}-${colIdx}`} className="labour-two-col-table w-full min-w-full border-collapse text-left">
-                          <thead>
-                            <tr className="bg-white text-[11px] uppercase text-black dark:bg-gray-950 dark:text-white">
-                              <th className="w-12 border border-gray-900 px-1.5 py-1 text-center font-extrabold dark:border-gray-200">sr#</th>
-                              <th className="border border-gray-900 px-1.5 py-1 text-center font-extrabold dark:border-gray-200">W</th>
-                              <th className="w-6 border border-gray-900 px-1 py-1 text-center font-extrabold dark:border-gray-200"></th>
-                              <th className="border border-gray-900 px-1.5 py-1 text-center font-extrabold dark:border-gray-200">H</th>
-                              <th className="w-12 border border-gray-900 px-1.5 py-1 text-center font-extrabold dark:border-gray-200">Qty</th>
+                  <div className="labour-group-grid w-full p-2">
+                    <div className="labour-table-wrap overflow-hidden rounded-none border-2 border-gray-900 dark:border-gray-200">
+                      <table className="labour-two-col-table w-full min-w-full border-collapse text-left">
+                        <thead>
+                          <tr className="bg-white text-[11px] uppercase text-black dark:bg-gray-950 dark:text-white">
+                            <th className="w-12 border border-gray-900 px-1.5 py-1 text-center font-extrabold dark:border-gray-200">sr#</th>
+                            <th className="border border-gray-900 px-1.5 py-1 text-center font-extrabold dark:border-gray-200">W</th>
+                            <th className="w-6 border border-gray-900 px-1 py-1 text-center font-extrabold dark:border-gray-200"></th>
+                            <th className="border border-gray-900 px-1.5 py-1 text-center font-extrabold dark:border-gray-200">H</th>
+                            <th className="w-12 border border-gray-900 px-1.5 py-1 text-center font-extrabold dark:border-gray-200">Qty</th>
+                          </tr>
+                        </thead>
+                        <tbody className="text-xs">
+                          {group?.items?.length === 0 ? (
+                            <tr>
+                              <td colSpan={5} className="border border-gray-900 px-2 py-2 text-center text-gray-400 dark:border-gray-200">
+                                —
+                              </td>
                             </tr>
-                          </thead>
-                          <tbody className="text-xs">
-                            {column.length === 0 ? (
-                              <tr>
-                                <td colSpan={5} className="border border-gray-900 px-2 py-2 text-center text-gray-400 dark:border-gray-200">
-                                  —
+                          ) : (
+                            group.items.map((item: any) => (
+                              <tr key={`lab-item-${groupIdx}-${item.__idx}`} className="bg-white dark:bg-gray-950">
+                                <td className="border border-gray-900 px-1.5 py-[3px] text-center text-[15px] font-bold text-black dark:border-gray-200 dark:text-white">
+                                  {item.SerialNum || item.__idx}
+                                </td>
+                                <td className="print-no-wrap border border-gray-900 px-1.5 py-[3px] text-center text-[15px] font-semibold text-black dark:border-gray-200 dark:text-white">
+                                  {item.width}
+                                </td>
+                                <td className="border border-gray-900 px-1 py-[3px] text-center text-[15px] font-bold text-black dark:border-gray-200 dark:text-white">
+                                  x
+                                </td>
+                                <td className="print-no-wrap border border-gray-900 px-1.5 py-[3px] text-center text-[15px] font-semibold text-black dark:border-gray-200 dark:text-white">
+                                  {item.height}
+                                </td>
+                                <td className="border border-gray-900 px-1.5 py-[3px] text-center text-[15px] font-extrabold text-black dark:border-gray-200 dark:text-white">
+                                  {Number(item.qtyPcs || 0).toLocaleString()}
                                 </td>
                               </tr>
-                            ) : (
-                              column.map((item: any) => (
-                                <tr key={`lab-item-${groupIdx}-${colIdx}-${item.__idx}`} className="bg-white dark:bg-gray-950">
-                                  <td className="border border-gray-900 px-1.5 py-[3px] text-center text-[13px] font-bold text-black dark:border-gray-200 dark:text-white">
-                                    {item.SerialNum || item.__idx}
-                                  </td>
-                                  <td className="print-no-wrap border border-gray-900 px-1.5 py-[3px] text-center text-[13px] font-semibold text-black dark:border-gray-200 dark:text-white">
-                                    {item.width}
-                                  </td>
-                                  <td className="border border-gray-900 px-1 py-[3px] text-center text-[13px] font-bold text-black dark:border-gray-200 dark:text-white">
-                                    x
-                                  </td>
-                                  <td className="print-no-wrap border border-gray-900 px-1.5 py-[3px] text-center text-[13px] font-semibold text-black dark:border-gray-200 dark:text-white">
-                                    {item.height}
-                                  </td>
-                                  <td className="border border-gray-900 px-1.5 py-[3px] text-center text-[13px] font-extrabold text-black dark:border-gray-200 dark:text-white">
-                                    {Number(item.qtyPcs || 0).toLocaleString()}
-                                  </td>
-                                </tr>
-                              ))
-                            )}
-                          </tbody>
-                        </table>
-                      </div>
-                    ))}
+                            ))
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                   <div className="labour-group-total flex justify-end border-t-2 border-gray-900 bg-gray-50 px-3 py-1.5 text-sm font-extrabold text-black dark:border-gray-200 dark:bg-gray-900 dark:text-white">
                     Total Qty: {Number(group.totalQty || 0).toLocaleString()}
                   </div>
                 </div>
-                  );
-                })()
               ))}
             </div>
           )}
