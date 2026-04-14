@@ -589,9 +589,9 @@ export default function ViewInvoiceModal({
             max-width: 100% !important;
           }
           #printable-invoice.print-labour-large .labour-group-title {
-            font-size: 9.9px !important;
-            line-height: 1.02 !important;
-            padding: 3px 6px !important;
+            font-size: 11.8px !important;
+            line-height: 1.1 !important;
+            padding: 5px 8px !important;
             border-bottom: 2px solid #111 !important;
             background: #f4f4f4 !important;
             font-weight: 700 !important;
@@ -599,8 +599,8 @@ export default function ViewInvoiceModal({
             color: #000 !important;
           }
           #printable-invoice.print-labour-large .labour-group-total {
-            font-size: 9.7px !important;
-            padding: 2px 6px !important;
+            font-size: 11.3px !important;
+            padding: 4px 8px !important;
             border-top: 2px solid #111 !important;
             background: #fafafa !important;
             color: #000 !important;
@@ -619,9 +619,9 @@ export default function ViewInvoiceModal({
           }
           #printable-invoice.print-labour-large .labour-two-col-table th,
           #printable-invoice.print-labour-large .labour-two-col-table td {
-            font-size: 10.4px !important;
-            line-height: 0.98 !important;
-            padding: 1px 2px !important;
+            font-size: 12.6px !important;
+            line-height: 1.08 !important;
+            padding: 3px 4px !important;
             border: 1px solid #111 !important;
             color: #000 !important;
           }
@@ -636,7 +636,7 @@ export default function ViewInvoiceModal({
           }
           #printable-invoice.print-labour-large .labour-two-col-table th {
             font-weight: 800 !important;
-            font-size: 8.9px !important;
+            font-size: 11.3px !important;
             text-transform: uppercase !important;
             color: #000 !important;
           }
