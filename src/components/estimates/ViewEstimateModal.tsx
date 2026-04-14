@@ -235,12 +235,15 @@ export default function ViewEstimateModal({ isOpen, onClose, estimateId, printRe
       clone.prepend(style);
       clone.querySelectorAll(".print\\:hidden").forEach((el) => el.remove());
       document.body.appendChild(clone);
+      await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
 
       const rect = clone.getBoundingClientRect();
       const captureWidth = Math.ceil(clone.scrollWidth || rect.width);
       const captureHeight = Math.ceil(clone.scrollHeight || rect.height);
+      const renderScale = 1.45;
+      const jpegQuality = 0.86;
       const canvas = await html2canvas(clone, {
-        scale: 2,
+        scale: renderScale,
         useCORS: true,
         backgroundColor: "#ffffff",
         width: captureWidth,
@@ -273,12 +276,12 @@ export default function ViewEstimateModal({ isOpen, onClose, estimateId, printRe
           ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
           ctx.drawImage(canvas, 0, -y);
         }
-        const imgData = pageCanvas.toDataURL("image/png");
+        const imgData = pageCanvas.toDataURL("image/jpeg", jpegQuality);
         if (pageIndex > 0) pdf.addPage();
         pdf.setFillColor(255, 255, 255);
         pdf.rect(0, 0, pageWidth, pageHeight, "F");
         const imgHeightMm = sliceHeight / scale;
-        pdf.addImage(imgData, "PNG", 0, 0, pageWidth, imgHeightMm);
+        pdf.addImage(imgData, "JPEG", 0, 0, pageWidth, imgHeightMm, undefined, "MEDIUM");
         y += sliceHeight - overlap;
         pageIndex += 1;
       }
