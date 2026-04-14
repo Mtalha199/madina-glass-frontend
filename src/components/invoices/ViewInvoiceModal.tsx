@@ -571,7 +571,17 @@ export default function ViewInvoiceModal({
           #printable-invoice.print-labour-large .print-meta h4 { font-size: 10px !important; }
           #printable-invoice.print-labour-large .print-meta .font-bold,
           #printable-invoice.print-labour-large .print-meta .font-medium { font-size: 11px !important; }
-          #printable-invoice.print-labour-large .labour-two-col { gap: 4px !important; }
+          #printable-invoice.print-labour-large .labour-groups-layout {
+            display: grid !important;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+            gap: 8px !important;
+            align-items: start !important;
+          }
+          #printable-invoice.print-labour-large .labour-two-col {
+            gap: 4px !important;
+            align-items: flex-start !important;
+            justify-content: flex-start !important;
+          }
           #printable-invoice.print-labour-large .labour-group-box {
             break-inside: avoid !important;
             page-break-inside: avoid !important;
@@ -580,6 +590,10 @@ export default function ViewInvoiceModal({
             border-radius: 0 !important;
             background: #fff !important;
             box-shadow: none !important;
+            display: flex !important;
+            flex-direction: column !important;
+            width: 100% !important;
+            max-width: 100% !important;
           }
           #printable-invoice.print-labour-large .labour-group-title {
             font-size: 9.9px !important;
@@ -601,11 +615,19 @@ export default function ViewInvoiceModal({
           #printable-invoice.print-labour-large .labour-group-grid {
             padding: 4px !important;
             gap: 4px !important;
+            width: 100% !important;
+            max-width: 100% !important;
           }
           #printable-invoice.print-labour-large .labour-table-wrap {
             border: 2px solid #111 !important;
             border-radius: 0 !important;
             overflow: hidden !important;
+            width: auto !important;
+            min-width: 0 !important;
+          }
+          #printable-invoice.print-labour-large .labour-table-wrap.single-table {
+            width: auto !important;
+            max-width: 100% !important;
           }
           #printable-invoice.print-labour-large .labour-two-col-table th,
           #printable-invoice.print-labour-large .labour-two-col-table td {
@@ -910,22 +932,31 @@ export default function ViewInvoiceModal({
               </tbody>
             </table>
           ) : (
-            <div className="mb-6 space-y-3">
+            <div className="labour-groups-layout mb-6 grid grid-cols-1 items-start gap-3 md:grid-cols-2">
               {labourGroups.map((group, groupIdx) => (
+                (() => {
+                  const labourColumns = [group.left, group.right].filter((column: any[]) => column.length > 0);
+                  const visibleColumns = labourColumns.length > 0 ? labourColumns : [group.left];
+
+                  return (
                 <div
                   key={`labour-group-${group.key}-${groupIdx}`}
-                  className="labour-group-box overflow-hidden rounded-none border-2 border-gray-900 bg-white shadow-none dark:border-gray-200 dark:bg-gray-950"
+                  className="labour-group-box flex w-full max-w-full flex-col self-start overflow-hidden rounded-none border-2 border-gray-900 bg-white shadow-none dark:border-gray-200 dark:bg-gray-950"
                 >
                   <div className="labour-group-title border-b-2 border-gray-900 bg-gray-100 px-3 py-1.5 text-sm font-bold uppercase tracking-[0.12em] text-black dark:border-gray-200 dark:bg-gray-900 dark:text-white">
                     {group.key}
                   </div>
-                  <div className="labour-group-grid labour-two-col grid grid-cols-1 gap-2 p-2 md:grid-cols-2">
-                    {[group.left, group.right].map((column: any[], colIdx: number) => (
+                  <div className="labour-group-grid labour-two-col flex w-full max-w-full flex-wrap items-start gap-2 p-2">
+                    {visibleColumns.map((column: any[], colIdx: number) => (
                       <div
                         key={`lab-col-wrap-${groupIdx}-${colIdx}`}
-                        className="labour-table-wrap overflow-hidden rounded-none border-2 border-gray-900 dark:border-gray-200"
+                        className={`labour-table-wrap shrink-0 overflow-hidden rounded-none border-2 border-gray-900 dark:border-gray-200 ${
+                          visibleColumns.length === 1
+                            ? "single-table w-full max-w-full"
+                            : "w-full md:w-[48.5%] md:max-w-[48.5%]"
+                        }`}
                       >
-                        <table key={`lab-col-${groupIdx}-${colIdx}`} className="labour-two-col-table w-full border-collapse text-left">
+                        <table key={`lab-col-${groupIdx}-${colIdx}`} className="labour-two-col-table w-full min-w-full border-collapse text-left">
                           <thead>
                             <tr className="bg-white text-[11px] uppercase text-black dark:bg-gray-950 dark:text-white">
                               <th className="w-12 border border-gray-900 px-1.5 py-1 text-center font-extrabold dark:border-gray-200">sr#</th>
@@ -972,6 +1003,8 @@ export default function ViewInvoiceModal({
                     Total Qty: {Number(group.totalQty || 0).toLocaleString()}
                   </div>
                 </div>
+                  );
+                })()
               ))}
             </div>
           )}
