@@ -240,8 +240,8 @@ export default function ViewEstimateModal({ isOpen, onClose, estimateId, printRe
       const rect = clone.getBoundingClientRect();
       const captureWidth = Math.ceil(clone.scrollWidth || rect.width);
       const captureHeight = Math.ceil(clone.scrollHeight || rect.height);
-      const renderScale = 1.45;
-      const jpegQuality = 0.86;
+      const renderScale = 1.2;
+      const jpegQuality = 0.7;
       const canvas = await html2canvas(clone, {
         scale: renderScale,
         useCORS: true,
@@ -254,7 +254,7 @@ export default function ViewEstimateModal({ isOpen, onClose, estimateId, printRe
         scrollY: -window.scrollY,
       });
       clone.remove();
-      const pdf = new jsPDF("p", "mm", "a4");
+      const pdf = new jsPDF({ orientation: "p", unit: "mm", format: "a4", compress: true });
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
       const scale = canvas.width / pageWidth;
@@ -281,7 +281,7 @@ export default function ViewEstimateModal({ isOpen, onClose, estimateId, printRe
         pdf.setFillColor(255, 255, 255);
         pdf.rect(0, 0, pageWidth, pageHeight, "F");
         const imgHeightMm = sliceHeight / scale;
-        pdf.addImage(imgData, "JPEG", 0, 0, pageWidth, imgHeightMm, undefined, "MEDIUM");
+        pdf.addImage(imgData, "JPEG", 0, 0, pageWidth, imgHeightMm, undefined, "FAST");
         y += sliceHeight - overlap;
         pageIndex += 1;
       }
@@ -344,6 +344,10 @@ export default function ViewEstimateModal({ isOpen, onClose, estimateId, printRe
               <div>
                 <h1 className="print-title text-3xl font-black tracking-tight text-brand-500 uppercase">Madina Glass</h1>
                 <p className="text-sm text-gray-500">Aluminium & Glass Works Specialist</p>
+                <div className="mt-2 space-y-0.5 text-sm text-gray-600 dark:text-gray-300">
+                  <p className="font-medium">Phone: 03240744007</p>
+                  <p>Address: Phalia Road, Near Total Petrol Pump, Mandi Bahauddin</p>
+                </div>
               </div>
               <span className="inline-block mt-3 px-3 py-1 rounded-full text-xs font-bold bg-brand-50 text-brand-600 dark:bg-brand-500/20 dark:text-brand-300 print:hidden">
                 ESTIMATE
