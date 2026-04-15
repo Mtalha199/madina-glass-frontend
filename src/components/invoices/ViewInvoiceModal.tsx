@@ -353,8 +353,10 @@ export default function ViewInvoiceModal({
       const rect = clone.getBoundingClientRect();
       const captureWidth = Math.ceil(clone.scrollWidth || rect.width);
       const captureHeight = Math.ceil(clone.scrollHeight || rect.height);
+      const renderScale = resolvedMode === "LABOUR" ? 1.28 : 1.22;
+      const jpegQuality = resolvedMode === "LABOUR" ? 0.72 : 0.7;
       const canvas = await html2canvas(clone, {
-        scale: 2,
+        scale: renderScale,
         useCORS: true,
         backgroundColor: "#ffffff",
         width: captureWidth,
@@ -365,7 +367,7 @@ export default function ViewInvoiceModal({
         scrollY: -window.scrollY,
       });
       clone.remove();
-      const pdf = new jsPDF("p", "mm", "a4");
+      const pdf = new jsPDF({ orientation: "p", unit: "mm", format: "a4", compress: true });
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
 
@@ -388,11 +390,11 @@ export default function ViewInvoiceModal({
             ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
             ctx.drawImage(canvas, 0, -y);
           }
-          const imgData = pageCanvas.toDataURL("image/png");
+          const imgData = pageCanvas.toDataURL("image/jpeg", jpegQuality);
           if (pageIndex > 0) pdf.addPage();
           pdf.setFillColor(255, 255, 255);
           pdf.rect(0, 0, pageWidth, pageHeight, "F");
-          pdf.addImage(imgData, "PNG", 0, 0, pageWidth, sliceHeight / scale);
+          pdf.addImage(imgData, "JPEG", 0, 0, pageWidth, sliceHeight / scale, undefined, "FAST");
           pageIndex += 1;
           const nextY = y + sliceHeight;
           if (nextY >= canvas.height) break;
@@ -407,7 +409,7 @@ export default function ViewInvoiceModal({
         const y = 0;
         pdf.setFillColor(255, 255, 255);
         pdf.rect(0, 0, pageWidth, pageHeight, "F");
-        pdf.addImage(canvas.toDataURL("image/png"), "PNG", x, y, renderWidth, renderHeight);
+        pdf.addImage(canvas.toDataURL("image/jpeg", jpegQuality), "JPEG", x, y, renderWidth, renderHeight, undefined, "FAST");
       }
 
       const safeNumber = invoice?.invoiceNumber || `INV-${invoice?.id || ""}`;
@@ -656,6 +658,10 @@ export default function ViewInvoiceModal({
               <div>
                 <h1 className="print-title text-3xl font-black tracking-tight text-brand-500 uppercase">Madina Glass</h1>
                 <p className="text-sm text-gray-500">Aluminium & Glass Works Specialist</p>
+                <div className="mt-2 space-y-0.5 text-sm text-gray-600 dark:text-gray-300">
+                  <p className="font-medium">Phone: 03240744007</p>
+                  <p>Address: Phalia Road, Near Total Petrol Pump, Mandi Bahauddin</p>
+                </div>
               </div>
               <span className="inline-block mt-3 px-3 py-1 rounded-full text-xs font-bold bg-brand-50 text-brand-600 dark:bg-brand-500/20 dark:text-brand-300 print:hidden">
                 {printMode} INVOICE VIEW

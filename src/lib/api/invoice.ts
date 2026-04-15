@@ -23,6 +23,7 @@ export interface InvoiceItem {
 export interface CreateInvoiceRequest {
   invoiceType?: "CUSTOMER" | "LABOUR";
   customerType: "CUSTOMER" | "WALKIN";
+  deliveryStatus?: "NOT_DELIVERED" | "DELIVERED";
   customerId?: number;
   name: string;
   phone: string;
