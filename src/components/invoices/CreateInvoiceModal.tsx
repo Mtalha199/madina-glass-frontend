@@ -166,6 +166,7 @@ export default function CreateInvoiceModal({ isOpen, onClose, onSuccess, presetC
 
   const [formData, setFormData] = useState<any>({
     customerType: presetCustomerType || "WALKIN",
+    deliveryStatus: "NOT_DELIVERED",
     customerId: undefined,
     name: "",
     phone: "",
@@ -471,6 +472,18 @@ export default function CreateInvoiceModal({ isOpen, onClose, onSuccess, presetC
             <div>
               <Label>Address</Label>
               <Input value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} />
+            </div>
+
+            <div>
+              <Label>Delivery</Label>
+              <Select
+                options={[
+                  { value: "NOT_DELIVERED", label: "Not Delivered" },
+                  { value: "DELIVERED", label: "Delivered" },
+                ]}
+                value={formData.deliveryStatus}
+                onChange={(value) => setFormData({ ...formData, deliveryStatus: value })}
+              />
             </div>
 
             <div>
