@@ -116,6 +116,7 @@ export default function EditInvoiceModal({ isOpen, onClose, invoiceId, onSuccess
         const inv = res?.data || res;
         setFormData({
           customerType: inv.customerType || "WALKIN",
+          deliveryStatus: inv.deliveryStatus || "NOT_DELIVERED",
           customerId: inv.customerId,
           name: inv.customer?.name || "",
           phone: inv.customer?.phone || "",
@@ -281,6 +282,17 @@ export default function EditInvoiceModal({ isOpen, onClose, invoiceId, onSuccess
               <div>
                 <Label>Address</Label>
                 <Input value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} />
+              </div>
+              <div>
+                <Label>Delivery</Label>
+                <Select
+                  options={[
+                    { value: "NOT_DELIVERED", label: "Not Delivered" },
+                    { value: "DELIVERED", label: "Delivered" },
+                  ]}
+                  value={formData.deliveryStatus}
+                  onChange={(value) => setFormData({ ...formData, deliveryStatus: value })}
+                />
               </div>
               <div>
                 <Label>Driver</Label>

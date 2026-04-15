@@ -29,6 +29,7 @@ export default function InvoicesList({
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [invoiceToDelete, setInvoiceToDelete] = useState<{ id: number; invoiceNumber: string } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [updatingDeliveryId, setUpdatingDeliveryId] = useState<number | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [actionMenu, setActionMenu] = useState<{ id: number; invoiceNumber: string; top: number; left: number } | null>(null);
   const [printRequest, setPrintRequest] = useState<{ key: number; mode: "CUSTOMER" | "LABOUR" } | null>(null);
@@ -81,6 +82,18 @@ export default function InvoicesList({
       setDeleteError("Failed to delete invoice. Please try again.");
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const handleUpdateDeliveryStatus = async (id: number, deliveryStatus: "NOT_DELIVERED" | "DELIVERED") => {
+    try {
+      setUpdatingDeliveryId(id);
+      await invoicesApi.updateInvoice(id, { deliveryStatus });
+      await fetchInvoices();
+    } catch {
+      setDeleteError("Failed to update delivery status. Please try again.");
+    } finally {
+      setUpdatingDeliveryId(null);
     }
   };
 
@@ -147,6 +160,7 @@ export default function InvoicesList({
                 <th className="px-6 py-4">Cutter / Driver</th>
                 <th className="px-6 py-4">Total Amount</th>
                 <th className="px-6 py-4">Status</th>
+                <th className="px-6 py-4">Delivery</th>
                 <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
@@ -172,6 +186,11 @@ export default function InvoicesList({
                      <Badge color={inv.balance <= 0 ? "success" : "warning"}>
                         {inv.balance <= 0 ? "Paid" : `Pending: Rs. ${inv.balance}`}
                      </Badge>
+                  </td>
+                  <td className="px-6 py-4">
+                    <Badge color={String(inv.deliveryStatus || "NOT_DELIVERED").toUpperCase() === "DELIVERED" ? "success" : "light"}>
+                      {String(inv.deliveryStatus || "NOT_DELIVERED").toUpperCase() === "DELIVERED" ? "Delivered" : "Not Delivered"}
+                    </Badge>
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex justify-end items-center gap-3">
@@ -239,6 +258,28 @@ export default function InvoicesList({
             className="block w-full text-left px-4 py-2 text-sm text-brand-500 hover:bg-brand-50 hover:text-brand-600 dark:text-brand-300 dark:hover:bg-brand-500/10"
           >
             Download Labour Invoice
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              handleUpdateDeliveryStatus(
+                actionMenu.id,
+                String(
+                  invoices.find((inv: any) => inv.id === actionMenu.id)?.deliveryStatus || "NOT_DELIVERED"
+                ).toUpperCase() === "DELIVERED"
+                  ? "NOT_DELIVERED"
+                  : "DELIVERED"
+              );
+              setActionMenu(null);
+            }}
+            disabled={updatingDeliveryId === actionMenu.id}
+            className="block w-full text-left px-4 py-2 text-sm text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700 disabled:opacity-60 dark:text-emerald-400 dark:hover:bg-emerald-500/10"
+          >
+            {updatingDeliveryId === actionMenu.id
+              ? "Updating Delivery..."
+              : String(invoices.find((inv: any) => inv.id === actionMenu.id)?.deliveryStatus || "NOT_DELIVERED").toUpperCase() === "DELIVERED"
+                ? "Mark as Not Delivered"
+                : "Mark as Delivered"}
           </button>
           <button
             type="button"
