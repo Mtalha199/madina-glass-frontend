@@ -31,7 +31,7 @@ export default function AuthLayout({
                   />
                 </Link>
                 <p className="text-center text-gray-400 dark:text-white/60">
-                Comprehensive Glass and Aluminium Business Management Platform
+                Comprehensive Glass and Aluminium Business Management Platform.
 
                 </p>
               </div>
