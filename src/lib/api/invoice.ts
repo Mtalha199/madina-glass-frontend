@@ -91,8 +91,8 @@ export const invoicesApi = {
     return response.data;
   },
 
-  getCustomerLedger: async (customerId: number) => {
-    const response = await apiClient.get(`/invoices/customer/${customerId}/ledger`);
+  getCustomerLedger: async (customerId: number, includeArchived = false) => {
+    const response = await apiClient.get(`/invoices/customer/${customerId}/ledger?includeArchived=${includeArchived ? "true" : "false"}`);
     return response.data;
   },
 

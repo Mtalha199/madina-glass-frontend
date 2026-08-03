@@ -39,6 +39,10 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
   const [ledgerEditError, setLedgerEditError] = useState<string | null>(null);
   const [deletingLedgerRow, setDeletingLedgerRow] = useState<any | null>(null);
   const [deletingLedgerPayment, setDeletingLedgerPayment] = useState(false);
+  const [closingLedger, setClosingLedger] = useState(false);
+  const [closeLedgerConfirmOpen, setCloseLedgerConfirmOpen] = useState(false);
+  const [ledgerCloseMode, setLedgerCloseMode] = useState<"HIDE" | "DELETE" | null>(null);
+  const [showArchivedLedger, setShowArchivedLedger] = useState(false);
   const [editPaymentForm, setEditPaymentForm] = useState({
     amount: "",
     method: "CASH",
@@ -60,13 +64,13 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
     return { debit: totals.debit, credit: totals.credit, running };
   }, [ledgerRows]);
 
-  const loadCustomerHistory = async () => {
+  const loadCustomerHistory = async (includeArchived = showArchivedLedger) => {
     if (!customerId) return;
     setLoading(true);
     try {
       const [customerRes, ledgerRes] = await Promise.all([
-        customersApi.getCustomerById(customerId),
-        invoicesApi.getCustomerLedger(customerId),
+        customersApi.getCustomerById(customerId, includeArchived),
+        invoicesApi.getCustomerLedger(customerId, includeArchived),
       ]);
       setData(customerRes.data || customerRes);
       const ledgerPayload = ledgerRes?.data || ledgerRes;
@@ -91,6 +95,9 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
       setEditingLedgerRow(null);
       setLedgerEditError(null);
       setDeletingLedgerRow(null);
+      setCloseLedgerConfirmOpen(false);
+      setLedgerCloseMode(null);
+      setShowArchivedLedger(false);
     }
   }, [isOpen]);
 
@@ -189,6 +196,31 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
     } finally {
       setDeletingLedgerPayment(false);
     }
+  };
+
+  const handleCloseLedger = async () => {
+    if (!customerId || !ledgerCloseMode) return;
+    try {
+      setClosingLedger(true);
+      await customersApi.closeLedger(customerId, ledgerCloseMode);
+      setCloseLedgerConfirmOpen(false);
+      setShowArchivedLedger(false);
+      await loadCustomerHistory(false);
+      onPaymentSaved?.();
+    } finally {
+      setClosingLedger(false);
+    }
+  };
+
+  const openCloseLedgerConfirm = (mode: "HIDE" | "DELETE") => {
+    setLedgerCloseMode(mode);
+    setCloseLedgerConfirmOpen(true);
+  };
+
+  const toggleArchivedLedger = async () => {
+    const next = !showArchivedLedger;
+    setShowArchivedLedger(next);
+    await loadCustomerHistory(next);
   };
 
   const waitForRender = () =>
@@ -1007,6 +1039,19 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
                 onChange={(e) => setPaymentForm((p) => ({ ...p, notes: e.target.value }))}
               />
             </div>
+            {data?.ledgerClosedAt ? (
+              <div className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+                Ledger {data.ledgerClosedMode === "DELETE" ? "deleted" : "closed"} on {new Date(data.ledgerClosedAt).toLocaleString()}.
+                {data.ledgerClosedByAdmin?.name ? ` Closed by ${data.ledgerClosedByAdmin.name}.` : ""}
+              </div>
+            ) : null}
+            {data?.ledgerClosedMode === "HIDE" ? (
+              <div className="mt-3 flex justify-end mb-3">
+                <Button variant="outline" onClick={toggleArchivedLedger}>
+                  {showArchivedLedger ? "Show Current Ledger" : "View Archived Ledger"}
+                </Button>
+              </div>
+            ) : null}
             <div id="customer-history-ledger" className="rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
               <div className="max-h-72 overflow-auto">
                 <table className="w-full text-sm text-gray-900 dark:text-white">
@@ -1089,7 +1134,25 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
             </div>
           </>
         )}
-        <div className="mt-8 flex justify-end">
+        <div className="mt-8 flex justify-end gap-3">
+          {!data?.ledgerClosedAt ? (
+            <>
+              <Button
+                onClick={() => openCloseLedgerConfirm("HIDE")}
+                variant="outline"
+                disabled={closingLedger}
+              >
+                {closingLedger && ledgerCloseMode === "HIDE" ? "Hiding..." : "Hide Ledger"}
+              </Button>
+              <Button
+                onClick={() => openCloseLedgerConfirm("DELETE")}
+                variant="outline"
+                disabled={closingLedger}
+              >
+                {closingLedger && ledgerCloseMode === "DELETE" ? "Deleting..." : "Delete Ledger"}
+              </Button>
+            </>
+          ) : null}
           <Button onClick={onClose} variant="outline">Close Ledger</Button>
         </div>
       </div>
@@ -1187,6 +1250,23 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
         cancelLabel="Cancel"
         variant="danger"
         isLoading={deletingLedgerPayment}
+      />
+      <ConfirmModal
+        isOpen={closeLedgerConfirmOpen}
+        onClose={() => {
+          if (!closingLedger) setCloseLedgerConfirmOpen(false);
+        }}
+        onConfirm={handleCloseLedger}
+        title={ledgerCloseMode === "DELETE" ? "Delete customer ledger?" : "Hide customer ledger?"}
+        message={
+          ledgerCloseMode === "DELETE"
+            ? "This will permanently delete all invoices, invoice items, and ledger payments for this customer, but the customer record will stay saved."
+            : "This will hide older invoices and payments from the default ledger view, but the records will stay saved in the database and can be viewed again."
+        }
+        confirmLabel={ledgerCloseMode === "DELETE" ? (closingLedger ? "Deleting..." : "Delete Ledger") : (closingLedger ? "Hiding..." : "Hide Ledger")}
+        cancelLabel="Cancel"
+        variant="default"
+        isLoading={closingLedger}
       />
     </Modal>
   );
