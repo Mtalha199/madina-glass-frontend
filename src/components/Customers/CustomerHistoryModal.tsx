@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Modal } from "../ui/modal";
 import Button from "../ui/button/Button";
 
@@ -34,6 +34,10 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
   const [showPrintOptions, setShowPrintOptions] = useState(false);
   const [showDownloadOptions, setShowDownloadOptions] = useState(false);
   const [downloadingPdf, setDownloadingPdf] = useState(false);
+  const [downloadFromDate, setDownloadFromDate] = useState("");
+  const [downloadToDate, setDownloadToDate] = useState("");
+  const downloadFromRef = useRef<HTMLInputElement | null>(null);
+  const downloadToRef = useRef<HTMLInputElement | null>(null);
   const [editingLedgerRow, setEditingLedgerRow] = useState<any | null>(null);
   const [savingLedgerEdit, setSavingLedgerEdit] = useState(false);
   const [ledgerEditError, setLedgerEditError] = useState<string | null>(null);
@@ -92,6 +96,8 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
       setSelectedInvoiceId(null);
       setShowPrintOptions(false);
       setShowDownloadOptions(false);
+      setDownloadFromDate("");
+      setDownloadToDate("");
       setEditingLedgerRow(null);
       setLedgerEditError(null);
       setDeletingLedgerRow(null);
@@ -217,10 +223,34 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
     setCloseLedgerConfirmOpen(true);
   };
 
+  const getFilteredInvoicesForDownload = () => {
+    const invoices = Array.isArray(data?.invoices) ? data.invoices : [];
+    const from = downloadFromDate ? new Date(`${downloadFromDate}T00:00:00`) : null;
+    const to = downloadToDate ? new Date(`${downloadToDate}T23:59:59.999`) : null;
+
+    return invoices.filter((inv: any) => {
+      const createdAt = new Date(inv?.createdAt || inv?.date || Date.now());
+      if (Number.isNaN(createdAt.getTime())) return false;
+      if (from && createdAt < from) return false;
+      if (to && createdAt > to) return false;
+      return true;
+    });
+  };
+
   const toggleArchivedLedger = async () => {
     const next = !showArchivedLedger;
     setShowArchivedLedger(next);
     await loadCustomerHistory(next);
+  };
+
+  const openNativeDatePicker = (ref: React.RefObject<HTMLInputElement | null>) => {
+    const input = ref.current;
+    if (!input) return;
+    input.focus();
+    const picker = (input as HTMLInputElement & { showPicker?: () => void }).showPicker;
+    if (typeof picker === "function") {
+      picker.call(input);
+    }
   };
 
   const waitForRender = () =>
@@ -307,7 +337,11 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
     #customer-history-printable .invoice-print-summary .summary-row.balance { font-weight: 700; color: #b91c1c; }
   `;
 
-  const buildPrintRoot = (mode: "LEDGER" | "INVOICES" | "ALL", includeCaptureStyles = false) => {
+  const buildPrintRoot = (
+    mode: "LEDGER" | "INVOICES" | "ALL",
+    includeCaptureStyles = false,
+    invoicesOverride?: any[] | null,
+  ) => {
     const ledgerNode = document.getElementById("customer-history-ledger");
     const invoicesNode = document.getElementById("customer-history-invoices");
     if (!ledgerNode || !invoicesNode) return null;
@@ -386,7 +420,11 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
       const invoicesSection = document.createElement("div");
       invoicesSection.className = "invoices-print-section";
       invoicesSection.style.marginTop = "16px";
-      const invoices = Array.isArray(data?.invoices) ? data.invoices : [];
+      const invoices = Array.isArray(invoicesOverride)
+        ? invoicesOverride
+        : Array.isArray(data?.invoices)
+          ? data.invoices
+          : [];
       const invoiceBlocks = invoices
         .map((inv: any) => {
           const items = Array.isArray(inv?.items) ? inv.items : [];
@@ -538,7 +576,8 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
     if (downloadingPdf) return;
     setDownloadingPdf(true);
     try {
-      const printRoot = buildPrintRoot(mode, true);
+      const filteredInvoices = mode === "LEDGER" ? null : getFilteredInvoicesForDownload();
+      const printRoot = buildPrintRoot(mode, true, filteredInvoices);
       if (!printRoot) return;
 
       const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
@@ -654,7 +693,17 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
 
       printRoot.remove();
 
-      const fileSuffix = mode === "LEDGER" ? "LEDGER" : mode === "INVOICES" ? "INVOICES" : "ALL";
+      const hasDateRange = Boolean(downloadFromDate || downloadToDate);
+      const fileSuffix =
+        mode === "LEDGER"
+          ? "LEDGER"
+          : mode === "INVOICES"
+            ? hasDateRange
+              ? `INVOICES_${downloadFromDate || "START"}_${downloadToDate || "END"}`
+              : "INVOICES"
+            : hasDateRange
+              ? `ALL_${downloadFromDate || "START"}_${downloadToDate || "END"}`
+              : "ALL";
       const safeName = data?.name ? String(data.name).replace(/\s+/g, "_") : "Customer";
       pdf.save(`${safeName}-${fileSuffix}.pdf`);
     } catch (error) {
@@ -830,7 +879,59 @@ export default function CustomerHistoryModal({ isOpen, onClose, customerId, onPa
                     {downloadingPdf ? "Preparing..." : "Download"}
                   </Button>
                   {showDownloadOptions && (
-                    <div className="absolute right-0 mt-2 w-56 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-lg p-2 z-20">
+                    <div className="absolute right-0 mt-2 w-72 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-lg p-3 z-20">
+                      <div className="grid grid-cols-2 gap-2 mb-3">
+                        <label className="text-xs">
+                          <span className="block mb-1 text-gray-500 dark:text-gray-400">From</span>
+                          <div className="relative">
+                            <input
+                              type="date"
+                              ref={downloadFromRef}
+                              className="w-full rounded-lg border border-gray-200 dark:border-gray-800 bg-transparent px-2 py-2 pr-9 text-sm"
+                              value={downloadFromDate}
+                              onChange={(e) => setDownloadFromDate(e.target.value)}
+                              onClick={() => openNativeDatePicker(downloadFromRef)}
+                              onFocus={() => openNativeDatePicker(downloadFromRef)}
+                            />
+                            <button
+                              type="button"
+                              className="absolute inset-y-0 right-2 flex items-center text-gray-400"
+                              onClick={() => openNativeDatePicker(downloadFromRef)}
+                              aria-label="Open from date picker"
+                            >
+                              <svg viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                <rect x="3" y="4" width="18" height="17" rx="2" />
+                                <path d="M8 2v4M16 2v4M3 10h18" />
+                              </svg>
+                            </button>
+                          </div>
+                        </label>
+                        <label className="text-xs">
+                          <span className="block mb-1 text-gray-500 dark:text-gray-400">To</span>
+                          <div className="relative">
+                            <input
+                              type="date"
+                              ref={downloadToRef}
+                              className="w-full rounded-lg border border-gray-200 dark:border-gray-800 bg-transparent px-2 py-2 pr-9 text-sm"
+                              value={downloadToDate}
+                              onChange={(e) => setDownloadToDate(e.target.value)}
+                              onClick={() => openNativeDatePicker(downloadToRef)}
+                              onFocus={() => openNativeDatePicker(downloadToRef)}
+                            />
+                            <button
+                              type="button"
+                              className="absolute inset-y-0 right-2 flex items-center text-gray-400"
+                              onClick={() => openNativeDatePicker(downloadToRef)}
+                              aria-label="Open to date picker"
+                            >
+                              <svg viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                <rect x="3" y="4" width="18" height="17" rx="2" />
+                                <path d="M8 2v4M16 2v4M3 10h18" />
+                              </svg>
+                            </button>
+                          </div>
+                        </label>
+                      </div>
                       <button
                         type="button"
                         className="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-gray-50 dark:hover:bg-white/5"
