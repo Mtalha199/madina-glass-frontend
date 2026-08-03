@@ -26,12 +26,13 @@ export default function AuthLayout({
                     width={231}
                     height={48}
                     draggable={false}
-                    src="/images/logo/logo.svg"
+                    src="/images/logo/logo4.jpeg"
                     alt="Logo"
                   />
                 </Link>
                 <p className="text-center text-gray-400 dark:text-white/60">
-                Comprehensive Vehicle Tracking and Fleet Management Platform
+                Comprehensive Glass and Aluminium Business Management Platform
+
                 </p>
               </div>
             </div>
