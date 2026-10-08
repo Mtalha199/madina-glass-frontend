@@ -99,7 +99,11 @@ const navItems: NavItem[] = [
       },
       {
         name: "Aluminium",
-        path: "/admin/vessels",
+        path: "/admin/aluminium",
+      },
+      {
+        name: "Companies",
+        path: "/admin/aluminium/companies",
       },
     ],
   },
